@@ -10,7 +10,6 @@ class AveluneBattleUI {
     this.onSound = onSound;
     this.root = document.getElementById('battle-screen');
     this.active = false;
-    this.images = new Map();
     this.reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.fast = false;
     this.frameId = 0;
@@ -50,7 +49,7 @@ class AveluneBattleUI {
     this.menu = 'main';
     this.pending = null;
     this.summary = null;
-    this.displayParty = null; this.displayEnemies = null;
+    this.displayParty = null; this.displayEnemies = null; this.displayRound = null;
     this.logs = [{text: spec.boss ? 'A guardian stands across the road.' : 'Your party readies for battle.', kind:'intro'}];
     this.selectedEnemy = -1;
     this.highlight = null;
@@ -59,7 +58,7 @@ class AveluneBattleUI {
     this.root.setAttribute('role', 'dialog');
     this.root.setAttribute('aria-modal', 'true');
     this.root.setAttribute('aria-label', 'Turn-based battle');
-    this.root.innerHTML = '<div class="battle-window"><header class="battle-header"><div><p class="battle-eyebrow" id="battle-type"></p><h2 id="battle-name"></h2></div><div class="battle-round"><span id="battle-round-label"></span><button type="button" id="battle-speed" aria-label="Toggle battle animation speed">1× speed</button></div></header><div class="battle-stage"><canvas id="battle-canvas" width="640" height="236" aria-label="Enemies stand on the left and your party on the right"></canvas><div class="battle-encounter-tag" id="battle-intent"></div><div class="battle-enemy-list" id="battle-enemy-list"></div></div><div class="battle-party" id="battle-party"></div><div class="battle-bottom"><section class="battle-command-panel" aria-labelledby="battle-command-title"><div class="battle-panel-heading"><div><p id="battle-command-eyebrow"></p><h3 id="battle-command-title"></h3></div><button type="button" id="battle-back" aria-label="Go back or undo last command">← Back</button></div><div id="battle-options"></div></section><section class="battle-log-panel" aria-labelledby="battle-log-title"><p class="battle-eyebrow" id="battle-log-title">FIELD CHRONICLE</p><div id="battle-log" role="log" aria-live="polite" aria-relevant="additions text"></div><p class="battle-controls">Choose every order, then resolve the round.</p></section></div></div>';
+    this.root.innerHTML = '<div class="battle-window"><header class="battle-header"><div><p class="battle-eyebrow" id="battle-type"></p><h2 id="battle-name"></h2></div><div class="battle-round"><span id="battle-round-label"></span><button type="button" id="battle-speed" aria-label="Toggle battle animation speed">1× speed</button></div></header><div class="battle-stage"><canvas id="battle-canvas" width="320" height="144" aria-label="Enemies stand on the left and your party on the right"></canvas></div><div class="battle-roster"><div class="battle-encounter-tag" id="battle-intent"></div><div class="battle-enemy-list" id="battle-enemy-list"></div></div><div class="battle-party" id="battle-party"></div><div class="battle-bottom"><section class="battle-command-panel" aria-labelledby="battle-command-title"><div class="battle-panel-heading"><div><p id="battle-command-eyebrow"></p><h3 id="battle-command-title"></h3></div><button type="button" id="battle-back" aria-label="Go back or undo last command">← Back</button></div><div id="battle-options"></div></section><section class="battle-log-panel" aria-labelledby="battle-log-title"><p class="battle-eyebrow" id="battle-log-title">FIELD CHRONICLE</p><div id="battle-log" role="log" aria-live="polite" aria-relevant="additions text"></div><p class="battle-controls">Choose every order, then resolve the round.</p></section></div></div>';
     this.canvas = this.root.querySelector('#battle-canvas');
     this.ctx = this.canvas.getContext('2d', {alpha:false});
     this.ctx.imageSmoothingEnabled = false;
@@ -69,7 +68,10 @@ class AveluneBattleUI {
     });
     this.el('battle-speed').textContent = this.fast ? '2× speed' : '1× speed';
     this.el('battle-back').addEventListener('click', () => this.back());
-    this.loadImages();
+    this.stageObserver?.disconnect();
+    this.stageObserver = new ResizeObserver(() => this.fitStage());
+    this.stageObserver.observe(this.canvas.parentElement);
+    this.fitStage();
     this.render();
     this.onSound('battle');
     const animate = time => {
@@ -83,20 +85,19 @@ class AveluneBattleUI {
 
   el(id) { return this.root.querySelector('#' + id); }
 
-  loadImages() {
-    if (typeof ART !== 'undefined' && ART.landscape && !this.images.has('landscape')) {
-      const landscape = new Image();
-      landscape.src = ART.landscape;
-      this.images.set('landscape',landscape);
-    }
-    for (const hero of this.rpg.party) {
-      const id = hero.id === 'keeper' ? 'roadkeeper' : hero.id;
-      const url = typeof ART !== 'undefined' && ART.heroes ? ART.heroes[id] : null;
-      if (!url || this.images.has(id)) continue;
-      const img = new Image();
-      img.src = url;
-      this.images.set(id, img);
-    }
+  fitStage() {
+    // Keep one art pixel equal to a whole number of screen pixels at every width.
+    // The battlefield gains horizontal space on wide screens instead of stretching.
+    if (!this.active || !this.canvas) return;
+    const available = this.canvas.parentElement.clientWidth;
+    const scale = available >= 640 ? 2 : 1;
+    const width = Math.max(1, Math.floor(available / scale));
+    if (this.canvas.width !== width) this.canvas.width = width;
+    this.canvas.height = 144;
+    this.canvas.style.width = width * scale + 'px';
+    this.canvas.style.height = 144 * scale + 'px';
+    this.canvas.parentElement.style.height = 144 * scale + 'px';
+    this.ctx.imageSmoothingEnabled = false;
   }
 
   alive() { return this.rpg.party.map((hero,index) => hero.hp > 0 ? index : -1).filter(index => index >= 0); }
@@ -114,6 +115,7 @@ class AveluneBattleUI {
   queue(command) {
     if (this.phase !== 'command' || this.actor < 0) return;
     this.commands[this.actor] = command;
+    this.selectedEnemy = -1;
     this.pending = null;
     this.menu = 'main';
     this.actor = this.rpg.party.findIndex((hero,index) => hero.hp > 0 && !this.commands[index]);
@@ -169,9 +171,9 @@ class AveluneBattleUI {
     const result = this.phase === 'result';
     this.el('battle-type').textContent = result ? 'THE ROAD CONTINUES' : this.spec.boss ? 'GUARDIAN ENCOUNTER' : 'WILDERNESS ENCOUNTER';
     this.el('battle-name').textContent = result ? {victory:'Victory',defeat:'A light still burns',fled:'A narrow escape'}[this.summary?.outcome] ?? 'The battle ends' : this.spec.name ?? 'An unexpected encounter';
-    this.el('battle-round-label').textContent = 'ROUND ' + (this.encounter?.round ?? 1);
+    this.el('battle-round-label').textContent = 'ROUND ' + (this.displayRound ?? this.encounter?.round ?? 1);
     const heavy = this.enemies().filter(enemy => enemy.hp > 0 && /heavy|gather|charge/i.test(enemy.intent ?? ''));
-    this.el('battle-intent').textContent = result ? '' : heavy.length ? '⚠ Power gathers · Guard against the next strike' : this.spec.boss ? 'A guardian blocks the way. Escape is impossible.' : 'Victory opens the road. Retreat is possible.';
+    this.el('battle-intent').textContent = result ? 'ENCOUNTER COMPLETE' : heavy.length ? 'POWER GATHERS · Guard against the next strike' : this.spec.boss ? 'GUARDIAN · This road must be won' : 'ENEMIES · Select a foe to attack';
     this.el('battle-intent').classList.toggle('battle-danger', heavy.length > 0);
     this.renderEnemyList();
     this.renderParty();
@@ -224,7 +226,7 @@ class AveluneBattleUI {
       fill.style.width = Math.max(0,Math.min(100,hero.hp/hero.maxHp*100)) + '%';
       track.append(fill);
       const charges = hero.charges ?? [0,0];
-      card.append(hp,track,this.node('span','I ' + charges[0] + '   /   II ' + charges[1], 'battle-charges'),this.node('span',hero.hp <= 0 ? 'Fallen' : this.commandName(this.commands[index]),'battle-order'));
+      card.append(hp,track,this.node('span','MP  I ' + charges[0] + '  II ' + charges[1], 'battle-charges'),this.node('span',hero.hp <= 0 ? 'Fallen' : this.commandName(this.commands[index]),'battle-order'));
       card.addEventListener('click', () => {
         if (this.menu === 'target' && this.targetSide === 'party') {
           if (this.validAllyTarget(hero)) this.chooseTarget(index);
@@ -349,28 +351,48 @@ class AveluneBattleUI {
     this.menu = 'main';
     this.selectedEnemy = -1;
     const run = this.token;
+    this.displayRound = this.encounter.round;
     this.displayParty = this.rpg.party.map(hero => ({...hero, charges:[...hero.charges]}));
     this.displayEnemies = this.encounter.enemies.map(enemy => ({...enemy}));
     const round = this.rpg.resolveRound(this.commands.map(command => command ?? {type:'guard'}));
     this.encounter = this.rpg.battle ?? this.encounter;
     this.render();
+    const presentedOrders = new Set();
     for (const event of round.events ?? []) {
       if (!this.active || run !== this.token) return;
+      const duration = this.reduce ? 60 : this.fast ? 190 : 390;
+      const started = performance.now();
       this.logs.push(event);
-      this.highlight = {...event, until:performance.now() + 290};
-      this.renderLog();
-      this.onSound(event.kind === 'heal' ? 'heal' : event.kind === 'spell' ? 'magic' : /damage|attack|hit/.test(event.kind ?? '') ? 'hit' : 'select');
-      await new Promise(resolve => setTimeout(resolve,this.reduce ? 60 : this.fast ? 160 : 330));
-      if (event.targetSide && event.amount) {
-        const target=(event.targetSide==='party'?this.displayParty:this.displayEnemies)?.[event.targetIndex];
-        if(target) target.hp=Math.min(target.maxHp,Math.max(0,target.hp+(event.kind==='heal'?event.amount:-event.amount)));
+      this.highlight = {...event, started, duration, until:started + duration};
+      if (event.actorSide === 'party' && !presentedOrders.has(event.actorIndex)) {
+        presentedOrders.add(event.actorIndex);
+        const command = this.commands[event.actorIndex];
+        const hero = this.displayParty[event.actorIndex];
+        if (command?.type === 'spell' && event.kind !== 'miss') {
+          const tier = (this.spell(command.spell)?.tier ?? 1) - 1;
+          hero.charges[tier] = Math.max(0, hero.charges[tier] - 1);
+        }
+        if (command?.item === 'ether' && event.kind === 'heal') {
+          const target = this.displayParty[event.targetIndex];
+          if (target) target.charges = target.charges.map((value,tier) => Math.min(target.maxCharges[tier],value + 2));
+        }
       }
-      if(event.kind==='down' && event.targetSide==='party')this.displayParty[event.targetIndex].hp=0;
-      this.renderParty(); this.renderEnemyList();
+      // Show the hit and its health change together; do not show the round's final
+      // health before its actions have played. Ether restores charges, not HP.
+      if (event.targetSide && event.amount && !/spell charges/i.test(event.text || '')) {
+        const target = (event.targetSide === 'party' ? this.displayParty : this.displayEnemies)?.[event.targetIndex];
+        if (target) target.hp = Math.min(target.maxHp, Math.max(0, target.hp + (event.kind === 'heal' ? event.amount : -event.amount)));
+      }
+      if (event.kind === 'down' && event.targetSide === 'party') this.displayParty[event.targetIndex].hp = 0;
+      this.renderLog();
+      this.renderParty();
+      this.renderEnemyList();
+      this.onSound(event.kind === 'heal' ? 'heal' : event.kind === 'spell' ? 'magic' : /damage|attack|hit/.test(event.kind ?? '') ? 'hit' : 'select');
+      await new Promise(resolve => setTimeout(resolve, duration));
     }
-    this.highlight = null;
-    this.displayParty=null; this.displayEnemies=null;
     if (!this.active || run !== this.token) return;
+    this.highlight = null;
+    this.displayParty = null; this.displayEnemies = null; this.displayRound = null;
     if (round.outcome) {
       this.summary = this.rpg.finishBattle();
       this.summary.outcome = this.summary.outcome ?? round.outcome;
@@ -410,6 +432,7 @@ class AveluneBattleUI {
     this.active = false;
     this.token++;
     cancelAnimationFrame(this.frameId);
+    this.stageObserver?.disconnect();
     this.root.hidden = true;
     const result = {outcome:this.summary.outcome,rewards:{xp:this.summary.xp ?? 0,gold:this.summary.gold ?? 0},summary:this.summary,spec:this.spec};
     this.focusBefore?.focus?.({preventScroll:true});
@@ -444,116 +467,174 @@ class AveluneBattleUI {
   draw(time) {
     if (!this.ctx) return;
     const ctx = this.ctx;
-    const w = 640, h = 236;
-    const boss = this.spec.boss;
-    const backdrop = this.spec.backdrop || 'orchard';
-    const palettes = {orchard:['#233d49','#42616a','#78908a','#3b6161','#425e40','#4f6c46','#354f38','#638056'],water:['#173447','#32596b','#71a8ab','#295a6e','#2c6074','#387588','#204958','#689fa6'],coast:['#263d63','#547c94','#a7c9c1','#487884','#67765b','#879574','#536550','#c3c79a'],desert:['#4f4b70','#aa8991','#dcc59e','#ad8e78','#a98255','#ba9863','#8c6b49','#d9b777'],snow:['#253d5b','#5a7893','#b8d3d9','#728c9f','#92acb5','#bfd0ce','#7796aa','#e2e5d4'],cavern:['#131c2f','#283349','#505369','#373e53','#3e4651','#4e5361','#303a48','#77808a'],pale:['#292743','#595471','#a397b5','#76677f','#626775','#7d8291','#4f586e','#aba8be']};
-    const colors=palettes[backdrop]||palettes.orchard;
-    const phase = this.reduce ? 0 : time / 1000;
-    ctx.fillStyle = boss ? '#15192d' : colors[0]; ctx.fillRect(0,0,w,h);
-    ctx.fillStyle = boss ? '#283650' : colors[1]; ctx.fillRect(0,45,w,76);
-    ctx.fillStyle = boss ? '#46516b' : colors[2]; ctx.fillRect(0,97,w,24);
-    // Deliberate stepped silhouettes keep the battlefield on the same pixel grid.
-    for (let i = 0; i < 11; i++) {
-      const x = i * 69 - 29;
-      const rise = 26 + (i * 17) % 33;
-      ctx.fillStyle = boss ? '#303e57' : colors[3];
-      for (let step = 0; step < 7; step++) ctx.fillRect(x + step * 5, 112 - rise + step * 4, 70 - step * 8, rise - step * 4 + 4);
-    }
-    ctx.fillStyle = boss ? '#30383e' : colors[4]; ctx.fillRect(0,121,w,h-121);
-    ctx.fillStyle = boss ? '#39454d' : colors[5]; ctx.fillRect(0,139,w,28);
-    ctx.fillStyle = boss ? '#263039' : colors[6]; ctx.fillRect(0,189,w,47);
-    for (let i = 0; i < 85; i++) {
-      const x = (i * 97 + 17) % w;
-      const y = 132 + ((i * 41) % 102);
-      ctx.fillStyle = i % 3 ? (boss ? '#46515a' : colors[7]) : (boss ? '#222d35' : '#263f32');
-      ctx.fillRect(x,y,3 + i%4,1);
-    }
-    const landscape = this.images.get('landscape');
-    if (!boss && backdrop==='orchard' && landscape?.complete && landscape.naturalWidth) {
-      const sourceHeight = Math.round(landscape.naturalWidth*h/w);
-      const sourceY = Math.min(landscape.naturalHeight-sourceHeight,Math.round(landscape.naturalHeight*.32));
-      ctx.drawImage(landscape,0,sourceY,landscape.naturalWidth,sourceHeight,0,0,w,h);
-      ctx.fillStyle='#12292c30';ctx.fillRect(0,0,w,h);
-    }
-    if(!boss && ['water','coast'].includes(backdrop)){ctx.fillStyle='#9ac1bd';for(let i=0;i<24;i++)ctx.fillRect((i*47+Math.round(phase)*3)%640,130+(i*29)%90,13,1);}
-    if(!boss && backdrop==='pale'){ctx.strokeStyle='#b4a0cb';ctx.lineWidth=3;ctx.beginPath();ctx.arc(300,80,62,Math.PI,Math.PI*2);ctx.stroke();}
-    if (!boss && backdrop==='snow'){ctx.fillStyle='#e9e8d8';for(let i=0;i<45;i++)ctx.fillRect((i*53)%640,(i*41+Math.round(phase*3))%236,2,2);}
-    if (boss) {
-      for (const x of [30,280,603]) {
-        ctx.fillStyle='#1a2533';ctx.fillRect(x,60,12,76);
-        ctx.fillStyle='#596575';ctx.fillRect(x-4,57,20,5);
-        ctx.fillStyle='#cfaf6e';ctx.fillRect(x+4,78,4,10);
-        ctx.fillStyle='#efe1a3';ctx.fillRect(x+5,78,2,5);
-      }
-    }
+    const w = this.canvas.width, h = this.canvas.height;
+    const event = this.highlight?.until > time ? this.highlight : null;
+    const progress = event ? Math.min(1, (time - event.started) / event.duration) : 0;
+    this.drawBackdrop(ctx, w, h, time);
     const foes = this.enemies();
+    const positions = foes.map((enemy,index) => {
+      if (foes.length === 1) return {x:Math.round(w * .29), y:119};
+      if (foes.length === 2) return {x:Math.round(w * (.2 + index * .19)), y:107 + index * 20};
+      return {x:Math.round(w * (.17 + (index % 2) * .2)), y:91 + Math.floor(index / 2) * 35};
+    });
     foes.forEach((enemy,index) => {
-      const count = foes.length;
-      let x, y;
-      if (count === 1) { x=190; y=188; }
-      else if (count === 2) { x=112 + index*133; y=165 + index*29; }
-      else { x=97 + (index%2)*128; y=151 + Math.floor(index/2)*48; }
-      if (enemy.hp <= 0) return;
-      const pulse = this.reduce ? 0 : Math.round(Math.sin(phase*2 + index)*1);
-      const selected = this.selectedEnemy === index;
-      const struck = this.highlight?.targetSide === 'enemy' && this.highlight.targetIndex === index && this.highlight.until > time;
-      ctx.fillStyle = '#101d2790';ctx.fillRect(x-21,y-2,42,5);
-      if (selected) {
-        ctx.fillStyle='#f1d591';ctx.fillRect(x-25,y+7,50,2);
-        ctx.fillRect(x-28,y+4,3,5);ctx.fillRect(x+25,y+4,3,5);
-      }
+      const {x,y} = positions[index];
+      const hit = event?.targetSide === 'enemy' && event.targetIndex === index;
+      // Keep a defeated enemy present for the final strike, then remove it.
+      if (enemy.hp <= 0 && !hit) return;
+      const scale = this.spec.boss && foes.length === 1 ? 2 : 1;
+      const selected = this.selectedEnemy === index && this.phase === 'command';
+      const acting = event?.actorSide === 'enemy' && event.actorIndex === index;
+      const offset = acting && !this.reduce ? 3 : 0;
+      ctx.fillStyle = '#152538'; ctx.fillRect(x - 13 * scale,y - 1,26 * scale,3);
+      if (selected) this.drawCursor(ctx,x - 20 * scale,y - 14 * scale,'right');
       ctx.save();
-      if (struck && Math.floor(time/60)%2) ctx.globalAlpha=.55;
-      if (typeof drawAveluneEnemy === 'function') drawAveluneEnemy(ctx,enemy.sprite || 'slime',x,y+pulse,boss ? 3 : 2);
-      else this.drawFallbackEnemy(ctx,enemy.sprite,x,y+pulse,boss ? 3 : 2);
+      if (hit && !this.reduce && progress > .15 && progress < .7 && Math.floor(progress * 12) % 2) ctx.globalAlpha = .42;
+      if (typeof drawAveluneEnemy === 'function') drawAveluneEnemy(ctx,enemy.sprite || 'slime',x + offset,y,scale);
+      else this.drawFallbackEnemy(ctx,enemy.sprite,x + offset,y,scale);
       ctx.restore();
-      if (struck && this.highlight.amount) this.drawNumber(ctx,this.highlight.amount,x,y-45,this.highlight.kind === 'heal' ? '#9aefbc' : '#fff0c6');
+      if (hit) this.drawHit(ctx,event,x,y - 19 * scale,progress);
     });
     (this.displayParty ?? this.rpg.party).forEach((hero,index) => {
-      const x=464+(index%2)*42;
-      const y=102+index*33;
-      const highlighted = this.highlight?.actorSide === 'party' && this.highlight.actorIndex === index && this.highlight.until > time;
-      const hurt = this.highlight?.targetSide === 'party' && this.highlight.targetIndex === index && this.highlight.until > time;
-      const offset = highlighted && !this.reduce ? -9 : 0;
-      const id=hero.id === 'keeper' ? 'roadkeeper' : hero.id;
-      const img=this.images.get(id);
-      ctx.fillStyle='#111e2990';ctx.fillRect(x-13,y-1,26,4);
+      const x = w - 47 + (index % 2) * 8;
+      const y = 49 + index * 27;
+      const acting = event?.actorSide === 'party' && event.actorIndex === index;
+      const hit = event?.targetSide === 'party' && event.targetIndex === index;
+      const offset = acting && !this.reduce ? -4 : 0;
+      ctx.fillStyle = '#152538'; ctx.fillRect(x - 7,y - 1,14,3);
       ctx.save();
-      if (hero.hp <= 0) ctx.globalAlpha=.3;
-      if (hurt && Math.floor(time/60)%2) ctx.globalAlpha=.45;
-      if (img?.complete && img.naturalWidth) {
-        const size=53;
-        ctx.drawImage(img,x-size/2+offset,y-size,size,size);
-      } else this.drawFallbackHero(ctx,hero,x+offset,y,index);
+      if (hero.hp <= 0 && !hit) ctx.globalAlpha = .35;
+      if (hit && event.kind !== 'heal' && !this.reduce && progress > .15 && progress < .7 && Math.floor(progress * 12) % 2) ctx.globalAlpha = .45;
+      const id = hero.id === 'keeper' ? 'roadkeeper' : hero.id;
+      if (typeof AvelunePixelArt !== 'undefined') {
+        AvelunePixelArt.drawHero(ctx,id,'left',acting && progress < .65 ? 1 : 0,x + offset,y);
+      } else this.drawFallbackHero(ctx,hero,x + offset,y,index);
       ctx.restore();
-      if (this.actor === index && this.phase === 'command') {
-        ctx.fillStyle='#f2d892';
-        ctx.fillRect(x+27,y-26,6,2);ctx.fillRect(x+24,y-25,5,4);ctx.fillRect(x+27,y-21,6,2);
+      if (this.actor === index && this.phase === 'command') this.drawCursor(ctx,x + 14,y - 14,'left');
+      if (hit) this.drawHit(ctx,event,x,y - 13,progress);
+      if (event?.kind === 'guard' && acting) {
+        ctx.strokeStyle = '#eddfb2'; ctx.lineWidth = 1; ctx.strokeRect(x - 11,y - 25,21,27);
       }
-      if (hurt && this.highlight.amount) this.drawNumber(ctx,this.highlight.amount,x,y-37,this.highlight.kind === 'heal' ? '#9aefbc' : '#fff0c6');
     });
-    ctx.fillStyle='#b3c1b6';ctx.font='8px monospace';ctx.textAlign='left';
-    ctx.fillText('ENEMIES',20,20);ctx.textAlign='right';ctx.fillText('ROADKEEPERS',620,20);
   }
 
-  drawNumber(ctx, amount, x, y, color) {
-    ctx.font='bold 13px monospace';ctx.textAlign='center';ctx.fillStyle='#142331';ctx.fillText(String(amount),x+1,y+1);ctx.fillStyle=color;ctx.fillText(String(amount),x,y);
+  drawBackdrop(ctx,w,h,time) {
+    const p = typeof AVELUNE_PALETTE !== 'undefined' ? AVELUNE_PALETTE : {};
+    const ink = p.ink || '#172334', blue = p.waterLight || '#487e9d';
+    const grass = p.grass || '#547b48', moss = p.grassDark || '#3c6044';
+    const leaf = p.grassBright || '#92ad62', cream = p.cream || '#f1e6c6';
+    const stone = p.stone || '#687984', sand = p.path || '#c8ad72';
+    const backdrop = this.spec.backdrop || 'orchard';
+    const cave = backdrop === 'cavern';
+    const pale = backdrop === 'pale';
+    const snow = backdrop === 'snow';
+    const desert = backdrop === 'desert';
+    const water = backdrop === 'water' || backdrop === 'coast';
+    const sky = cave ? ink : pale ? '#49486c' : snow ? '#9ab5c6' : desert ? '#c8ad72' : blue;
+    const ground = cave ? '#62646b' : pale ? '#89939a' : snow ? (p.snow || '#cadcda') : desert ? '#c7b17a' : grass;
+    ctx.fillStyle = sky; ctx.fillRect(0,0,w,h);
+    // Far silhouettes and foreground share the map's small, stepped pixel shapes.
+    if (cave) {
+      ctx.fillStyle = '#273b50'; ctx.fillRect(0,0,w,44);
+      for (let x = -8; x < w; x += 32) {
+        const height = 8 + ((x + 8) / 32 % 3) * 7;
+        ctx.fillStyle = '#465563'; ctx.fillRect(x,0,28,height); ctx.fillRect(x + 6,height,16,7); ctx.fillRect(x + 11,height + 7,6,7);
+        ctx.fillStyle = '#273b50'; ctx.fillRect(x,27,30,18); ctx.fillRect(x + 6,20,19,12);
+      }
+    } else {
+      ctx.fillStyle = snow ? '#b9cacc' : desert ? '#dfc48e' : pale ? '#777c9a' : '#9db69a';
+      if (!pale) for (let x = 12; x < w; x += 104) {
+        ctx.fillRect(x,14,24,3); ctx.fillRect(x + 5,11,12,3);
+      }
+      ctx.fillStyle = snow ? '#8cabb4' : desert ? '#ae8559' : pale ? '#585f7e' : moss;
+      for (let x = -24, i = 0; x < w; x += 48, i++) {
+        const top = 20 + i % 3 * 3;
+        ctx.fillRect(x,top + 8,64,27); ctx.fillRect(x + 8,top + 3,43,8); ctx.fillRect(x + 18,top,24,4);
+      }
+      if (water) {
+        ctx.fillStyle = p.water || '#315f85'; ctx.fillRect(0,27,w,18);
+        ctx.fillStyle = p.waterFoam || '#76a9ba';
+        for (let x = 9; x < w; x += 39) { ctx.fillRect(x,32,13,1); ctx.fillRect(x + 17,40,8,1); }
+      }
+    }
+    ctx.fillStyle = ground; ctx.fillRect(0,44,w,h - 44);
+    ctx.fillStyle = cave ? '#344656' : pale ? '#565e73' : snow ? '#9cb8bd' : desert ? '#af8758' : moss;
+    ctx.fillRect(0,42,w,3);
+    // A quiet, repeating ground texture, never a detailed illustration under actors.
+    for (let y = 56; y < h; y += 16) for (let x = 4 + (y % 3) * 5; x < w; x += 32) {
+      ctx.fillStyle = cave ? '#61727a' : pale ? '#9399a4' : snow ? cream : desert ? '#dfc48e' : leaf;
+      ctx.fillRect(x,y,3,1); ctx.fillRect(x + 16,y + 7,2,1);
+    }
+    if (!cave && !desert && !snow && !pale && !water) {
+      for (let x = 7; x < w; x += 38) {
+        ctx.fillStyle = p.wood || '#765543'; ctx.fillRect(x + 11,24,4,21);
+        ctx.fillStyle = p.tree || '#305b48'; ctx.fillRect(x + 2,12,23,17); ctx.fillRect(x + 6,5,16,9); ctx.fillRect(x,18,27,7);
+        ctx.fillStyle = p.treeLight || '#4d7a50'; ctx.fillRect(x + 5,8,14,7); ctx.fillRect(x + 2,16,20,5);
+        ctx.fillStyle = p.treeBright || '#769758'; ctx.fillRect(x + 8,10,8,2);
+        ctx.fillStyle = p.roofLight || '#cf7755'; ctx.fillRect(x + 6,22,2,2); ctx.fillRect(x + 19,17,2,2);
+      }
+    }
+    if (desert) for (let x = 25; x < w; x += 126) {
+      ctx.fillStyle = moss; ctx.fillRect(x,23,5,22); ctx.fillRect(x - 5,32,5,4); ctx.fillRect(x - 7,27,3,9); ctx.fillRect(x + 5,29,6,3); ctx.fillRect(x + 9,23,3,9);
+    }
+    if (pale || this.spec.boss) {
+      for (const x of [16, Math.round(w * .57), w - 18]) {
+        ctx.fillStyle = ink; ctx.fillRect(x,5,9,40); ctx.fillRect(x - 3,2,15,4);
+        ctx.fillStyle = stone; ctx.fillRect(x + 1,6,3,36); ctx.fillRect(x - 2,2,12,2);
+        ctx.fillStyle = sand; ctx.fillRect(x + 3,17,3,6);
+        ctx.fillStyle = cream; ctx.fillRect(x + 4,17,1,3);
+      }
+    }
+    if (snow) {
+      ctx.fillStyle = cream;
+      for (let i = 0; i < 15; i++) ctx.fillRect((i * 37 + 13) % w, (i * 23 + 8) % 40,1,1);
+    }
+  }
+
+  drawCursor(ctx,x,y,direction) {
+    ctx.fillStyle = '#172334'; ctx.fillRect(x - 1,y - 4,7,9);
+    ctx.fillStyle = '#f1e6c6';
+    for (let row = -3; row <= 3; row++) {
+      const width = 4 - Math.abs(row);
+      ctx.fillRect(direction === 'right' ? x : x + 4 - width,y + row,width,1);
+    }
+  }
+
+  drawHit(ctx,event,x,y,progress) {
+    const healing = event.kind === 'heal';
+    if (event.amount) {
+      const lift = this.reduce ? 0 : Math.floor(progress * 5);
+      this.drawNumber(ctx,(healing ? '+' : '') + event.amount,x,y - 14 - lift,healing ? '#92ad62' : '#f1e6c6');
+    }
+    if (this.reduce || progress > .72 || !event.amount) return;
+    const color = healing ? '#92ad62' : event.kind === 'spell' ? '#a7c9dd' : '#f1e6c6';
+    ctx.fillStyle = color;
+    const radius = 3 + Math.floor(progress * 7);
+    ctx.fillRect(x - radius,y,3,1); ctx.fillRect(x + radius - 2,y,3,1);
+    ctx.fillRect(x,y - radius,1,3); ctx.fillRect(x,y + radius - 2,1,3);
+    if (event.weak || event.critical) {
+      ctx.fillRect(x - radius + 1,y - radius + 1,2,2); ctx.fillRect(x + radius - 2,y + radius - 2,2,2);
+    }
+  }
+
+  drawNumber(ctx,amount,x,y,color) {
+    ctx.font = 'bold 9px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+    ctx.lineWidth = 3; ctx.strokeStyle = '#172334'; ctx.strokeText(String(amount),Math.round(x),Math.round(y));
+    ctx.fillStyle = color; ctx.fillText(String(amount),Math.round(x),Math.round(y));
   }
 
   drawFallbackEnemy(ctx,key,x,y,scale) {
-    ctx.fillStyle='#24323e';ctx.fillRect(x-10*scale,y-17*scale,20*scale,17*scale);
-    ctx.fillStyle=key === 'guardian' ? '#9c8c68' : '#8baf7a';ctx.fillRect(x-8*scale,y-15*scale,16*scale,13*scale);
-    ctx.fillStyle='#192c36';ctx.fillRect(x-5*scale,y-10*scale,3*scale,2*scale);ctx.fillRect(x+2*scale,y-10*scale,3*scale,2*scale);
-    ctx.fillStyle='#f0c683';ctx.fillRect(x-4*scale,y-10*scale,scale,scale);ctx.fillRect(x+3*scale,y-10*scale,scale,scale);
+    ctx.fillStyle = '#172334'; ctx.fillRect(x - 11 * scale,y - 19 * scale,22 * scale,19 * scale);
+    ctx.fillStyle = key === 'guardian' ? '#c8ad72' : '#92ad62'; ctx.fillRect(x - 9 * scale,y - 17 * scale,18 * scale,15 * scale);
+    ctx.fillStyle = '#172334'; ctx.fillRect(x - 5 * scale,y - 12 * scale,3 * scale,3 * scale); ctx.fillRect(x + 3 * scale,y - 12 * scale,3 * scale,3 * scale);
   }
 
   drawFallbackHero(ctx,hero,x,y,index) {
-    const palette=['#c7ad70','#7e9dba','#e2dfbc','#a68dba'];
-    ctx.fillStyle='#172737';ctx.fillRect(x-8,y-31,16,28);
-    ctx.fillStyle=palette[index];ctx.fillRect(x-7,y-20,14,16);
-    ctx.fillStyle='#d9b18a';ctx.fillRect(x-5,y-29,10,10);
-    ctx.fillStyle='#4b3c36';ctx.fillRect(x-6,y-32,12,6);
-    ctx.fillStyle='#283b4b';ctx.fillRect(x-7,y-4,5,5);ctx.fillRect(x+2,y-4,5,5);
+    const colors = ['#c8ad72','#7196ab','#f1e6c6','#9292ab'];
+    ctx.fillStyle = '#172334'; ctx.fillRect(x - 6,y - 23,12,23);
+    ctx.fillStyle = colors[index]; ctx.fillRect(x - 5,y - 13,10,10);
+    ctx.fillStyle = '#dfb780'; ctx.fillRect(x - 4,y - 20,8,7);
+    ctx.fillStyle = '#705b40'; ctx.fillRect(x - 5,y - 23,10,5);
+    ctx.fillStyle = '#273b50'; ctx.fillRect(x - 5,y - 3,4,3); ctx.fillRect(x + 2,y - 3,4,3);
   }
 }

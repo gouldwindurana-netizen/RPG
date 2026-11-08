@@ -38,3 +38,11 @@ The script retains every runtime asset key and every ground-map dimension. It:
 For the original runtime atlas, all grounds, animation atlas and world chart, image files fell from **11,757,262 bytes to 2,357,878 bytes**, a **79.95% reduction**. The newly generated landscape and four hero crops are additions and are excluded from this like-for-like comparison. See `asset-metrics.json` for machine-readable measurements.
 
 Validation checked 284 sprite rectangles against atlas bounds, exact transparent gutters, binary alpha, and all 108 ground-image dimensions. `asset-validation.json` records zero errors. Visual inspection covered the packed atlas, hero crop and new landscape. Browser-level composition and playfield readability are covered by the main playtest report.
+
+## Cohesion polish
+
+The active field now uses `src/pixel-art.js` and `src/terrain.js`, an original shared pixel vocabulary based on the supplied Avelune locations, fixtures, silhouettes and stable asset IDs. The earlier source atlas and baked grounds remain in the editable asset library; they are no longer mixed into the live field. All 284 keys have deliberate semantic renderers. Terrain and scenery use matching color ramps and integer coordinates.
+
+Field and battle characters share the same fixed 16×24 source. Idle uses the neutral walking stance, with a common bottom-center anchor; only arm/leg clusters alternate. `classic-roadkeeper.png`, `classic-mara.png`, `classic-iven.png` and `classic-sella.png` are menu portraits rendered from this exact source. `classic-roadkeeper-walk.png` provides a four-direction, four-pose contact sheet. Run `npm run art:classic` to regenerate them.
+
+The previous image-byte reduction figures describe the original asset optimization, not a new GPU or frame-rate benchmark. The current field also avoids loading the legacy raster atlas/ground textures and caches at most six generated grounds.

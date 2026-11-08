@@ -7,7 +7,9 @@
     "dev": "node tools/serve.mjs",
     "build": "node tools/build.mjs",
     "test": "node --test tests/*.test.mjs",
-    "test:browser": "node tests/playtest.mjs"
+    "test:browser": "node tests/playtest.mjs",
+    "art:classic": "node tools/export-classic-art.mjs",
+    "test:visual": "node tests/visual-polish.mjs"
   },
   "devDependencies": {
     "@fontsource/cinzel": "^5.3.0",

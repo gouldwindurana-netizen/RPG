@@ -2,7 +2,7 @@
  * drawAveluneEnemy(ctx, key, x, y, scale=1): bottom-center anchor; 32x32 logical pixels.
  * Keys: slime, wolf, wisp, guardian, serpent, moth, crown, boar, crow, crab, plant, bell, star. */
 const AveluneEnemyArt = (() => {
-  const P={o:'#131b2a',d:'#263642',s:'#496375',m:'#72939c',l:'#b7d2c7',w:'#f2e8c9',g:'#527b53',v:'#88b66b',y:'#d7b65a',a:'#a67d3a',r:'#b9674c',p:'#9b85b2',b:'#5d91b3',c:'#98d6d2'};
+  const P={o:'#172334',d:'#0b1325',s:'#687984',m:'#93a0a6',l:'#c4c4b6',w:'#f1e6c6',g:'#3c6044',v:'#709254',y:'#e2bc69',a:'#a17a54',r:'#cf7755',p:'#a597b9',b:'#315f85',c:'#76a9ba'};
   const maps={};
   function make(draw){const a=Array.from({length:32},()=>Array(32).fill('.'));const dot=(x,y,c)=>{if(x>=0&&x<32&&y>=0&&y<32)a[y][x]=c;};const rect=(x,y,w,h,c)=>{for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)dot(i,j,c);};const oval=(cx,cy,rx,ry,c)=>{for(let y=0;y<32;y++)for(let x=0;x<32;x++)if(((x-cx)/rx)**2+((y-cy)/ry)**2<=1)dot(x,y,c);};draw({a,dot,rect,oval});return a;}
   maps.slime=make(({dot,rect,oval})=>{

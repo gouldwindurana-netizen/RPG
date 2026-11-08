@@ -46,6 +46,7 @@ class AveluneView {
     this.tile = tile;
     this.reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.images = new Map();
+    this.groundCache = new Map();
   }
 
   load(key, src) {
@@ -61,10 +62,13 @@ class AveluneView {
   }
 
   async prepare(id) {
-    return Promise.all([
-      this.load('sprites', this.art.sprites), this.load(id, this.art.grounds[id]),
-      this.load('motion', this.art.motion.image),
-    ]);
+    if (typeof AveluneTerrain !== 'undefined' && typeof LAYOUT !== 'undefined') {
+      if(!this.groundCache.has(id))this.groundCache.set(id,AveluneTerrain.bake(LAYOUT.areas[id]));
+      const ground=this.groundCache.get(id);
+      if(this.groundCache.size>6)this.groundCache.delete(this.groundCache.keys().next().value);
+      return [null,ground,null];
+    }
+    return Promise.all([this.load('sprites',this.art.sprites),this.load(id,this.art.grounds[id]),this.load('motion',this.art.motion.image)]);
   }
 
   enter(area, [atlas, ground, motion]) {
@@ -72,6 +76,7 @@ class AveluneView {
     this.ground = ground;
     this.motionAtlas = motion;
     this.indoor = area.indoor;
+    this.area = area;
     if (this.images.size > 13) {
       const oldest = [...this.images.keys()].find(key => !['sprites', 'motion', area.id].includes(key));
       if (oldest) this.images.delete(oldest);
@@ -99,39 +104,46 @@ class AveluneView {
   }
 
   size() {
-    const {clientWidth, clientHeight} = this.canvas;
-    if (!clientWidth || !clientHeight) return;
-    let width = Math.max(368, Math.min(600, Math.round(clientWidth / 1.9)));
-    if (this.indoor) {
-      const roomW = this.bounds.right - this.bounds.left + 12;
-      const roomH = this.bounds.bottom - this.bounds.top + 12;
-      width = Math.max(width, roomW, Math.ceil(roomH * clientWidth / clientHeight));
-    }
-    const height = Math.max(180, Math.round(width * clientHeight / clientWidth));
+    const frame = this.canvas.parentElement || this.canvas;
+    const availableWidth = Math.floor(frame.clientWidth);
+    const availableHeight = Math.floor(frame.clientHeight);
+    if (!availableWidth || !availableHeight) return;
+    // Every source pixel occupies a whole square of display pixels. Keep the
+    // same scale in rooms and outside; only the camera's visible area changes.
+    const tile = this.tile;
+    const scale = Math.max(1, Math.floor(Math.min(availableWidth / 320, availableHeight / 192)));
+    const width = Math.max(tile, Math.min(576, Math.floor(availableWidth / scale / tile) * tile));
+    const height = Math.max(tile, Math.min(224, Math.floor(availableHeight / scale / tile) * tile));
     if (width !== this.canvas.width || height !== this.canvas.height) {
       this.canvas.width = width;
       this.canvas.height = height;
     }
+    Object.assign(this.canvas.style, {
+      width: width * scale + 'px', height: height * scale + 'px',
+      position: 'absolute', left: Math.floor((availableWidth-width*scale)/2) + 'px',
+      top: Math.floor((availableHeight-height*scale)/2) + 'px', transform: 'none',
+    });
     this.ctx.imageSmoothingEnabled = false;
   }
 
-  spriteBox(key, x, y, width, height) {
-    const rect = this.art.frames[key];
-    const w = height ? Math.round(height * rect[2] / rect[3]) : Math.round(width);
-    const h = height ? Math.round(height) : Math.round(w * rect[3] / rect[2]);
-    return {rect, left:Math.round(x-w/2), top:Math.round(y-h), w, h};
+  spriteBox(key,x,y,width,height) {
+    if(typeof AvelunePixelArt!=='undefined')return AvelunePixelArt.box(key,x,y,width,{region:this.area?.region,theme:this.area?.theme,indoor:this.indoor});
+    const rect=this.art.frames[key];const w=height?Math.round(height*rect[2]/rect[3]):Math.round(width),h=height?Math.round(height):Math.round(w*rect[3]/rect[2]);
+    return {rect,left:Math.round(x-w/2),top:Math.round(y-h),w,h};
   }
-
-  stamp(ctx, key, x, y, width, height) {
-    if (!this.art.frames[key]) return;
-    const {rect, left, top, w, h} = this.spriteBox(key, x, y, width, height);
-    ctx.drawImage(this.atlas, ...rect, left, top, w, h);
+  stamp(ctx,key,x,y,width,height) {
+    if(typeof AvelunePixelArt!=='undefined'){AvelunePixelArt.draw(ctx,key,Math.round(x),Math.round(y),width,{region:this.area?.region,theme:this.area?.theme,indoor:this.indoor});return;}
+    if(!this.art.frames[key])return;const{rect,left,top,w,h}=this.spriteBox(key,x,y,width,height);ctx.drawImage(this.atlas,...rect,left,top,w,h);
   }
 
   motion(ctx, key, seconds, x, y, width, opacity=1, height) {
-    const clip = this.art.motion.clips[key];
-    const phase = this.reduce ? 0 : (seconds % clip.period) / clip.period;
+    const clip = this.art.motion?.clips[key];
+    if (!clip?.frames.length || !this.motionAtlas) return;
+    const period = clip.period || 1;
+    const elapsed = Number.isFinite(seconds) ? seconds : 0;
+    const phase = this.reduce ? 0 : ((elapsed % period) + period) % period / period;
     const rect = this.art.motion.rects[clip.frames[Math.floor(phase*clip.frames.length)]];
+    if (!rect) return;
     const sx = width ? width / clip.art_width : 1;
     const sy = height ? height / clip.art_height : sx;
     ctx.save();
@@ -142,68 +154,64 @@ class AveluneView {
     ctx.restore();
   }
 
-  actor(ctx, model, t) {
+  animateActor(model) {
+    const directions = {south:'down', west:'left', east:'right', north:'up'};
+    const facing = directions[model.facing] ? model.facing : 'south';
     const foot = [model.x, model.y];
-    if (this.lastFoot && model.moving) {
-      const distance = Math.hypot(foot[0]-this.lastFoot[0], foot[1]-this.lastFoot[1]);
-      this.stride = (this.stride + Math.min(distance, this.tile)) % 28;
+    const distance = this.lastFoot ? Math.hypot(foot[0]-this.lastFoot[0], foot[1]-this.lastFoot[1]) : 0;
+    if (!this.lastFoot || !model.moving || this.reduce || this.actorFacing !== facing || distance > this.tile * 2) {
+      this.stride = 0;
+    } else {
+      // A complete four-pose stride covers 24 world pixels, whether walking,
+      // running, or rendering more often. Waiting never advances a footstep.
+      this.stride = (this.stride + distance) % 24;
     }
     this.lastFoot = foot;
-    this.shadow(ctx, foot[0], foot[1]+1, 23);
-    if (model.moving && !this.reduce) {
-      const clip = 'walk_'+model.facing;
-      this.motion(ctx, clip, this.stride / 28 * this.art.motion.clips[clip].period, ...foot);
+    this.actorFacing = facing;
+    return {x:Math.round(foot[0]), y:Math.round(foot[1]), direction:directions[facing], facing,
+      frame:model.moving && !this.reduce ? Math.floor(this.stride / 6) : 0};
+  }
+
+  actor(ctx, model, t) {
+    const pose = this.animateActor(model);
+    this.shadow(ctx, pose.x, pose.y+1, 14);
+    if (typeof AvelunePixelArt !== 'undefined') {
+      AvelunePixelArt.drawHero(ctx, 'roadkeeper', pose.direction, pose.frame, pose.x, pose.y);
     } else {
-      const breath = this.reduce ? 0 : Number(Math.sin(t*2.25)>.75);
-      this.stamp(ctx, 'party_travel_roadkeeper_'+model.facing, ...foot, 0, 33+breath);
+      const key = 'walk_' + pose.facing;
+      const clip = this.art.motion?.clips[key];
+      if (clip) this.motion(ctx, key, (pose.frame + .1) / clip.frames.length * clip.period,
+        pose.x, pose.y, undefined, 1, 24);
     }
   }
 
-  scenery(ctx, item, box, model, t) {
-    const {asset, x, y, width} = item;
-    const phase = t + (x*3 + y*5) % 29 / 13;
-    const boat = asset==='ocean_packet' || asset==='party_travel_ferry_east';
-    const air = asset==='party_travel_skiff_east';
-    const bob = this.reduce || !(boat || air) ? 0 : Math.round(Math.sin(phase*2.1) * (air ? 2 : 1));
-    if (width>=36 && !boat && !air) this.shadow(ctx, x, y+1, width);
-    if (boat && !this.reduce) this.motion(ctx, 'ripple', phase, x-4, y+4, width*.7, .64);
-    if (asset==='ocean_packet') {
-      this.motion(ctx, 'ocean_sail', phase, x, y-bob, width);
-    } else if (WindPlants.has(asset) && !this.reduce) {
-      ctx.save();
-      ctx.translate(Math.round(x),Math.round(y));
-      ctx.transform(1,0,Math.sin(phase*1.7)*.036,1,0,0);
-      this.stamp(ctx,asset,0,0,width);
-      ctx.restore();
-    } else {
-      const breath = !this.reduce && BreathingCast.has(asset) && Math.sin(phase*2)>.76 ? 1 : 0;
-      this.stamp(ctx,asset,x,y-bob,width,breath ? box.h+1 : undefined);
+  scenery(ctx,item,box,model,t) {
+    const {asset,x,y,width}=item;
+    const p=AVELUNE_PALETTE;
+    const boat=asset==='ocean_packet'||asset==='party_travel_ferry_east',air=asset==='party_travel_skiff_east';
+    const bob=!this.reduce&&(boat||air)?Math.round(Math.sin(t*2+(x%5))):0;
+    if(!boat&&!air&&width>24)this.shadow(ctx,x,y+1,Math.min(width,box.w));
+    AvelunePixelArt.draw(ctx,asset,x,y-bob,width,{region:model.area.region,theme:model.area.theme,indoor:model.area.indoor,time:this.reduce?0:t,millRunning:model.has('mill_valves')});
+    if(this.reduce)return;
+    if(/hearth|campfire/.test(asset)||asset==='PROP059'){
+      const phase=Math.floor(t*4)%2,fx=Math.round(x),fy=Math.round(y-7);
+      ctx.fillStyle=p.roofLight;ctx.fillRect(fx-3,fy-4-phase,6,5+phase);ctx.fillStyle=p.gold;ctx.fillRect(fx-1,fy-6+phase,3,6);ctx.fillStyle=p.cream;ctx.fillRect(fx,fy-2,1,2);
     }
-
-    if (this.reduce) return;
-    for (const [clip, ax, ay, scale, opacity] of FixtureMotion[asset] ?? []) {
-      this.motion(ctx,clip,phase,box.left+box.w*ax,box.top+box.h*ay,box.w*scale,opacity);
-    }
-    if (asset==='landmarks_watermill') {
-      this.motion(ctx,'splash',phase,box.left+box.w*.43,box.top+box.h*.99,box.w*.31,.81);
-      if (model.has('mill_valves')) {
-        this.motion(ctx,'wheel',phase,box.left+box.w*.76,box.top+box.h*.697,box.w*.30,.91,box.h*.39);
-      }
-    }
+    if(boat){ctx.fillStyle=p.waterFoam;ctx.fillRect(Math.round(x-box.w/2+3),Math.round(y+2),6,1);ctx.fillRect(Math.round(x+box.w/2-8),Math.round(y+2),5,1)}
   }
 
   thumbnail(canvas, key) {
     const ctx = canvas.getContext('2d');
     const rect = this.art.frames[key];
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (!rect || !this.atlas) return;
+    if (!rect) return;
     ctx.imageSmoothingEnabled = false;
     this.stamp(ctx, key, canvas.width/2, canvas.height-4, Math.min(104, 106*rect[2]/rect[3]));
   }
 
   shadow(ctx, x, y, w) {
-    const r = Math.max(5, Math.round(w * .29));
-    ctx.fillStyle = '#101f2980';
+    const r = Math.max(3, Math.round(w * .29));
+    ctx.fillStyle = '#17233455';
     ctx.fillRect(Math.round(x-r), Math.round(y-2), r*2, 4);
     ctx.fillRect(Math.round(x-r+2), Math.round(y-4), Math.max(4, r*2-4), 2);
   }
@@ -216,19 +224,14 @@ class AveluneView {
     const cx = this.cameraAxis(model.x, w, this.bounds.left, this.bounds.right);
     const cy = this.cameraAxis(model.y, h, this.bounds.top, this.bounds.bottom);
     this.camera = {x:cx,y:cy};
-    ctx.fillStyle = '#172b34';
+    ctx.fillStyle = '#0b1325';
     ctx.fillRect(0,0,w,h);
     ctx.save();
     ctx.translate(-cx,-cy);
     ctx.drawImage(this.ground,0,0);
     const t = this.reduce ? 0 : time / 1000;
-    if (!this.reduce) {
-      for (const [x,y] of this.water) {
-        const px=x*this.tile+8, py=y*this.tile+11;
-        if (px<cx-16 || px>cx+w+16 || py<cy-16 || py>cy+h+16) continue;
-        this.motion(ctx,'ripple',t+(x+y)*.064,px,py,10,.78);
-      }
-    }
+    if(!this.reduce&&typeof AveluneTerrain!=='undefined')AveluneTerrain.waterFrame(ctx,model.area,time,{x:cx,y:cy},w,h);
+
     for (const gate of model.area.barriers) {
       if (model.has(gate.gate)) continue;
       const [x,y,x2,y2]=gate.rect;
@@ -311,13 +314,9 @@ class AveluneView {
     }
     const asset=air?'party_travel_skiff_east':mode==='sea_passage'?'ocean_packet'
       :land?'party_travel_tallowback_east':'party_travel_ferry_east';
-    const x = w*(.29+.43*progress);
+    const x = Math.round(w*(.29+.43*progress));
     const y = h*.59 + (this.reduce ? 0 : Math.round(Math.sin(progress*14)*3));
-    if (!air && !land && !this.reduce) {
-      this.motion(ctx,'ripple',progress*2.4,x-55,y+5,31,.80);
-      this.motion(ctx,'ripple',progress*2.4+.4,x-75,y+9,22,.66);
-    }
-    if (asset==='ocean_packet') this.motion(ctx,'ocean_sail',progress*2.2,x,y,112);
-    else this.stamp(ctx,asset,x,y,air?143:94);
+    if (!air&&!land){ctx.fillStyle=AVELUNE_PALETTE.waterFoam;ctx.fillRect(x-40,y+3,14,1);ctx.fillRect(x-53,y+6,7,1);}
+    this.stamp(ctx,asset,x,Math.round(y),air?80:64);
   }
 }
