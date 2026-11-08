@@ -24,7 +24,7 @@ class AveluneServicesUI {
   _draw() {
     const focus=document.activeElement?.dataset?.focus;this.actions.clear();this.sequence=0;this.mount.replaceChildren();
     const r=this.getRPG(),head=this._el('div',undefined,'town-status');head.append(this._el('span',this.service?.label||'ROADKEEPERS'),this._el('strong',r.gold+' G','town-gold'));this.mount.append(head);
-    this.render();
+    this.render();this._frameRows();
     const feedback=this._el('p',this.message,'town-feedback'+(this.failed?' town-error':''));feedback.setAttribute('role','status');feedback.setAttribute('aria-live','polite');this.mount.append(feedback);
     if(focus){const next=[...this.mount.querySelectorAll('[data-focus]')].find(el=>el.dataset.focus===focus&&!el.disabled);next?.focus({preventScroll:true});}
   }
@@ -33,11 +33,21 @@ class AveluneServicesUI {
     catch(error){this.failed=true;this.message=error.message||'That action is unavailable.';if(this.mount?.isConnected)this._draw();return {ok:false,text:this.message};}
   }
   _note(value,className='town-note') {return this._el('p',value,className);}
+  _frameRows() {
+    // Keep the existing actions in a single classic menu window, rather than
+    // presenting every item as a separate card.
+    const rows=[...this.mount.children];let ledger=null;
+    for(const child of rows){
+      if(!child.classList.contains('town-row')){ledger=null;continue;}
+      if(!ledger){ledger=this._el('div',undefined,'town-ledger');const heading=this._el('div',undefined,'town-ledger-heading');heading.setAttribute('aria-hidden','true');heading.append(this._el('span',this.mount.dataset.serviceType==='town-directory'?'COUNTER':this.mount.dataset.serviceType==='field-magic'?'PARTY':'SELECTION'),this._el('span','COMMAND'));ledger.append(heading);child.before(ledger);}
+      ledger.append(child);
+    }
+  }
   _tabs(entries,selected,change) {const tabs=this._el('div',undefined,'town-tabs');for(const [id,label]of entries){const b=this._action(label,()=>{change(id);this.message='';this._draw();});b.classList.toggle('selected',id===selected);b.setAttribute('aria-pressed',String(id===selected));tabs.append(b);}return tabs;}
   _heroes(change) {const r=this.getRPG(),tabs=this._tabs(r.party.map((h,i)=>[i,h.name]),this.state.hero,index=>{this.state.hero=index;change?.(index);});tabs.classList.add('town-heroes');return tabs;}
   _hp(hero) {const wrap=this._el('div',undefined,'town-vitals');wrap.append(this._el('span',hero.hp===0?'FALLEN':'HP '+hero.hp+' / '+hero.maxHp,hero.hp===0?'town-fallen':''));const bar=this._el('span',undefined,'town-hp');const fill=this._el('i');fill.style.width=(100*hero.hp/hero.maxHp)+'%';bar.append(fill);wrap.append(bar);return wrap;}
   _heroSummary(hero) {const box=this._el('div',undefined,'town-hero-summary');box.append(this._el('strong',hero.name+' · '+hero.role),this._hp(hero));const charges=(hero.maxCharges||[]).map((max,i)=>max?'Tier '+(i+1)+' '+hero.charges[i]+'/'+max:null).filter(Boolean).join('  ·  ');if(charges)box.append(this._el('small',charges));return box;}
-  _row(title,description,action,meta='') {const row=this._el('div',undefined,'town-row'),info=this._el('div',undefined,'town-row-info');info.append(this._el('strong',title));if(description)info.append(this._el('small',description));if(meta)info.append(this._el('span',meta,'town-row-meta'));row.append(info);if(action)row.append(action);return row;}
+  _row(title,description,action,meta='') {const row=this._el('div',undefined,'town-row'),info=this._el('div',undefined,'town-row-info'),heading=this._el('strong');const price=title.match(/^(.*?)( · )(\d+ G)$/);if(price){heading.append(this._el('span',price[1],'town-row-name'),this._el('span',price[2],'town-row-separator'),this._el('span',price[3],'town-row-price'));}else heading.textContent=title;info.append(heading);if(description)info.append(this._el('small',description));if(meta)info.append(this._el('span',meta,'town-row-meta'));row.append(info);if(action)row.append(action);return row;}
   _price() {const w=this.getWorld();if(this.service?.type==='camp')return 0;if(Number.isFinite(this.service?.cost))return Math.max(1,this.service.cost);return 8+(typeof AveluneCampaign!=='undefined'?AveluneCampaign.recommendedLevel(w.area,w):Math.max(1,this.service?.stockTier||1))*3;}
   _stock(tier) {return (this.service?.stockTier||1)>=Math.max(1,tier||1);}
   open(service) {

@@ -58,7 +58,7 @@ class AveluneBattleUI {
     this.root.setAttribute('role', 'dialog');
     this.root.setAttribute('aria-modal', 'true');
     this.root.setAttribute('aria-label', 'Turn-based battle');
-    this.root.innerHTML = '<div class="battle-window"><header class="battle-header"><div><p class="battle-eyebrow" id="battle-type"></p><h2 id="battle-name"></h2></div><div class="battle-round"><span id="battle-round-label"></span><button type="button" id="battle-speed" aria-label="Toggle battle animation speed">1× speed</button></div></header><div class="battle-stage"><canvas id="battle-canvas" width="320" height="144" aria-label="Enemies stand on the left and your party on the right"></canvas></div><div class="battle-roster"><div class="battle-encounter-tag" id="battle-intent"></div><div class="battle-enemy-list" id="battle-enemy-list"></div></div><div class="battle-party" id="battle-party"></div><div class="battle-bottom"><section class="battle-command-panel" aria-labelledby="battle-command-title"><div class="battle-panel-heading"><div><p id="battle-command-eyebrow"></p><h3 id="battle-command-title"></h3></div><button type="button" id="battle-back" aria-label="Go back or undo last command">← Back</button></div><div id="battle-options"></div></section><section class="battle-log-panel" aria-labelledby="battle-log-title"><p class="battle-eyebrow" id="battle-log-title">FIELD CHRONICLE</p><div id="battle-log" role="log" aria-live="polite" aria-relevant="additions text"></div><p class="battle-controls">Choose every order, then resolve the round.</p></section></div></div>';
+    this.root.innerHTML = '<div class="battle-window"><header class="battle-header"><div><p class="battle-eyebrow" id="battle-type"></p><h2 id="battle-name"></h2></div><div class="battle-round"><span id="battle-round-label"></span><button type="button" id="battle-speed" aria-label="Toggle battle animation speed">1× speed</button></div></header><div class="battle-stage"><canvas id="battle-canvas" width="320" height="144" aria-label="Enemies stand on the left and your party on the right"></canvas></div><div class="battle-roster"><div class="battle-encounter-tag" id="battle-intent"></div><div class="battle-enemy-list" id="battle-enemy-list"></div></div><div class="battle-party" id="battle-party"></div><div class="battle-bottom"><section class="battle-command-panel" aria-labelledby="battle-command-title"><div class="battle-panel-heading"><div><p id="battle-command-eyebrow"></p><h3 id="battle-command-title"></h3></div><button type="button" id="battle-back" aria-label="Go back or undo last command">← Back</button></div><div id="battle-options"></div></section><section class="battle-log-panel" aria-labelledby="battle-log-title"><p class="battle-eyebrow" id="battle-log-title">MESSAGE</p><div id="battle-log" role="log" aria-live="polite" aria-relevant="additions text"></div><p class="battle-controls">Choose every order, then resolve the round.</p></section></div></div>';
     this.canvas = this.root.querySelector('#battle-canvas');
     this.ctx = this.canvas.getContext('2d', {alpha:false});
     this.ctx.imageSmoothingEnabled = false;
@@ -169,6 +169,7 @@ class AveluneBattleUI {
   render() {
     if (!this.active) return;
     const result = this.phase === 'result';
+    this.root.classList.toggle('battle-submenu',this.phase === 'command' && this.menu !== 'main');
     this.el('battle-type').textContent = result ? 'THE ROAD CONTINUES' : this.spec.boss ? 'GUARDIAN ENCOUNTER' : 'WILDERNESS ENCOUNTER';
     this.el('battle-name').textContent = result ? {victory:'Victory',defeat:'A light still burns',fled:'A narrow escape'}[this.summary?.outcome] ?? 'The battle ends' : this.spec.name ?? 'An unexpected encounter';
     this.el('battle-round-label').textContent = 'ROUND ' + (this.displayRound ?? this.encounter?.round ?? 1);
@@ -252,7 +253,7 @@ class AveluneBattleUI {
     if (this.phase === 'resolving') {
       eyebrow.textContent = 'ORDERS COMMITTED';
       title.textContent = 'The round unfolds…';
-      list.append(this.node('p','Your party acts in initiative order. Watch the chronicle for damage, healing, and enemy intent.','battle-hint'));
+      list.append(this.node('p','Your orders unfold. Watch the message window.','battle-hint'));
       return;
     }
     if (this.phase === 'result') {
@@ -270,7 +271,7 @@ class AveluneBattleUI {
       return;
     }
     const hero = this.rpg.party[this.actor];
-    eyebrow.textContent = 'CHOOSE AN ORDER · ' + (this.actor + 1) + ' / ' + this.rpg.party.length;
+    eyebrow.textContent = 'COMMAND ' + (this.actor + 1) + ' / ' + this.rpg.party.length;
     title.textContent = hero?.name ?? 'Your party';
     if (this.menu === 'main') {
       list.classList.add('battle-main-commands');

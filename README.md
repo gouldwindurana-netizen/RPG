@@ -8,12 +8,12 @@ Open **Avelune.html** in a modern browser for the self-contained offline edition
 
 - WASD or arrow keys: walk. Shift: run. Click the ground to walk there.
 - E or Space: interact. **Follow marker** walks toward the tracked objective.
-- P: party and jobs. I: items. M: atlas. J: journal. H: Town & rest. F: field healing magic. Esc: menu/back.
+- P: Status (party and jobs). I: Items. M: Atlas. J: Journal. H: Town services. F: Magic. Esc: menu/back.
 - Touch: directional pad, Interact, and the same menus.
 - In battle, choose one order for each living hero and **Resolve round**. Select a hero card to revise an order before committing it. Magic and items have explicit targets. The enemy’s third-round heavy strike is telegraphed; Guard reduces it.
-- **Town & rest** lists the signed INN, ITEMS, ARMS, MAGIC, CLINIC, GUILD and INFO counters. The town strip’s buttons walk to the corresponding merchant and open their service. You can also walk there and press E. Paid inns restore standing allies; clinics revive at 1 HP, followed by inn recovery. Clinics charge 30 G per fallen ally; Wyla’s guest room is a paid inn. Camps consume a Tent or Cottage.
+- **Town** lists the signed INN, ITEMS, ARMS, MAGIC, CLINIC, GUILD and INFO counters. The town strip’s buttons walk to the corresponding merchant and open their service. You can also walk there and press E. Paid inns restore standing allies; clinics revive at 1 HP, followed by inn recovery. Clinics charge 30 G per fallen ally; Wyla’s guest room is a paid inn. Camps consume a Tent or Cottage.
 - Buy and sell supplies in quantities of 1/5/10. At the armory, buy named gear, compare stats for each hero, then select **Equip**. Worn copies cannot be sold. Party → Equip weapons and armor lets you change owned gear on the road.
-- Magic shops sell permanent spells for eligible characters. Prepare custom loadouts of up to three spells per tier. **Field magic** casts healing and revival from the same charge pool used in battle. The original starter spellbooks remain available for compatibility.
+- Magic shops sell permanent spells for eligible characters. Prepare custom loadouts of up to three spells per tier. **Magic** casts healing and revival from the same charge pool used in battle. The original starter spellbooks remain available for compatibility.
 - Use tents and cottage kits from Items while outdoors to recover standing allies. The guild changes jobs, reorders the party, and offers promotion after the Alderreach Hearth at level 5 for 120 G per traveler. Front slots attract more attacks; the leader appears in the field.
 - Use **Menu → Save journal** to save immediately; inns, camps and normal autosave also preserve your progress.
 
@@ -28,6 +28,7 @@ Open **Avelune.html** in a modern browser for the self-contained offline edition
 - Signed physical services across all 18 main towns/villages/ports/markets; refuge and interior counters across 37 safe areas. Buy/sell shops carry 30 named gear pieces, six consumables and eight purchasable spells, with stock tiers tied to region/progress.
 - Paid inns, paid clinics, supply-based camps, field healing/revival, camping supplies, equipment comparisons, spell loadouts, formation, earned promotion, manual save, autosave and portable journal import/export.
 - One-time treasure/story rewards, desktop/touch controls, optional synthesized sound effects and reduced-motion support.
+- Classic cobalt command windows, ivory double borders, pixel typography and arrow cursors across exploration, shops, status, dialogue and battles. Desktop commands sit beside a party status table showing HP and both tiers of magic charges. Mobile menus adapt to 320px screens.
 - A unified original 16px world-art vocabulary, fixed 16×24 character source shared by standing/walking/battles/portraits, thirteen enemy silhouettes, and classic blue/ivory command menus. Buildings, foliage, water, paths, furnishings and regional battlefields share material colors and pixel density.
 
 This is a streamlined complete adaptation of the supplied route, not the design bible’s proposed 35–45-hour commercial campaign. The full catalog of 332 items, 72 books, 48 native skills, 70 quests, crafting, summons, six-character roster/recruitment, bespoke multiphase boss mechanics, and unique art for every enemy are **not** all implemented. Bosses use tuned stats, weaknesses, and a shared heavy-strike cycle; multiple named enemies share silhouettes. Playtime has not been measured with human players.
@@ -58,6 +59,7 @@ npm run test:browser
 npm run test:visual
 npm run test:services
 npm run test:travel
+npm run test:ui
 node tests/overworld-render.mjs
 ```
 
@@ -73,6 +75,7 @@ The native canvas renderer uses two exploration scales. Towns use compact local 
 - `docs/PLAYTEST.md`, `docs/balance-results.json`: deterministic full-route and party-composition verification.
 - `docs/BROWSER-QA.md`: actual desktop/mobile Chromium checks and limits.
 - `docs/VISUAL-QA.md` and `docs/VISUAL-POLISH.md`: full-map rendering, walking consistency, and visual integration evidence.
+- `docs/CLASSIC-UI.md`: the shared classic RPG window design, keyboard controls and desktop/mobile interface checks.
 - `docs/OVERWORLD-QA.md`: town layouts, two-scale travel, recovery economy and current verification.
 - `docs/TOWN-SERVICES.md`, `docs/FF1-SERVICES-GAP.md` and `docs/SERVICES-QA.md`: preparation systems, historical reference differences, physical placements, and transaction/recovery verification.
 
