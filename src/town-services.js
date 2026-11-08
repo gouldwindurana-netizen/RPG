@@ -57,12 +57,11 @@ class AveluneTownServices {
   static specs(area) {
     const entry = (key, type, name, label, description, extra = {}) => ({key, type, name, label, description, free: false, catalogs: [], ...extra});
     if (area.id === 'wyla_cottage') return [
-      entry('care', 'inn', 'Wyla’s care', 'FREE CARE', 'Rest at Wyla’s spare bed. Restore the whole party and replenish magic without paying.', {free: true, preferred: [9, 9], match: /PROP001/}),
+      entry('care', 'inn', 'Wyla’s guest room', 'INN', 'Pay for a night in the spare room to restore living companions’ HP and magic.', {preferred: [9, 9], match: /PROP001/}),
       entry('advice', 'rumor', 'Wyla’s road advice', 'TALK', 'A familiar voice and a direction for the road ahead.', {preferred: [21, 15], match: /PROP005/})
     ];
     if (['oakmere_clinic', 'infirmary'].includes(area.id)) return [
-      entry('care', 'inn', 'Wardkeeper’s recovery', 'FREE CARE', 'The clinic offers a safe bed and restores the party’s strength and magic.', {free: true, preferred: [9, 9], match: /PROP001/}),
-      entry('chapel', 'chapel', 'Clinic revival', 'REVIVE', 'The wardkeeper tends fallen companions.', {free: true, preferred: [22, 15], match: /PROP007/})
+      entry('chapel', 'chapel', 'Clinic revival', 'REVIVE', 'Revive a fallen companion for 30 G. They return with 1 HP; the inn restores HP and magic afterward.', {preferred: [22, 15], match: /PROP007/})
     ];
     if (area.id === 'smithy_inn') return [
       entry('inn', 'inn', 'Tilda’s rooms', 'INN', 'Buy a night’s rest to restore living allies’ HP and magic.', {preferred: [8, 10], match: /PROP009/}),
@@ -73,7 +72,7 @@ class AveluneTownServices {
       entry('armor', 'armor', 'Oakmere armor counter', 'ARMOR', 'Fit the party with armor suited to each job.', {preferred: [20, 15], match: /PROP012/, catalogs: ['armor']})
     ];
     if (AVELUNE_REFUGE_KINDS.has(area.kind)) return [
-      entry('camp', 'camp', area.kind === 'landing' ? 'Mooring rest stop' : 'Roadkeeper’s refuge', 'REST', 'Rest here freely to recover HP and magic before the next stretch of road.', {free: true, offset: [-4, 4], match: /campfire|shelter|infirmary|sanctuary|hearth|bell|gantry|arch/i}),
+      entry('camp', 'camp', area.kind === 'landing' ? 'Mooring rest stop' : 'Roadkeeper’s campsite', 'CAMP', 'Use a Tent or Cottage from your bag to recover living companions’ HP and magic. Fallen allies need revival first.', {offset: [-4, 4], match: /campfire|shelter|infirmary|sanctuary|hearth|bell|gantry|arch/i}),
       entry('guild', 'guild', 'Traveling job mentor', 'JOBS', 'Change a party member’s job while sheltered, then rest to replenish magic.', {free: true, offset: [4, 4], match: /shelter|pavilion|infirmary|sanctuary|hearth|bell|gantry|arch/i}),
       entry('rumor', 'rumor', 'Roadkeeper', 'TALK', 'Ask about the next crossing and the work that keeps it open.', {offset: [0, -2], match: /Road post/i})
     ];
@@ -84,7 +83,7 @@ class AveluneTownServices {
       entry('items', 'item', home ? 'Bakehouse provisions' : `${area.name} provisions`, 'ITEMS', 'Buy healing supplies, remedies, and travel gear. Sell spare supplies here.', {match: /produce stall|apothecary|market|exchange|bakehouse|kiosk|office|boatbuilder/i, offset: [4, 3], catalogs: ['item']}),
       entry('armory', 'weapon', home ? 'Tilda’s forge stall' : `${area.name} armory`, 'ARMS', 'Buy and sell weapons and armor; compare equipment for every party job.', {match: /armory|smithy|furnace|guild|tool|foundry|lampwright|shed|boatbuilder/i, offset: [-5, 6], catalogs: ['weapon', 'armor'], interior: area.id === 'alderreach_07' ? 'oakmere_armory' : home ? 'smithy_inn' : undefined}),
       entry('magic', 'magic', home ? 'Orchard spellwright' : `${area.name} spellwright`, 'MAGIC', 'Learn white and black magic for eligible jobs. Stronger spell stock follows the trade roads.', {match: /observatory|chart|lamp|records|pavilion|well|hall|press/i, offset: [5, 6], catalogs: ['white', 'black']}),
-      entry('chapel', 'chapel', home ? 'Wyla’s wayside chapel' : `${area.name} wardkeeper`, 'REVIVE', home?'Wyla offers free recovery for the entire party. Her cottage also keeps a spare bed.':'Pay the wardkeeper to revive a fallen companion. An inn restores the party’s remaining strength.', {free:home, match: [/clinic|infirmary/i,/shrine|well/i,/shelter|cottage/i], offset: [-8, 3], interior: home ? 'wyla_cottage' : area.id === 'alderreach_07' ? 'oakmere_clinic' : area.id === 'edrin_05' ? 'infirmary' : undefined}),
+      entry('chapel', 'chapel', home ? 'Brackenwell wardkeeper' : `${area.name} wardkeeper`, 'REVIVE', 'Revive a fallen companion for 30 G. They return with 1 HP; the inn restores HP and magic afterward.', {match: [/clinic|infirmary/i,/shrine|well/i,/shelter|cottage/i], offset: [-8, 3], interior: area.id === 'alderreach_07' ? 'oakmere_clinic' : area.id === 'edrin_05' ? 'infirmary' : undefined}),
       entry('guild', 'guild', home ? 'Festival roadkeepers’ guild' : `${area.name} job mentor`, 'JOBS', 'Choose jobs for the four-person party. Rest after retraining to replenish magic.', {free: true, match: /guild|hall|office|press|court|exchange|barn/i, offset: [8, 3]}),
       entry('rumor', 'rumor', `${area.name} road guide`, 'TALK', 'Ask for local directions and news of the next road.', {match: /Road post/i, offset: [0, -2]})
     ];
@@ -114,10 +113,13 @@ class AveluneTownServices {
     for (let index = 0; index < specs.length; index++) {
       const spec = specs[index];
       const matches = Array.isArray(spec.match) ? spec.match : [spec.match];
-      const anchor = matches.map(match => buildings.find(o => match?.test(`${o.name || ''} ${o.asset}`))
+      const frontage = area.serviceSpots?.[spec.type];
+      const nearestBuilding = frontage && [...buildings].sort((a,b) =>
+        (a.x-frontage[0])**2+(a.y-frontage[1])**2-((b.x-frontage[0])**2+(b.y-frontage[1])**2))[0];
+      const anchor = nearestBuilding || matches.map(match => buildings.find(o => match?.test(`${o.name || ''} ${o.asset}`))
         || objects.find(o => match?.test(`${o.name || ''} ${o.asset}`) && !(area.events || []).some(event => event.at[0] === o.x && event.at[1] - 1 === o.y))).find(Boolean)
         || buildings[index % Math.max(1, buildings.length)] || {x:area.spawn[0],y:area.spawn[1]-5,name:'Sheltered road'};
-      const preferred = spec.preferred || [anchor.x + (spec.offset?.[0] || 0), anchor.y + (spec.offset?.[1] || 3)];
+      const preferred = frontage || spec.preferred || [anchor.x + (spec.offset?.[0] || 0), anchor.y + (spec.offset?.[1] || 3)];
       let at = null, bestDistance = Infinity;
       for (const candidate of queue) {
         const distance = (candidate[0]-preferred[0]) ** 2 + (candidate[1]-preferred[1]) ** 2;

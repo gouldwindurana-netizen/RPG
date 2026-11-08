@@ -161,7 +161,7 @@ try {
   assert.equal(mobileInside.width,mobileOutside.width);assert.equal(mobileInside.height,mobileOutside.height);
   await mobile.screenshot({path:path.join(output,'mobile-interior.png')});
   pass('390×844 mobile field and interior preserve square pixels, sprite scale and page width');
-  await mobile.evaluate(async()=>{await __avelune.visit('alderreach_01',[24,20]);__avelune.closeDialog();});
+  await mobile.evaluate(async()=>{const door=__avelune.world.layout.areas.alderreach_01.stops.find(s=>s.mode==='door');await __avelune.visit('alderreach_01',door.at);__avelune.closeDialog();});
   await mobile.locator('#interact:not([hidden])').waitFor({state:'visible'});
   const action=await mobile.locator('#interact').boundingBox(),badge=await mobile.locator('#danger-chip').boundingBox();
   assert.ok(action&&badge);

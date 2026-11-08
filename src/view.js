@@ -63,7 +63,10 @@ class AveluneView {
 
   async prepare(id) {
     if (typeof AveluneTerrain !== 'undefined' && typeof LAYOUT !== 'undefined') {
-      if(!this.groundCache.has(id))this.groundCache.set(id,AveluneTerrain.bake(LAYOUT.areas[id]));
+      if(!this.groundCache.has(id)){
+        const area=LAYOUT.areas[id];
+        this.groundCache.set(id,area.kind==='overworld'&&typeof AveluneOverworldArt!=='undefined'?AveluneOverworldArt.bake(area):AveluneTerrain.bake(area));
+      }
       const ground=this.groundCache.get(id);
       if(this.groundCache.size>6)this.groundCache.delete(this.groundCache.keys().next().value);
       return [null,ground,null];
@@ -77,6 +80,7 @@ class AveluneView {
     this.motionAtlas = motion;
     this.indoor = area.indoor;
     this.area = area;
+    this.overworld = area.kind === 'overworld';
     if (this.images.size > 13) {
       const oldest = [...this.images.keys()].find(key => !['sprites', 'motion', area.id].includes(key));
       if (oldest) this.images.delete(oldest);
@@ -108,12 +112,12 @@ class AveluneView {
     const availableWidth = Math.floor(frame.clientWidth);
     const availableHeight = Math.floor(frame.clientHeight);
     if (!availableWidth || !availableHeight) return;
-    // Every source pixel occupies a whole square of display pixels. Keep the
-    // same scale in rooms and outside; only the camera's visible area changes.
+    // Towns retain their life-sized tiles. The separate world map uses a wider
+    // viewport and miniature landmarks, with a smaller integer display scale.
     const tile = this.tile;
-    const scale = Math.max(1, Math.floor(Math.min(availableWidth / 320, availableHeight / 192)));
-    const width = Math.max(tile, Math.min(576, Math.floor(availableWidth / scale / tile) * tile));
-    const height = Math.max(tile, Math.min(224, Math.floor(availableHeight / scale / tile) * tile));
+    const scale = Math.max(1, Math.floor(Math.min(availableWidth / (this.overworld?640:320), availableHeight / (this.overworld?320:192))));
+    const width = Math.max(tile, Math.min(this.overworld?960:576, Math.floor(availableWidth / scale / tile) * tile));
+    const height = Math.max(tile, Math.min(this.overworld?480:224, Math.floor(availableHeight / scale / tile) * tile));
     if (width !== this.canvas.width || height !== this.canvas.height) {
       this.canvas.width = width;
       this.canvas.height = height;
@@ -218,6 +222,7 @@ class AveluneView {
 
   frame(model, time, objective) {
     if (!this.ground) return;
+    if(this.overworld&&typeof AveluneOverworldArt!=='undefined'){this.worldFrame(model,time,objective);return;}
     this.size();
     const ctx = this.ctx;
     const {width:w, height:h} = this.canvas;
@@ -277,6 +282,44 @@ class AveluneView {
     }
     ctx.restore();
     if (objective) this.marker(model, objective, cx, cy, w, h, t);
+  }
+
+  worldFrame(model,time,objective) {
+    this.size();
+    const ctx=this.ctx,{width:w,height:h}=this.canvas;
+    const cx=this.cameraAxis(model.x,w,0,this.ground.width),cy=this.cameraAxis(model.y,h,0,this.ground.height);
+    this.camera={x:cx,y:cy};
+    ctx.fillStyle=AVELUNE_PALETTE.deep;ctx.fillRect(0,0,w,h);
+    ctx.save();ctx.translate(-cx,-cy);ctx.drawImage(this.ground,0,0);
+    const t=this.reduce?0:time/1000;
+    if(!this.reduce)AveluneTerrain.waterFrame(ctx,model.area,time,this.camera,w,h);
+    const nodes=model.area.mapNodes||[],gateways=model.area.gateways||[];
+    const labels=[...nodes.filter(node=>model.distance(node.at)<=112),...gateways.filter(gate=>model.distance(gate.at)<=64).map(gate=>({...gate,name:gate.title}))];
+    const nearest=labels.sort((a,b)=>model.distance(a.at)-model.distance(b.at))[0];
+    for(const node of nodes){
+      const x=model.center(node.at[0]),y=model.center(node.at[1]);
+      if(x<cx-24||x>cx+w+24||y<cy-24||y>cy+h+24)continue;
+      const onThisShore=!model.area.allowedEntries||model.area.allowedEntries.includes(node.id);
+      AveluneOverworldArt.node(ctx,node,x,y,onThisShore&&(model.canEnterArea?.(node.id)??true));
+    }
+    for(const gate of gateways){
+      const x=model.center(gate.at[0]),y=model.center(gate.at[1]);
+      if(x<cx-16||x>cx+w+16||y<cy-16||y>cy+h+16)continue;
+      const route=model.routes.get(gate.route);
+      AveluneOverworldArt.gateway(ctx,x,y,model.routeOpen?model.routeOpen(route):model.has(route?.gate));
+    }
+    const pose=this.animateActor(model);
+    AveluneOverworldArt.hero(ctx,model.leaderId||'roadkeeper',pose.direction,pose.frame,pose.x,pose.y);
+    if(nearest){
+      const x=model.center(nearest.at[0]),y=model.center(nearest.at[1])-24;
+      ctx.font='16px VT323, monospace';ctx.textAlign='center';ctx.textBaseline='bottom';
+      const width=Math.ceil(ctx.measureText(nearest.name).width)+12;
+      const labelX=Math.round(Math.max(cx+width/2+3,Math.min(cx+w-width/2-3,x)));
+      ctx.fillStyle='#0b1325ed';ctx.fillRect(labelX-width/2,y-17,width,20);
+      ctx.fillStyle=AVELUNE_PALETTE.cream;ctx.fillText(nearest.name,labelX,y);
+    }
+    ctx.restore();
+    if(objective)this.marker(model,objective,cx,cy,w,h,t);
   }
 
   cameraAxis(at, view, min, max) {

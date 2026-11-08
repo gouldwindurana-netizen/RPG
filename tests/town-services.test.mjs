@@ -52,22 +52,38 @@ test('service tiles are reachable, distinct, spaced from story events and author
   }
 });
 
-test('Brackenwell has recognizable storefront sources and a reachable free-care fallback', () => {
+test('Brackenwell and clinic interiors keep paid inn recovery separate from paid revival', () => {
   const services = Town.forArea(layout.areas.alderreach_01, model());
   assert.match(services.find(service => service.type === 'inn').source, /Tilda/);
   assert.match(services.find(service => service.type === 'item').source, /bakehouse/);
   assert.match(services.find(service => service.type === 'weapon').source, /Tilda/);
   assert.match(services.find(service => service.type === 'magic').source, /Orchard press/);
   assert.match(services.find(service => service.type === 'guild').source, /Festival Barn/);
-  assert.equal(services.find(service => service.type === 'chapel').interior, 'wyla_cottage');
+  assert.equal(services.find(service => service.type === 'chapel').free, false);
   const cottage = model('wyla_cottage');
   const care = Town.forArea(cottage.area, cottage).find(service => service.type === 'inn');
-  assert.equal(care.free, true);
+  assert.equal(care.free, false);
+  assert.equal(care.label, 'INN');
   assert.ok(path(cottage,care.at));
   assert.equal(Town.forArea(layout.areas.smithy_inn, model('smithy_inn')).length, 2);
   assert.equal(Town.forArea(layout.areas.oakmere_armory, model('oakmere_armory')).length, 2);
   for (const id of ['oakmere_clinic','infirmary']) {
-    assert.ok(Town.forArea(layout.areas[id], model(id)).every(service => service.free));
+    const clinic = Town.forArea(layout.areas[id], model(id));
+    assert.equal(clinic.length, 1);
+    assert.equal(clinic[0].type, 'chapel');
+    assert.equal(clinic[0].free, false);
+    assert.match(clinic[0].description, /30 G/);
+    assert.match(clinic[0].description, /1 HP/);
+  }
+});
+
+test('no healing service offers free recovery and camps require supplies', () => {
+  for (const area of Object.values(layout.areas)) for (const service of Town.forArea(area, model(area.id))) {
+    if (['inn','chapel','camp'].includes(service.type)) {
+      assert.equal(service.free, false, service.id);
+      assert.doesNotMatch(service.label+' '+service.description, /free|without paying/i, service.id);
+    }
+    if (service.type === 'camp') assert.match(service.description, /Tent or Cottage/, service.id);
   }
 });
 
@@ -99,6 +115,14 @@ test('the service directory and proximity interactions share stable places', () 
   directory[0].catalogs.push('bad');
   assert.notEqual(Town.forArea(world.area,world)[0].at[0], -100);
   assert.ok(!Town.forArea(world.area,world)[0].catalogs.includes('bad'));
+});
+
+test('authored service frontage cells override legacy preferred coordinates', () => {
+  const world = model();
+  const original = Town.forArea(world.area, world);
+  const area = {...world.area, serviceSpots:Object.fromEntries(original.map(service=>[service.type,[...service.at]]))};
+  const placed = Town.forArea(area, world);
+  for (const service of placed) assert.deepEqual(clone(service.at), area.serviceSpots[service.type]);
 });
 
 test('nearby pending story events retain priority over a service', () => {

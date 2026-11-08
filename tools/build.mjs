@@ -1,13 +1,14 @@
-import fs from 'node:fs/promises';import path from 'node:path';
+import fs from 'node:fs/promises';import path from 'node:path';import vm from 'node:vm';
 const root=path.resolve('.');const read=(p)=>fs.readFile(path.join(root,p),'utf8');
 const layout=JSON.parse(await read('src/world.json'));
+vm.runInNewContext(await read('src/world-travel.js')+'; AveluneOverworld.apply(layout);',{layout});
 for(const area of Object.values(layout.areas))for(const key of ['lanes','crossings','watercourses'])delete area[key];
 const art=JSON.parse(await read('src/art.json'));
 const fontRoot='node_modules/@fontsource/';
 await fs.copyFile(fontRoot+'vt323/files/vt323-latin-400-normal.woff2','public/assets/pixel.woff2');
 await fs.copyFile(fontRoot+'cinzel/files/cinzel-latin-400-normal.woff2','public/assets/heading.woff2');
 const style=await read('src/style.css')+'\n'+await read('src/battle.css')+'\n'+await read('src/services.css');
-const tokens={STYLE:style,LAYOUT:JSON.stringify(layout),ART:JSON.stringify(art),PIXEL:await read('src/pixel-art.js'),TERRAIN:await read('src/terrain.js'),MODEL:await read('src/model.js'),VIEW:await read('src/view.js'),COMBAT:await read('src/combat.js'),CAMPAIGN:await read('src/campaign.js'),ENEMY:await read('src/enemy-art.js'),BATTLE:await read('src/battle-ui.js'),TOWNS:await read('src/town-services.js'),SERVICEART:await read('src/service-art.js'),SHOPS:await read('src/services-ui.js'),APP:await read('src/app.js')};
+const tokens={STYLE:style,LAYOUT:JSON.stringify(layout),ART:JSON.stringify(art),PIXEL:await read('src/pixel-art.js'),TERRAIN:await read('src/terrain.js'),OVERWORLDART:await read('src/overworld-art.js'),MODEL:await read('src/model.js'),VIEW:await read('src/view.js'),COMBAT:await read('src/combat.js'),CAMPAIGN:await read('src/campaign.js'),ENEMY:await read('src/enemy-art.js'),BATTLE:await read('src/battle-ui.js'),TOWNS:await read('src/town-services.js'),SERVICEART:await read('src/service-art.js'),SHOPS:await read('src/services-ui.js'),APP:await read('src/app.js')};
 let html=await read('src/shell.html');for(const [key,value]of Object.entries(tokens)){if(!html.includes('@@'+key+'@@'))throw Error('Missing token '+key);html=html.replace('@@'+key+'@@',()=>key==='STYLE'?value:value.replaceAll('</script','<\\/script'));}
 await fs.mkdir('dist',{recursive:true});await fs.cp('public/assets','dist/assets',{recursive:true});await fs.writeFile('dist/index.html',html);
 if(process.argv.includes('--standalone')){

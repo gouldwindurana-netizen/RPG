@@ -152,7 +152,7 @@ class AveluneCampaign {
       inn: haven,
       jobs: haven,
       camp: sanctuary || bosses.length > 0,
-      innCost: sanctuary ? 0 : 8 + this.recommendedLevel(area, world) * 3,
+      innCost: 8 + this.recommendedLevel(area, world) * 3,
       name: sanctuary ? 'Wayside refuge' : 'Roadkeeper’s provisions',
     };
   }

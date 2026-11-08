@@ -15,12 +15,32 @@ class AveluneWorld {
     this.moving = false;
     this.x = Number.isFinite(save?.x) ? save.x : this.center(this.area.spawn[0]);
     this.y = Number.isFinite(save?.y) ? save.y : this.center(this.area.spawn[1]);
-    if (!this.canStand(this.x, this.y)) [this.x, this.y] = this.area.spawn.map(n => this.center(n));
+    if (!this.canStand(this.x, this.y) || this.area.classicTown && (save?.version||1)<2) [this.x, this.y] = this.area.spawn.map(n => this.center(n));
     this.visited.add(this.id);
   }
 
   get area() { return this.layout.areas[this.id]; }
   center(value) { return (value + 0.5) * this.tile; }
+
+  accessibleAreas() {
+    const key=[...this.flags].sort().join(',');
+    if(this.accessCache?.key===key)return this.accessCache.ids;
+    const ids=new Set([this.layout.start]),queue=[this.layout.start];
+    for(const id of queue)for(const route of this.layout.travelGraph||this.layout.routes){
+      const to=route.a===id?route.b:route.b===id?route.a:null;
+      if(to&&!ids.has(to)&&this.has(route.gate)){ids.add(to);queue.push(to)}
+    }
+    this.accessCache={key,ids};return ids;
+  }
+
+  canEnterArea(id) { return this.accessibleAreas().has(id); }
+  routeOpen(route) { return !!route&&this.has(route.gate)&&(!route.access||this.id===route.access||this.canEnterArea(route.access)); }
+  routeMissing(route) {
+    if(!route.access||this.canEnterArea(route.access))return this.requirements([route.gate]);
+    const reached=this.accessibleAreas();
+    const frontier=(this.layout.travelGraph||[]).filter(r=>reached.has(r.a)!==reached.has(r.b));
+    return [...new Set(frontier.flatMap(r=>this.requirements([r.gate])))];
+  }
 
   has(gate) {
     if (!gate) return true;
@@ -88,8 +108,8 @@ class AveluneWorld {
   }
 
   crossedExit() {
-    return this.area.stops.find(stop => WalkModes.has(stop.mode)
-      && this.distance(stop.at) <= 7 && this.has(this.routes.get(stop.links[0]).gate));
+    return this.area.stops.find(stop => (WalkModes.has(stop.mode)||stop.mode==='entrance')
+      && this.distance(stop.at) <= 7 && this.routeOpen(this.routes.get(stop.links[0])));
   }
 
   applyEvent(id) {
@@ -107,7 +127,7 @@ class AveluneWorld {
       const route = this.routes.get(id);
       const to = route.a === this.id ? route.b : route.a;
       return {id, mode: route.mode, to, title: this.layout.areas[to].name,
-              open: this.has(route.gate), missing: this.requirements([route.gate]), note: route.note};
+              open: this.routeOpen(route), missing: this.routeMissing(route), note: route.note};
     });
   }
 
@@ -115,7 +135,7 @@ class AveluneWorld {
     const route = this.routes.get(id);
     const from = route?.stops[this.id];
     const stop = this.area.stops.find(item => item.id === from);
-    if (!stop || !this.has(route.gate) || this.distance(stop.at) > 30) return null;
+    if (!stop || !this.routeOpen(route) || this.distance(stop.at) > 30) return null;
     const to = route.a === this.id ? route.b : route.a;
     const area = this.layout.areas[to];
     const arrival = area.stops.find(item => item.id === route.stops[to]);
@@ -143,7 +163,7 @@ class AveluneWorld {
         for (const link of stop.links) {
           const route = this.routes.get(link);
           const there = route.a === here ? route.b : route.a;
-          if (seen.has(there) || !this.has(route.gate)) continue;
+          if (seen.has(there) || !this.has(route.gate) || route.access&&!this.canEnterArea(route.access)&&here!==route.access) continue;
           seen.set(there, seen.get(here) ?? {stop, there});
           queue.push(there);
         }
@@ -172,7 +192,7 @@ class AveluneWorld {
   }
 
   snapshot() {
-    return {version: 1, scene: this.id, x: this.x, y: this.y, facing: this.facing,
+    return {version: 2, scene: this.id, x: this.x, y: this.y, facing: this.facing,
             flags: [...this.flags], visited: [...this.visited]};
   }
 }
@@ -196,7 +216,9 @@ class AveluneDanger {
 
 function avelunePath(world,to) {
   const start=[Math.floor(world.x/world.tile),Math.floor(world.y/world.tile)];
+  const entrances=new Set(world.area.kind==='overworld'?world.area.stops
+    .filter(stop=>WalkModes.has(stop.mode)||stop.mode==='entrance').map(stop=>stop.at.join(',')):[]);
   const key=p=>p.join(',');const todo=[start], prev=new Map([[key(start),null]]);
   for(let i=0;i<todo.length;i++){const p=todo[i];if(p[0]===to[0]&&p[1]===to[1]){const path=[];let q=p;while(prev.get(key(q))){path.unshift(q);q=prev.get(key(q));}return path;}
-    for(const [dx,dy]of [[1,0],[-1,0],[0,1],[0,-1]]){const q=[p[0]+dx,p[1]+dy];if(prev.has(key(q))||!world.canStand(world.center(q[0]),world.center(q[1])))continue;prev.set(key(q),p);todo.push(q);}}return null;
+    for(const [dx,dy]of [[1,0],[-1,0],[0,1],[0,-1]]){const q=[p[0]+dx,p[1]+dy];if(prev.has(key(q))||entrances.has(key(q))&&(q[0]!==to[0]||q[1]!==to[1])||!world.canStand(world.center(q[0]),world.center(q[1])))continue;prev.set(key(q),p);todo.push(q);}}return null;
 }

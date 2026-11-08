@@ -10,7 +10,8 @@
     "test:browser": "node tests/playtest.mjs",
     "art:classic": "node tools/export-classic-art.mjs",
     "test:visual": "node tests/visual-polish.mjs",
-    "test:services": "node tests/services-browser.mjs"
+    "test:services": "node tests/services-browser.mjs",
+    "test:travel": "node tests/overworld-browser.mjs"
   },
   "devDependencies": {
     "@fontsource/cinzel": "^5.3.0",

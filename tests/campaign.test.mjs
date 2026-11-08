@@ -91,7 +91,7 @@ test('field rewards require a committed flag and cannot be farmed', () => {
   assert.equal(JSON.stringify({ gold: game.gold, inventory: game.inventory, xp: game.xp }), state);
 });
 
-test('rewards respect inventory caps and safe rest remains available without gold', () => {
+test('rewards respect inventory caps and haven recovery has a positive price', () => {
   const model = world();
   const game = rpg();
   game.inventory = { potion: 99, ether: 99, revive: 99 };
@@ -100,7 +100,7 @@ test('rewards respect inventory caps and safe rest remains available without gol
   assert.deepEqual(game.inventory, { potion: 99, ether: 99, revive: 99 });
   const refuge = Campaign.services(layout.areas.wyla_cottage, model);
   assert.equal(refuge.inn, true);
-  assert.equal(refuge.innCost, 0);
+  assert.equal(refuge.innCost, 11);
   assert.equal(refuge.jobs, true);
   assert.equal(Campaign.services(layout.areas.mill_sluice, model).camp, true);
   assert.equal(Campaign.services(layout.areas.alderreach_02, model).jobs, false);

@@ -38,29 +38,34 @@ class AveluneServicesUI {
   _hp(hero) {const wrap=this._el('div',undefined,'town-vitals');wrap.append(this._el('span',hero.hp===0?'FALLEN':'HP '+hero.hp+' / '+hero.maxHp,hero.hp===0?'town-fallen':''));const bar=this._el('span',undefined,'town-hp');const fill=this._el('i');fill.style.width=(100*hero.hp/hero.maxHp)+'%';bar.append(fill);wrap.append(bar);return wrap;}
   _heroSummary(hero) {const box=this._el('div',undefined,'town-hero-summary');box.append(this._el('strong',hero.name+' · '+hero.role),this._hp(hero));const charges=(hero.maxCharges||[]).map((max,i)=>max?'Tier '+(i+1)+' '+hero.charges[i]+'/'+max:null).filter(Boolean).join('  ·  ');if(charges)box.append(this._el('small',charges));return box;}
   _row(title,description,action,meta='') {const row=this._el('div',undefined,'town-row'),info=this._el('div',undefined,'town-row-info');info.append(this._el('strong',title));if(description)info.append(this._el('small',description));if(meta)info.append(this._el('span',meta,'town-row-meta'));row.append(info);if(action)row.append(action);return row;}
-  _price() {const w=this.getWorld();if(this.service?.free||this.service?.type==='camp')return 0;if(Number.isFinite(this.service?.cost))return this.service.cost;return 8+(typeof AveluneCampaign!=='undefined'?AveluneCampaign.recommendedLevel(w.area,w):Math.max(1,this.service?.stockTier||1))*3;}
+  _price() {const w=this.getWorld();if(this.service?.type==='camp')return 0;if(Number.isFinite(this.service?.cost))return Math.max(1,this.service.cost);return 8+(typeof AveluneCampaign!=='undefined'?AveluneCampaign.recommendedLevel(w.area,w):Math.max(1,this.service?.stockTier||1))*3;}
   _stock(tier) {return (this.service?.stockTier||1)>=Math.max(1,tier||1);}
   open(service) {
     this.service=service;this.state={hero:0,tab:'buy',quantity:1,slot:'weapon',school:'all',guild:'jobs',confirm:false};
     const aliases={itemshop:'item',provisions:'item',weaponshop:'weapon',armory:'weapon',armorshop:'armor',magicshop:'magic',clinic:'chapel',healer:'chapel'};
     this.type=aliases[service.type]||service.type;
     if(this.type==='armor')this.state.slot='armor';if(service.fieldOnly)this.state.tab='equip';
-    const render={inn:()=>this._inn(),camp:()=>this._inn(),chapel:()=>this._chapel(),item:()=>this._items(),weapon:()=>this._gear(),armor:()=>this._gear(),magic:()=>this._magicShop(),guild:()=>this._guild(),rumor:()=>this._rumor()}[this.type]||(()=>this._rumor());
+    const render={inn:()=>this._inn(),camp:()=>this._camp(),chapel:()=>this._chapel(),item:()=>this._items(),weapon:()=>this._gear(),armor:()=>this._gear(),magic:()=>this._magicShop(),guild:()=>this._guild(),rumor:()=>this._rumor()}[this.type]||(()=>this._rumor());
     this._begin('town-service',service.label||this.type.toUpperCase(),service.name,render);
   }
   _inn() {
     const r=this.getRPG(),price=this._price();this.mount.append(this._note(this.service.description||'A safe bed, a warm meal, and a fresh start for every traveler.'));
     const party=this._el('div',undefined,'town-party-summary');r.party.forEach(h=>party.append(this._heroSummary(h)));this.mount.append(party);
-    this.mount.append(this._note(this.service.free||this.service.type==='camp'?'This refuge restores the whole party’s HP and every spell charge, including fallen allies. Your journey is saved here.':'A night at the inn restores living allies’ HP and every spell charge. Take fallen allies to the clinic first. Your journey is saved here.'));
-    const box=this._el('div',undefined,'town-rest');box.append(this._el('strong',price?'A room for the party · '+price+' G':'A sheltered rest · FREE'));
+    this.mount.append(this._note('A night at the inn restores living allies’ HP and every spell charge. Take fallen allies to the clinic first. Your journey is saved here.'));
+    const box=this._el('div',undefined,'town-rest');box.append(this._el('strong','A room for the party · '+price+' G'));
     if(this.state.confirm){box.append(this._note('Stay until morning?'),this._action('Confirm rest',()=>this._run(()=>this.options.onRest(this.service)),{primary:true,disabled:r.gold<price}),this._action('Not yet',()=>{this.state.confirm=false;this._draw();}));}
-    else box.append(this._action(price?'Stay the night · '+price+' G':'Rest and recover',()=>{this.state.confirm=true;this._draw();},{primary:true,disabled:r.gold<price,note:r.gold<price?'You need '+(price-r.gold)+' more G.':'Restore HP + magic · save your journey'}));
-    this.mount.append(box);if(r.gold<price)this.mount.append(this._note('A free refuge, field healing, or a tent can help when gold is scarce.'));
+    else box.append(this._action('Stay the night · '+price+' G',()=>{this.state.confirm=true;this._draw();},{primary:true,disabled:r.gold<price,note:r.gold<price?'You need '+(price-r.gold)+' more G.':'Restore HP + magic · save your journey'}));
+    this.mount.append(box);if(r.gold<price)this.mount.append(this._note('Use supplies already in your bag, healing magic, or sell spare items to pay for a room.'));
+  }
+  _camp() {
+    const r=this.getRPG();this.mount.append(this._note(this.service.description||'A sheltered place to make camp. Recovery consumes a Tent or Cottage from your bag.'));
+    const party=this._el('div',undefined,'town-party-summary');r.party.forEach(h=>party.append(this._heroSummary(h)));this.mount.append(party);
+    this.mount.append(this._note('Camping supplies restore living allies. Take fallen companions to a clinic or use a revival item first.'));
+    for(const id of ['tent','cottage']){const item=AVELUNE_ITEMS[id],owned=r.inventory[id]||0;this.mount.append(this._row(item.name+' · '+owned+' in bag',item.description,this._action('Use '+item.name,()=>this._run(()=>this.options.onRest({...this.service,supply:id})),{primary:owned>0,disabled:owned<1,note:owned?'Consumes one '+item.name+'.':'Buy camping supplies at an item shop.'})));}
   }
   _chapel() {
-    const r=this.getRPG(),price=this.service.free?0:30;this.mount.append(this._note(this.service.description||'The keeper tends travelers who have fallen on the road.'));
-    for(const [i,h]of r.party.entries()){const b=this._action(h.hp===0?'Revive · '+(price?price+' G':'FREE'):'Standing',()=>this._run(()=>r.reviveAtClinic(i,price)),{disabled:h.hp>0||r.gold<price,primary:h.hp===0,note:h.hp===0?(r.gold<price?'Not enough gold.':'Return with 1 HP. Visit the inn afterward.'):'Visit the inn to recover HP and magic.'});const row=this._row(h.name+' · '+h.role,'HP '+h.hp+' / '+h.maxHp,b);row.classList.toggle('town-fallen-row',h.hp===0);this.mount.append(row);}
-    if(this.service.free)this.mount.append(this._action('Receive care · FREE',()=>this._run(()=>this.options.onRest({...this.service,free:true})),{primary:true,note:'Restore the entire party’s HP and spell charges.'}));
+    const r=this.getRPG(),price=30;this.mount.append(this._note(this.service.description||'Revive a fallen companion for 30 G. They return with 1 HP; visit the inn to recover HP and magic.'));
+    for(const [i,h]of r.party.entries()){const b=this._action(h.hp===0?'Revive · '+price+' G':'Standing',()=>this._run(()=>r.reviveAtClinic(i,price)),{disabled:h.hp>0||r.gold<price,primary:h.hp===0,note:h.hp===0?(r.gold<price?'Not enough gold.':'Return with 1 HP. Visit the inn afterward.'):'Visit the inn to recover HP and magic.'});const row=this._row(h.name+' · '+h.role,'HP '+h.hp+' / '+h.maxHp,b);row.classList.toggle('town-fallen-row',h.hp===0);this.mount.append(row);}
   }
   _quantity() {return this._tabs([[1,'×1'],[5,'×5'],[10,'×10']],this.state.quantity,n=>this.state.quantity=n);}
   _items() {
@@ -111,9 +116,9 @@ class AveluneServicesUI {
   _rumor() {this.mount.append(this._note(this.service.description||'Travelers share news around the town.'),this._el('blockquote',this.service.rumor||'Visit the inn before a long journey. Carry healing supplies, prepare your spells, and keep your strongest defender in the front rank.','town-rumor'));}
   directory(services=[]) {
     this.service=null;this.state={};this._begin('town-directory','TOWN SERVICES','Prepare for the road',()=>{this.mount.append(this._note('Follow a sign to the counter, then press E or Interact. Inns restore HP and magic; shops prepare your party for the next journey.'));
-      if(!services.length){this.mount.append(this._note('There are no town services here. Use the mailbag or field magic to heal, or return to a town or free refuge.'));return;}
-      const rest=services.find(s=>s.type==='inn'||s.type==='camp');if(rest){this.service=rest;const price=this._price();this.service=null;this.mount.append(this._action(price?'Rest at the inn · '+price+' G':'Rest at the refuge · FREE',()=>this.open(rest),{primary:true,note:rest.free?'Recover the whole party’s HP and spell charges.':'Recover living allies’ HP and spell charges.'}));}
-      const labels={inn:'INN',camp:'REFUGE',item:'ITEMS',weapon:'ARMORY',armor:'ARMOR',magic:'MAGIC',chapel:'CLINIC',guild:'GUILD',rumor:'NEWS'};for(const s of services){const label=labels[s.type]||s.type.toUpperCase();this.mount.append(this._row(label+' · '+s.name,s.description,this._action(this.options.navigateTo?'Walk to '+label:'Visit '+label,()=>this.options.navigateTo?this.options.navigateTo(s):this.open(s),{key:'directory-'+s.id}),s.free?'Free care':s.type==='inn'?'HP + magic recovery':s.type==='chapel'?'Revive fallen allies':''));}
+      if(!services.length){this.mount.append(this._note('There are no town services here. Use the mailbag or field magic to heal, or return to a town.'));return;}
+      const rest=services.find(s=>s.type==='inn'||s.type==='camp');if(rest){this.service=rest;const price=this._price();this.service=null;this.mount.append(this._action(rest.type==='camp'?'Make camp · supply required':'Rest at the inn · '+price+' G',()=>this.open(rest),{primary:true,note:rest.type==='camp'?'Use a Tent or Cottage from your bag.':'Recover living allies’ HP and spell charges.'}));}
+      const labels={inn:'INN',camp:'CAMP',item:'ITEMS',weapon:'ARMORY',armor:'ARMOR',magic:'MAGIC',chapel:'CLINIC',guild:'GUILD',rumor:'NEWS'};for(const s of services){const label=labels[s.type]||s.type.toUpperCase();this.mount.append(this._row(label+' · '+s.name,s.description,this._action(this.options.navigateTo?'Walk to '+label:'Visit '+label,()=>this.options.navigateTo?this.options.navigateTo(s):this.open(s),{key:'directory-'+s.id}),s.type==='inn'?'Paid HP + magic recovery':s.type==='chapel'?'30 G · revive at 1 HP':s.type==='camp'?'Tent or Cottage required':''));}
     });
   }
   equipmentField(heroIndex=0) {

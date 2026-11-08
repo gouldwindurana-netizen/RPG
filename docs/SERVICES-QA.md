@@ -1,6 +1,6 @@
 # Town and preparation verification
 
-The service update makes recovery and shopping explicit in the world and UI, rather than requiring knowledge of the old Haven button. All 18 town/village/port/market hubs expose seven distinct, signed interactions; refuges and named interiors bring service coverage to 37 safe areas. The world route, collision geometry, 91 events, jobs, ending and postgame are preserved.
+The service update makes recovery and shopping explicit in the world and UI, rather than requiring knowledge of the old Haven button. All 18 town/village/port/market hubs expose seven distinct, signed interactions; refuges and named interiors bring service coverage to 37 safe areas. The 91 events, jobs, ending and postgame remain available; town layouts and overworld travel were subsequently revised as described in OVERWORLD-QA.md.
 
 ## Implemented preparation loop
 
@@ -20,10 +20,10 @@ The service update makes recovery and shopping explicit in the world and UI, rat
 
 `npm run test:browser` passes the 17 existing navigation/combat/job/save/mobile checks, adapted to enter the new town directory and inn confirmation.
 
-`npm run test:services` passes 12 integrated Chromium groups. It starts from the actual new-game UI, walks to the inn and provisions counters, confirms recovery, performs bulk buy/sell and gear transactions, learns/prepares a spell, heals in the field, revives through a paid clinic, recovers a penniless party, advances/reorders/saves/reloads, and uses a tent. The checks include 390px and 320px touch layouts and reject browser errors or failed resources. Fixtures supply HP/resource conditions for isolated later scenarios; these checks do not claim human campaign playtime.
+`npm run test:services` passes 13 integrated Chromium groups. It starts from the actual new-game UI, walks to the inn and provisions counters, confirms recovery, performs bulk buy/sell and gear transactions, learns/prepares a spell, heals in the field, revives through a paid clinic, rejects unpaid revival, advances/reorders/saves/reloads, and uses a tent. The checks include 390px and 320px touch layouts and reject browser errors or failed resources. Fixtures supply HP/resource conditions for isolated later scenarios; these checks do not claim human campaign playtime.
 
 `npm run test:visual` again renders all 108 areas and 64 character pose combinations, checks integer scaling indoors/outdoors, and verifies mobile HUD separation. No visual or resource errors occurred.
 
-Status ailments/cures, eight-tier NES magic, exact NES price/inventory tables and every remake feature are not part of this update. The implemented loop is an original FF1-inspired Avelune adaptation, with modern free-recovery and save conveniences. The source-backed reference distinctions are recorded in `FF1-SERVICES-GAP.md`.
+Status ailments/cures, eight-tier NES magic, exact NES price/inventory tables and every remake feature are not part of this update. The implemented loop is an original FF1-inspired Avelune adaptation, with modern save conveniences. The source-backed reference distinctions are recorded in `FF1-SERVICES-GAP.md`.
 
 Independent integration review reproduced a stale merchant-route action when the player switched to Follow marker or clicked another destination. Both overrides now cancel the pending merchant action; the integrated browser suite covers reaching the story marker without opening a remote shop. Physical E interaction at a vendor and selling owned later-tier supplies in the starting town were also checked.
