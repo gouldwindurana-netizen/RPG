@@ -1,0 +1,188 @@
+{
+  "date": "2026-11-07",
+  "records": [
+    {
+      "name": "Default",
+      "seeds": 4,
+      "clears": 4,
+      "level": 22,
+      "rounds": [
+        3,
+        5
+      ],
+      "finalRounds": [
+        5,
+        5,
+        5,
+        5
+      ],
+      "endingGold": [
+        873,
+        873,
+        873,
+        873
+      ],
+      "endingInventory": [
+        {
+          "potion": 33,
+          "ether": 33,
+          "revive": 8
+        },
+        {
+          "potion": 33,
+          "ether": 33,
+          "revive": 8
+        },
+        {
+          "potion": 33,
+          "ether": 33,
+          "revive": 8
+        },
+        {
+          "potion": 33,
+          "ether": 33,
+          "revive": 8
+        }
+      ]
+    },
+    {
+      "name": "Physical",
+      "seeds": 4,
+      "clears": 4,
+      "level": 22,
+      "rounds": [
+        5,
+        11
+      ],
+      "finalRounds": [
+        10,
+        9,
+        10,
+        10
+      ],
+      "endingGold": [
+        993,
+        993,
+        993,
+        993
+      ],
+      "endingInventory": [
+        {
+          "potion": 25,
+          "ether": 33,
+          "revive": 7
+        },
+        {
+          "potion": 27,
+          "ether": 33,
+          "revive": 8
+        },
+        {
+          "potion": 25,
+          "ether": 33,
+          "revive": 8
+        },
+        {
+          "potion": 26,
+          "ether": 33,
+          "revive": 8
+        }
+      ]
+    },
+    {
+      "name": "Physical + healer",
+      "seeds": 4,
+      "clears": 4,
+      "level": 22,
+      "rounds": [
+        4,
+        10
+      ],
+      "finalRounds": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "endingGold": [
+        993,
+        993,
+        993,
+        993
+      ],
+      "endingInventory": [
+        {
+          "potion": 30,
+          "ether": 30,
+          "revive": 8
+        },
+        {
+          "potion": 30,
+          "ether": 29,
+          "revive": 8
+        },
+        {
+          "potion": 32,
+          "ether": 31,
+          "revive": 7
+        },
+        {
+          "potion": 33,
+          "ether": 30,
+          "revive": 8
+        }
+      ]
+    },
+    {
+      "name": "Four Black Mages",
+      "seeds": 4,
+      "clears": 4,
+      "level": 22,
+      "rounds": [
+        2,
+        5
+      ],
+      "finalRounds": [
+        5,
+        5,
+        5,
+        5
+      ],
+      "endingGold": [
+        2913,
+        2913,
+        2913,
+        2913
+      ],
+      "endingInventory": [
+        {
+          "potion": 32,
+          "ether": 33,
+          "revive": 8
+        },
+        {
+          "potion": 33,
+          "ether": 33,
+          "revive": 8
+        },
+        {
+          "potion": 32,
+          "ether": 33,
+          "revive": 8
+        },
+        {
+          "potion": 32,
+          "ether": 33,
+          "revive": 8
+        }
+      ]
+    }
+  ],
+  "postgame": {
+    "completed": true,
+    "battles": 29,
+    "level": 30,
+    "finalRounds": 5,
+    "failed": null
+  }
+}

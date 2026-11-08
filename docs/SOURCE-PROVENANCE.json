@@ -1,0 +1,5329 @@
+{
+  "library_file_id": "libfile_f2b45797306c81919bd672766fd82d3e",
+  "library_version": 13,
+  "art_pack_revision": 14,
+  "sprites": {
+    "LOC_alderreach_01": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_alderreach_01",
+      "sheet": "assets/locations_alderreach.png",
+      "source_rect": [
+        0,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        24,
+        31,
+        361,
+        352
+      ]
+    },
+    "LOC_alderreach_02": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_alderreach_02",
+      "sheet": "assets/locations_alderreach.png",
+      "source_rect": [
+        384,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        21,
+        36,
+        364,
+        352
+      ]
+    },
+    "LOC_alderreach_03": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_alderreach_03",
+      "sheet": "assets/locations_alderreach.png",
+      "source_rect": [
+        768,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        20,
+        48,
+        363,
+        351
+      ]
+    },
+    "LOC_alderreach_04": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_alderreach_04",
+      "sheet": "assets/locations_alderreach.png",
+      "source_rect": [
+        1152,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        20,
+        37,
+        364,
+        351
+      ]
+    },
+    "LOC_alderreach_05": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_alderreach_05",
+      "sheet": "assets/locations_alderreach.png",
+      "source_rect": [
+        1536,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        20,
+        42,
+        363,
+        352
+      ]
+    },
+    "LOC_alderreach_06": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_alderreach_06",
+      "sheet": "assets/locations_alderreach.png",
+      "source_rect": [
+        0,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        20,
+        44,
+        364,
+        352
+      ]
+    },
+    "LOC_alderreach_07": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_alderreach_07",
+      "sheet": "assets/locations_alderreach.png",
+      "source_rect": [
+        384,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        25,
+        32,
+        359,
+        352
+      ]
+    },
+    "LOC_alderreach_08": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_alderreach_08",
+      "sheet": "assets/locations_alderreach.png",
+      "source_rect": [
+        768,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        20,
+        44,
+        363,
+        351
+      ]
+    },
+    "LOC_alderreach_09": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_alderreach_09",
+      "sheet": "assets/locations_alderreach.png",
+      "source_rect": [
+        1152,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        21,
+        41,
+        363,
+        351
+      ]
+    },
+    "LOC_alderreach_10": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_alderreach_10",
+      "sheet": "assets/locations_alderreach.png",
+      "source_rect": [
+        1536,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        20,
+        37,
+        364,
+        351
+      ]
+    },
+    "LOC_edrin_01": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_edrin_01",
+      "sheet": "assets/locations_edrin.png",
+      "source_rect": [
+        0,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        21,
+        59,
+        363,
+        351
+      ]
+    },
+    "LOC_edrin_02": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_edrin_02",
+      "sheet": "assets/locations_edrin.png",
+      "source_rect": [
+        384,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        20,
+        38,
+        363,
+        352
+      ]
+    },
+    "LOC_edrin_03": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_edrin_03",
+      "sheet": "assets/locations_edrin.png",
+      "source_rect": [
+        768,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        24,
+        32,
+        359,
+        351
+      ]
+    },
+    "LOC_edrin_04": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_edrin_04",
+      "sheet": "assets/locations_edrin.png",
+      "source_rect": [
+        1152,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        21,
+        40,
+        363,
+        352
+      ]
+    },
+    "LOC_edrin_05": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_edrin_05",
+      "sheet": "assets/locations_edrin.png",
+      "source_rect": [
+        0,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        21,
+        38,
+        363,
+        351
+      ]
+    },
+    "LOC_edrin_06": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_edrin_06",
+      "sheet": "assets/locations_edrin.png",
+      "source_rect": [
+        384,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        20,
+        31,
+        362,
+        352
+      ]
+    },
+    "LOC_edrin_07": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_edrin_07",
+      "sheet": "assets/locations_edrin.png",
+      "source_rect": [
+        768,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        22,
+        32,
+        362,
+        351
+      ]
+    },
+    "LOC_edrin_08": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_edrin_08",
+      "sheet": "assets/locations_edrin.png",
+      "source_rect": [
+        1152,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        26,
+        31,
+        357,
+        352
+      ]
+    },
+    "LOC_edrin_09": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_edrin_09",
+      "sheet": "assets/locations_edrin.png",
+      "source_rect": [
+        0,
+        768,
+        384,
+        384
+      ],
+      "trim_box": [
+        27,
+        32,
+        358,
+        352
+      ]
+    },
+    "LOC_edrin_10": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_edrin_10",
+      "sheet": "assets/locations_edrin.png",
+      "source_rect": [
+        384,
+        768,
+        384,
+        384
+      ],
+      "trim_box": [
+        20,
+        39,
+        363,
+        351
+      ]
+    },
+    "LOC_edrin_11": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_edrin_11",
+      "sheet": "assets/locations_edrin.png",
+      "source_rect": [
+        768,
+        768,
+        384,
+        384
+      ],
+      "trim_box": [
+        24,
+        31,
+        358,
+        352
+      ]
+    },
+    "LOC_isles_01": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_isles_01",
+      "sheet": "assets/locations_isles.png",
+      "source_rect": [
+        0,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        21,
+        33,
+        363,
+        352
+      ]
+    },
+    "LOC_isles_02": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_isles_02",
+      "sheet": "assets/locations_isles.png",
+      "source_rect": [
+        384,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        21,
+        43,
+        363,
+        351
+      ]
+    },
+    "LOC_isles_03": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_isles_03",
+      "sheet": "assets/locations_isles.png",
+      "source_rect": [
+        768,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        20,
+        40,
+        364,
+        351
+      ]
+    },
+    "LOC_isles_04": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_isles_04",
+      "sheet": "assets/locations_isles.png",
+      "source_rect": [
+        1152,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        20,
+        41,
+        363,
+        351
+      ]
+    },
+    "LOC_isles_05": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_isles_05",
+      "sheet": "assets/locations_isles.png",
+      "source_rect": [
+        0,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        37,
+        32,
+        347,
+        352
+      ]
+    },
+    "LOC_isles_06": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_isles_06",
+      "sheet": "assets/locations_isles.png",
+      "source_rect": [
+        384,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        27,
+        32,
+        356,
+        352
+      ]
+    },
+    "LOC_isles_07": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_isles_07",
+      "sheet": "assets/locations_isles.png",
+      "source_rect": [
+        768,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        26,
+        32,
+        359,
+        351
+      ]
+    },
+    "LOC_isles_08": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_isles_08",
+      "sheet": "assets/locations_isles.png",
+      "source_rect": [
+        1152,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        24,
+        31,
+        360,
+        352
+      ]
+    },
+    "LOC_isles_09": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_isles_09",
+      "sheet": "assets/locations_isles.png",
+      "source_rect": [
+        0,
+        768,
+        384,
+        384
+      ],
+      "trim_box": [
+        31,
+        32,
+        352,
+        351
+      ]
+    },
+    "LOC_isles_10": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_isles_10",
+      "sheet": "assets/locations_isles.png",
+      "source_rect": [
+        384,
+        768,
+        384,
+        384
+      ],
+      "trim_box": [
+        21,
+        86,
+        363,
+        351
+      ]
+    },
+    "LOC_isles_11": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_isles_11",
+      "sheet": "assets/locations_isles.png",
+      "source_rect": [
+        768,
+        768,
+        384,
+        384
+      ],
+      "trim_box": [
+        21,
+        45,
+        363,
+        351
+      ]
+    },
+    "LOC_kharad_01": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_kharad_01",
+      "sheet": "assets/locations_kharad.png",
+      "source_rect": [
+        0,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        21,
+        32,
+        362,
+        352
+      ]
+    },
+    "LOC_kharad_02": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_kharad_02",
+      "sheet": "assets/locations_kharad.png",
+      "source_rect": [
+        384,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        28,
+        31,
+        354,
+        352
+      ]
+    },
+    "LOC_kharad_03": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_kharad_03",
+      "sheet": "assets/locations_kharad.png",
+      "source_rect": [
+        768,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        20,
+        46,
+        363,
+        352
+      ]
+    },
+    "LOC_kharad_04": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_kharad_04",
+      "sheet": "assets/locations_kharad.png",
+      "source_rect": [
+        0,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        26,
+        32,
+        358,
+        352
+      ]
+    },
+    "LOC_kharad_05": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_kharad_05",
+      "sheet": "assets/locations_kharad.png",
+      "source_rect": [
+        384,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        20,
+        35,
+        364,
+        351
+      ]
+    },
+    "LOC_kharad_06": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_kharad_06",
+      "sheet": "assets/locations_kharad.png",
+      "source_rect": [
+        768,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        20,
+        46,
+        363,
+        352
+      ]
+    },
+    "LOC_kharad_07": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_kharad_07",
+      "sheet": "assets/locations_kharad.png",
+      "source_rect": [
+        0,
+        768,
+        384,
+        384
+      ],
+      "trim_box": [
+        32,
+        31,
+        352,
+        351
+      ]
+    },
+    "LOC_kharad_08": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_kharad_08",
+      "sheet": "assets/locations_kharad.png",
+      "source_rect": [
+        384,
+        768,
+        384,
+        384
+      ],
+      "trim_box": [
+        22,
+        31,
+        362,
+        351
+      ]
+    },
+    "LOC_kharad_09": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_kharad_09",
+      "sheet": "assets/locations_kharad.png",
+      "source_rect": [
+        768,
+        768,
+        384,
+        384
+      ],
+      "trim_box": [
+        20,
+        37,
+        365,
+        352
+      ]
+    },
+    "LOC_ordel_01": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_ordel_01",
+      "sheet": "assets/locations_ordel.png",
+      "source_rect": [
+        0,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        26,
+        32,
+        358,
+        351
+      ]
+    },
+    "LOC_ordel_02": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_ordel_02",
+      "sheet": "assets/locations_ordel.png",
+      "source_rect": [
+        384,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        20,
+        35,
+        363,
+        352
+      ]
+    },
+    "LOC_ordel_03": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_ordel_03",
+      "sheet": "assets/locations_ordel.png",
+      "source_rect": [
+        768,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        30,
+        31,
+        355,
+        351
+      ]
+    },
+    "LOC_ordel_04": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_ordel_04",
+      "sheet": "assets/locations_ordel.png",
+      "source_rect": [
+        0,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        20,
+        39,
+        364,
+        351
+      ]
+    },
+    "LOC_ordel_05": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_ordel_05",
+      "sheet": "assets/locations_ordel.png",
+      "source_rect": [
+        384,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        26,
+        31,
+        357,
+        351
+      ]
+    },
+    "LOC_ordel_06": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_ordel_06",
+      "sheet": "assets/locations_ordel.png",
+      "source_rect": [
+        768,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        20,
+        50,
+        364,
+        352
+      ]
+    },
+    "LOC_ordel_07": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_ordel_07",
+      "sheet": "assets/locations_ordel.png",
+      "source_rect": [
+        0,
+        768,
+        384,
+        384
+      ],
+      "trim_box": [
+        22,
+        31,
+        363,
+        351
+      ]
+    },
+    "LOC_ordel_08": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_ordel_08",
+      "sheet": "assets/locations_ordel.png",
+      "source_rect": [
+        384,
+        768,
+        384,
+        384
+      ],
+      "trim_box": [
+        21,
+        38,
+        363,
+        351
+      ]
+    },
+    "LOC_ordel_09": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_ordel_09",
+      "sheet": "assets/locations_ordel.png",
+      "source_rect": [
+        768,
+        768,
+        384,
+        384
+      ],
+      "trim_box": [
+        24,
+        31,
+        360,
+        351
+      ]
+    },
+    "LOC_sereva_01": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_sereva_01",
+      "sheet": "assets/locations_sereva.png",
+      "source_rect": [
+        0,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        21,
+        45,
+        364,
+        352
+      ]
+    },
+    "LOC_sereva_02": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_sereva_02",
+      "sheet": "assets/locations_sereva.png",
+      "source_rect": [
+        384,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        21,
+        52,
+        364,
+        351
+      ]
+    },
+    "LOC_sereva_03": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_sereva_03",
+      "sheet": "assets/locations_sereva.png",
+      "source_rect": [
+        768,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        21,
+        42,
+        363,
+        352
+      ]
+    },
+    "LOC_sereva_04": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_sereva_04",
+      "sheet": "assets/locations_sereva.png",
+      "source_rect": [
+        1152,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        21,
+        38,
+        363,
+        351
+      ]
+    },
+    "LOC_sereva_05": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_sereva_05",
+      "sheet": "assets/locations_sereva.png",
+      "source_rect": [
+        1536,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        21,
+        34,
+        365,
+        352
+      ]
+    },
+    "LOC_sereva_06": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_sereva_06",
+      "sheet": "assets/locations_sereva.png",
+      "source_rect": [
+        0,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        21,
+        41,
+        364,
+        351
+      ]
+    },
+    "LOC_sereva_07": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_sereva_07",
+      "sheet": "assets/locations_sereva.png",
+      "source_rect": [
+        384,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        21,
+        40,
+        363,
+        351
+      ]
+    },
+    "LOC_sereva_08": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_sereva_08",
+      "sheet": "assets/locations_sereva.png",
+      "source_rect": [
+        768,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        20,
+        45,
+        364,
+        351
+      ]
+    },
+    "LOC_sereva_09": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_sereva_09",
+      "sheet": "assets/locations_sereva.png",
+      "source_rect": [
+        1152,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        21,
+        57,
+        364,
+        352
+      ]
+    },
+    "LOC_sereva_10": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_sereva_10",
+      "sheet": "assets/locations_sereva.png",
+      "source_rect": [
+        1536,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        21,
+        40,
+        364,
+        352
+      ]
+    },
+    "LOC_veyra_01": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_veyra_01",
+      "sheet": "assets/locations_veyra.png",
+      "source_rect": [
+        0,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        21,
+        32,
+        362,
+        352
+      ]
+    },
+    "LOC_veyra_02": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_veyra_02",
+      "sheet": "assets/locations_veyra.png",
+      "source_rect": [
+        384,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        26,
+        32,
+        357,
+        351
+      ]
+    },
+    "LOC_veyra_03": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_veyra_03",
+      "sheet": "assets/locations_veyra.png",
+      "source_rect": [
+        768,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        20,
+        49,
+        363,
+        351
+      ]
+    },
+    "LOC_veyra_04": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_veyra_04",
+      "sheet": "assets/locations_veyra.png",
+      "source_rect": [
+        1152,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        24,
+        32,
+        359,
+        352
+      ]
+    },
+    "LOC_veyra_05": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_veyra_05",
+      "sheet": "assets/locations_veyra.png",
+      "source_rect": [
+        1536,
+        0,
+        384,
+        384
+      ],
+      "trim_box": [
+        20,
+        41,
+        363,
+        351
+      ]
+    },
+    "LOC_veyra_06": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_veyra_06",
+      "sheet": "assets/locations_veyra.png",
+      "source_rect": [
+        0,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        27,
+        32,
+        355,
+        351
+      ]
+    },
+    "LOC_veyra_07": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_veyra_07",
+      "sheet": "assets/locations_veyra.png",
+      "source_rect": [
+        384,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        24,
+        31,
+        359,
+        351
+      ]
+    },
+    "LOC_veyra_08": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_veyra_08",
+      "sheet": "assets/locations_veyra.png",
+      "source_rect": [
+        768,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        24,
+        32,
+        361,
+        351
+      ]
+    },
+    "LOC_veyra_09": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_veyra_09",
+      "sheet": "assets/locations_veyra.png",
+      "source_rect": [
+        1152,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        20,
+        31,
+        363,
+        351
+      ]
+    },
+    "LOC_veyra_10": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "LOC_veyra_10",
+      "sheet": "assets/locations_veyra.png",
+      "source_rect": [
+        1536,
+        384,
+        384,
+        384
+      ],
+      "trim_box": [
+        21,
+        48,
+        364,
+        351
+      ]
+    },
+    "PROP001": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP001",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        0,
+        0,
+        158,
+        156
+      ],
+      "trim_box": [
+        21,
+        14,
+        135,
+        142
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          18,
+          28,
+          145,
+          170
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP002": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP002",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        158,
+        0,
+        157,
+        156
+      ],
+      "trim_box": [
+        21,
+        15,
+        135,
+        143
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          167,
+          14,
+          307,
+          171
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP003": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP003",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        315,
+        0,
+        158,
+        156
+      ],
+      "trim_box": [
+        16,
+        15,
+        142,
+        142
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          326,
+          21,
+          467,
+          163
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP005": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP005",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        630,
+        0,
+        158,
+        156
+      ],
+      "trim_box": [
+        27,
+        15,
+        130,
+        142
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          642,
+          11,
+          775,
+          175
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP007": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP007",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        946,
+        0,
+        157,
+        156
+      ],
+      "trim_box": [
+        14,
+        16,
+        142,
+        143
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          957,
+          34,
+          1096,
+          172
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP009": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP009",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        0,
+        156,
+        158,
+        156
+      ],
+      "trim_box": [
+        14,
+        20,
+        143,
+        143
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          9,
+          199,
+          153,
+          336
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP010": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP010",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        158,
+        156,
+        157,
+        156
+      ],
+      "trim_box": [
+        14,
+        15,
+        143,
+        144
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          169,
+          201,
+          308,
+          340
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP011": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP011",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        315,
+        156,
+        158,
+        156
+      ],
+      "trim_box": [
+        17,
+        15,
+        139,
+        144
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          326,
+          191,
+          466,
+          339
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP012": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP012",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        473,
+        156,
+        157,
+        156
+      ],
+      "trim_box": [
+        33,
+        15,
+        125,
+        144
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          500,
+          193,
+          605,
+          341
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP013": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP013",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        630,
+        156,
+        158,
+        156
+      ],
+      "trim_box": [
+        13,
+        27,
+        144,
+        144
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          645,
+          224,
+          773,
+          339
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP014": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP014",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        788,
+        156,
+        158,
+        156
+      ],
+      "trim_box": [
+        20,
+        15,
+        138,
+        144
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          799,
+          186,
+          940,
+          343
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP015": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP015",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        946,
+        156,
+        157,
+        156
+      ],
+      "trim_box": [
+        13,
+        25,
+        143,
+        142
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          958,
+          212,
+          1091,
+          332
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP016": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP016",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        1103,
+        156,
+        158,
+        156
+      ],
+      "trim_box": [
+        13,
+        26,
+        144,
+        143
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          1105,
+          202,
+          1256,
+          337
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP018": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP018",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        158,
+        312,
+        157,
+        156
+      ],
+      "trim_box": [
+        14,
+        39,
+        143,
+        144
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          163,
+          376,
+          310,
+          502
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP019": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP019",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        315,
+        312,
+        158,
+        156
+      ],
+      "trim_box": [
+        14,
+        31,
+        143,
+        144
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          319,
+          367,
+          466,
+          505
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP020": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP020",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        473,
+        312,
+        157,
+        156
+      ],
+      "trim_box": [
+        23,
+        15,
+        134,
+        144
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          495,
+          369,
+          604,
+          505
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP022": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP022",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        788,
+        312,
+        158,
+        156
+      ],
+      "trim_box": [
+        13,
+        44,
+        144,
+        144
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          804,
+          372,
+          930,
+          503
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP023": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP023",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        946,
+        312,
+        157,
+        156
+      ],
+      "trim_box": [
+        14,
+        26,
+        142,
+        144
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          957,
+          377,
+          1086,
+          505
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP026": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP026",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        158,
+        468,
+        157,
+        156
+      ],
+      "trim_box": [
+        13,
+        48,
+        142,
+        144
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          162,
+          551,
+          298,
+          653
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP027": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP027",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        315,
+        468,
+        158,
+        156
+      ],
+      "trim_box": [
+        16,
+        13,
+        142,
+        144
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          318,
+          536,
+          468,
+          656
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP028": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP028",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        473,
+        468,
+        157,
+        156
+      ],
+      "trim_box": [
+        17,
+        13,
+        140,
+        144
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          480,
+          528,
+          621,
+          667
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP029": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP029",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        630,
+        468,
+        158,
+        156
+      ],
+      "trim_box": [
+        13,
+        74,
+        144,
+        144
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          639,
+          528,
+          779,
+          664
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP031": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP031",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        946,
+        468,
+        157,
+        156
+      ],
+      "trim_box": [
+        24,
+        13,
+        133,
+        144
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          980,
+          528,
+          1067,
+          667
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP032": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP032",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        1103,
+        468,
+        158,
+        156
+      ],
+      "trim_box": [
+        13,
+        36,
+        144,
+        144
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          1109,
+          523,
+          1253,
+          665
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP033": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP033",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        0,
+        624,
+        158,
+        155
+      ],
+      "trim_box": [
+        29,
+        13,
+        129,
+        143
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          11,
+          696,
+          145,
+          819
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP034": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP034",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        158,
+        624,
+        157,
+        155
+      ],
+      "trim_box": [
+        14,
+        78,
+        143,
+        143
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          159,
+          689,
+          307,
+          826
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP035": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP035",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        315,
+        624,
+        158,
+        155
+      ],
+      "trim_box": [
+        13,
+        54,
+        143,
+        143
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          326,
+          692,
+          460,
+          826
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP037": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP037",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        630,
+        624,
+        158,
+        155
+      ],
+      "trim_box": [
+        31,
+        13,
+        126,
+        143
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          648,
+          697,
+          776,
+          826
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP038": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP038",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        788,
+        624,
+        158,
+        155
+      ],
+      "trim_box": [
+        34,
+        13,
+        124,
+        143
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          815,
+          692,
+          924,
+          811
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP039": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP039",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        946,
+        624,
+        157,
+        155
+      ],
+      "trim_box": [
+        45,
+        13,
+        111,
+        143
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          993,
+          677,
+          1065,
+          828
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP040": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP040",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        1103,
+        624,
+        158,
+        155
+      ],
+      "trim_box": [
+        23,
+        13,
+        133,
+        143
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          1133,
+          687,
+          1231,
+          828
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP045": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP045",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        630,
+        779,
+        158,
+        156
+      ],
+      "trim_box": [
+        38,
+        13,
+        121,
+        144
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          663,
+          840,
+          753,
+          986
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP046": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP046",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        788,
+        779,
+        158,
+        156
+      ],
+      "trim_box": [
+        36,
+        13,
+        121,
+        144
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          820,
+          845,
+          909,
+          986
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP048": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP048",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        1103,
+        779,
+        158,
+        156
+      ],
+      "trim_box": [
+        20,
+        13,
+        138,
+        144
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          1104,
+          843,
+          1257,
+          981
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP053": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP053",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        630,
+        935,
+        158,
+        156
+      ],
+      "trim_box": [
+        18,
+        13,
+        139,
+        142
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          631,
+          1001,
+          782,
+          1114
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP054": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP054",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        788,
+        935,
+        158,
+        156
+      ],
+      "trim_box": [
+        36,
+        13,
+        121,
+        144
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          800,
+          998,
+          932,
+          1113
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP055": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP055",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        946,
+        935,
+        157,
+        156
+      ],
+      "trim_box": [
+        38,
+        13,
+        119,
+        144
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          976,
+          992,
+          1073,
+          1121
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP056": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP056",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        1103,
+        935,
+        158,
+        156
+      ],
+      "trim_box": [
+        29,
+        13,
+        129,
+        143
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          1149,
+          993,
+          1221,
+          1117
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP057": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP057",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        0,
+        1091,
+        158,
+        156
+      ],
+      "trim_box": [
+        13,
+        33,
+        144,
+        143
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          10,
+          1126,
+          147,
+          1241
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP058": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP058",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        158,
+        1091,
+        157,
+        156
+      ],
+      "trim_box": [
+        17,
+        15,
+        139,
+        142
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          175,
+          1119,
+          294,
+          1243
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP059": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP059",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        315,
+        1091,
+        158,
+        156
+      ],
+      "trim_box": [
+        20,
+        14,
+        137,
+        143
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          340,
+          1122,
+          444,
+          1237
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP060": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP060",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        473,
+        1091,
+        157,
+        156
+      ],
+      "trim_box": [
+        14,
+        66,
+        142,
+        142
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          476,
+          1153,
+          621,
+          1239
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP061": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP061",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        630,
+        1091,
+        158,
+        156
+      ],
+      "trim_box": [
+        14,
+        55,
+        143,
+        143
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          639,
+          1150,
+          773,
+          1242
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP062": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP062",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        788,
+        1091,
+        158,
+        156
+      ],
+      "trim_box": [
+        35,
+        13,
+        124,
+        142
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          826,
+          1113,
+          914,
+          1243
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP063": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP063",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        946,
+        1091,
+        157,
+        156
+      ],
+      "trim_box": [
+        13,
+        54,
+        143,
+        143
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          954,
+          1146,
+          1095,
+          1243
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "PROP064": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "PROP064",
+      "sheet": "assets/interior_props.png",
+      "source_rect": [
+        1103,
+        1091,
+        158,
+        156
+      ],
+      "trim_box": [
+        14,
+        39,
+        143,
+        143
+      ],
+      "cleanup": {
+        "source": "input/sprites/interior_props_raw.png",
+        "source_sha256": "3e46b16eb90e4c7f92107d113e6b94247e57bda11eb3ae990d52e4c240f02304",
+        "full_source_bounds": [
+          1111,
+          1127,
+          1254,
+          1243
+        ],
+        "method": "complete connected silhouette"
+      }
+    },
+    "WR111": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR111",
+      "sheet": "assets/regional_buildings.png",
+      "source_rect": [
+        0,
+        0,
+        265,
+        212
+      ],
+      "trim_box": [
+        35,
+        18,
+        229,
+        193
+      ]
+    },
+    "WR112": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR112",
+      "sheet": "assets/regional_buildings.png",
+      "source_rect": [
+        265,
+        0,
+        265,
+        212
+      ],
+      "trim_box": [
+        26,
+        18,
+        239,
+        194
+      ]
+    },
+    "WR114": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR114",
+      "sheet": "assets/regional_buildings.png",
+      "source_rect": [
+        795,
+        0,
+        265,
+        212
+      ],
+      "trim_box": [
+        40,
+        19,
+        225,
+        194
+      ]
+    },
+    "WR121": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR121",
+      "sheet": "assets/regional_buildings.png",
+      "source_rect": [
+        0,
+        212,
+        265,
+        212
+      ],
+      "trim_box": [
+        24,
+        19,
+        241,
+        193
+      ]
+    },
+    "WR122": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR122",
+      "sheet": "assets/regional_buildings.png",
+      "source_rect": [
+        265,
+        212,
+        265,
+        212
+      ],
+      "trim_box": [
+        39,
+        19,
+        225,
+        194
+      ]
+    },
+    "WR123": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR123",
+      "sheet": "assets/regional_buildings.png",
+      "source_rect": [
+        530,
+        212,
+        265,
+        212
+      ],
+      "trim_box": [
+        36,
+        18,
+        230,
+        193
+      ]
+    },
+    "WR124": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR124",
+      "sheet": "assets/regional_buildings.png",
+      "source_rect": [
+        795,
+        212,
+        265,
+        212
+      ],
+      "trim_box": [
+        23,
+        22,
+        242,
+        193
+      ]
+    },
+    "WR131": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR131",
+      "sheet": "assets/regional_buildings.png",
+      "source_rect": [
+        0,
+        424,
+        265,
+        212
+      ],
+      "trim_box": [
+        29,
+        19,
+        236,
+        194
+      ]
+    },
+    "WR132": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR132",
+      "sheet": "assets/regional_buildings.png",
+      "source_rect": [
+        265,
+        424,
+        265,
+        212
+      ],
+      "trim_box": [
+        23,
+        18,
+        241,
+        194
+      ]
+    },
+    "WR133": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR133",
+      "sheet": "assets/regional_buildings.png",
+      "source_rect": [
+        530,
+        424,
+        265,
+        212
+      ],
+      "trim_box": [
+        31,
+        18,
+        233,
+        194
+      ]
+    },
+    "WR134": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR134",
+      "sheet": "assets/regional_buildings.png",
+      "source_rect": [
+        795,
+        424,
+        265,
+        212
+      ],
+      "trim_box": [
+        23,
+        29,
+        242,
+        194
+      ]
+    },
+    "WR141": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR141",
+      "sheet": "assets/regional_buildings.png",
+      "source_rect": [
+        0,
+        636,
+        265,
+        212
+      ],
+      "trim_box": [
+        23,
+        25,
+        242,
+        194
+      ]
+    },
+    "WR142": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR142",
+      "sheet": "assets/regional_buildings.png",
+      "source_rect": [
+        265,
+        636,
+        265,
+        212
+      ],
+      "trim_box": [
+        26,
+        19,
+        238,
+        193
+      ]
+    },
+    "WR143": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR143",
+      "sheet": "assets/regional_buildings.png",
+      "source_rect": [
+        530,
+        636,
+        265,
+        212
+      ],
+      "trim_box": [
+        29,
+        19,
+        236,
+        193
+      ]
+    },
+    "WR144": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR144",
+      "sheet": "assets/regional_buildings.png",
+      "source_rect": [
+        795,
+        636,
+        265,
+        212
+      ],
+      "trim_box": [
+        23,
+        38,
+        242,
+        195
+      ]
+    },
+    "WR151": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR151",
+      "sheet": "assets/regional_buildings.png",
+      "source_rect": [
+        0,
+        848,
+        265,
+        212
+      ],
+      "trim_box": [
+        30,
+        18,
+        235,
+        194
+      ]
+    },
+    "WR152": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR152",
+      "sheet": "assets/regional_buildings.png",
+      "source_rect": [
+        265,
+        848,
+        265,
+        212
+      ],
+      "trim_box": [
+        40,
+        18,
+        225,
+        193
+      ]
+    },
+    "WR153": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR153",
+      "sheet": "assets/regional_buildings.png",
+      "source_rect": [
+        530,
+        848,
+        265,
+        212
+      ],
+      "trim_box": [
+        22,
+        28,
+        242,
+        193
+      ]
+    },
+    "WR154": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR154",
+      "sheet": "assets/regional_buildings.png",
+      "source_rect": [
+        795,
+        848,
+        265,
+        212
+      ],
+      "trim_box": [
+        34,
+        18,
+        232,
+        193
+      ]
+    },
+    "WR161": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR161",
+      "sheet": "assets/regional_buildings.png",
+      "source_rect": [
+        0,
+        1060,
+        265,
+        212
+      ],
+      "trim_box": [
+        23,
+        19,
+        243,
+        195
+      ]
+    },
+    "WR162": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR162",
+      "sheet": "assets/regional_buildings.png",
+      "source_rect": [
+        265,
+        1060,
+        265,
+        212
+      ],
+      "trim_box": [
+        32,
+        19,
+        233,
+        194
+      ]
+    },
+    "WR163": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR163",
+      "sheet": "assets/regional_buildings.png",
+      "source_rect": [
+        530,
+        1060,
+        265,
+        212
+      ],
+      "trim_box": [
+        27,
+        19,
+        238,
+        193
+      ]
+    },
+    "WR164": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR164",
+      "sheet": "assets/regional_buildings.png",
+      "source_rect": [
+        795,
+        1060,
+        265,
+        212
+      ],
+      "trim_box": [
+        22,
+        26,
+        242,
+        194
+      ]
+    },
+    "WR171": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR171",
+      "sheet": "assets/regional_buildings.png",
+      "source_rect": [
+        0,
+        1272,
+        265,
+        212
+      ],
+      "trim_box": [
+        22,
+        19,
+        243,
+        193
+      ]
+    },
+    "WR172": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR172",
+      "sheet": "assets/regional_buildings.png",
+      "source_rect": [
+        265,
+        1272,
+        265,
+        212
+      ],
+      "trim_box": [
+        23,
+        33,
+        243,
+        193
+      ]
+    },
+    "WR173": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR173",
+      "sheet": "assets/regional_buildings.png",
+      "source_rect": [
+        530,
+        1272,
+        265,
+        212
+      ],
+      "trim_box": [
+        25,
+        18,
+        240,
+        193
+      ]
+    },
+    "WR174": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR174",
+      "sheet": "assets/regional_buildings.png",
+      "source_rect": [
+        795,
+        1272,
+        265,
+        212
+      ],
+      "trim_box": [
+        23,
+        35,
+        243,
+        194
+      ]
+    },
+    "WR211": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR211",
+      "sheet": "assets/regional_trades.png",
+      "source_rect": [
+        0,
+        0,
+        268,
+        209
+      ],
+      "trim_box": [
+        48,
+        17,
+        221,
+        191
+      ]
+    },
+    "WR214": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR214",
+      "sheet": "assets/regional_trades.png",
+      "source_rect": [
+        805,
+        0,
+        268,
+        209
+      ],
+      "trim_box": [
+        38,
+        18,
+        230,
+        191
+      ]
+    },
+    "WR221": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR221",
+      "sheet": "assets/regional_trades.png",
+      "source_rect": [
+        0,
+        209,
+        268,
+        210
+      ],
+      "trim_box": [
+        28,
+        19,
+        241,
+        191
+      ]
+    },
+    "WR222": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR222",
+      "sheet": "assets/regional_trades.png",
+      "source_rect": [
+        268,
+        209,
+        268,
+        210
+      ],
+      "trim_box": [
+        22,
+        25,
+        244,
+        191
+      ]
+    },
+    "WR223": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR223",
+      "sheet": "assets/regional_trades.png",
+      "source_rect": [
+        536,
+        209,
+        269,
+        210
+      ],
+      "trim_box": [
+        23,
+        23,
+        245,
+        191
+      ]
+    },
+    "WR224": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR224",
+      "sheet": "assets/regional_trades.png",
+      "source_rect": [
+        805,
+        209,
+        268,
+        210
+      ],
+      "trim_box": [
+        25,
+        19,
+        242,
+        193
+      ]
+    },
+    "WR231": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR231",
+      "sheet": "assets/regional_trades.png",
+      "source_rect": [
+        0,
+        419,
+        268,
+        209
+      ],
+      "trim_box": [
+        44,
+        17,
+        223,
+        191
+      ]
+    },
+    "WR232": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR232",
+      "sheet": "assets/regional_trades.png",
+      "source_rect": [
+        268,
+        419,
+        268,
+        209
+      ],
+      "trim_box": [
+        33,
+        18,
+        234,
+        192
+      ]
+    },
+    "WR233": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR233",
+      "sheet": "assets/regional_trades.png",
+      "source_rect": [
+        536,
+        419,
+        269,
+        209
+      ],
+      "trim_box": [
+        26,
+        18,
+        243,
+        190
+      ]
+    },
+    "WR234": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR234",
+      "sheet": "assets/regional_trades.png",
+      "source_rect": [
+        805,
+        419,
+        268,
+        209
+      ],
+      "trim_box": [
+        37,
+        16,
+        231,
+        191
+      ]
+    },
+    "WR241": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR241",
+      "sheet": "assets/regional_trades.png",
+      "source_rect": [
+        0,
+        628,
+        268,
+        210
+      ],
+      "trim_box": [
+        32,
+        18,
+        234,
+        191
+      ]
+    },
+    "WR242": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR242",
+      "sheet": "assets/regional_trades.png",
+      "source_rect": [
+        268,
+        628,
+        268,
+        210
+      ],
+      "trim_box": [
+        39,
+        19,
+        227,
+        191
+      ]
+    },
+    "WR243": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR243",
+      "sheet": "assets/regional_trades.png",
+      "source_rect": [
+        536,
+        628,
+        269,
+        210
+      ],
+      "trim_box": [
+        31,
+        18,
+        238,
+        191
+      ]
+    },
+    "WR244": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR244",
+      "sheet": "assets/regional_trades.png",
+      "source_rect": [
+        805,
+        628,
+        268,
+        210
+      ],
+      "trim_box": [
+        23,
+        20,
+        244,
+        192
+      ]
+    },
+    "WR251": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR251",
+      "sheet": "assets/regional_trades.png",
+      "source_rect": [
+        0,
+        838,
+        268,
+        209
+      ],
+      "trim_box": [
+        22,
+        20,
+        244,
+        191
+      ]
+    },
+    "WR252": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR252",
+      "sheet": "assets/regional_trades.png",
+      "source_rect": [
+        268,
+        838,
+        268,
+        209
+      ],
+      "trim_box": [
+        23,
+        25,
+        244,
+        191
+      ]
+    },
+    "WR253": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR253",
+      "sheet": "assets/regional_trades.png",
+      "source_rect": [
+        536,
+        838,
+        269,
+        209
+      ],
+      "trim_box": [
+        28,
+        17,
+        242,
+        190
+      ]
+    },
+    "WR254": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR254",
+      "sheet": "assets/regional_trades.png",
+      "source_rect": [
+        805,
+        838,
+        268,
+        209
+      ],
+      "trim_box": [
+        29,
+        17,
+        239,
+        191
+      ]
+    },
+    "WR261": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR261",
+      "sheet": "assets/regional_trades.png",
+      "source_rect": [
+        0,
+        1047,
+        268,
+        210
+      ],
+      "trim_box": [
+        30,
+        18,
+        238,
+        192
+      ]
+    },
+    "WR262": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR262",
+      "sheet": "assets/regional_trades.png",
+      "source_rect": [
+        268,
+        1047,
+        268,
+        210
+      ],
+      "trim_box": [
+        29,
+        18,
+        238,
+        192
+      ]
+    },
+    "WR263": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR263",
+      "sheet": "assets/regional_trades.png",
+      "source_rect": [
+        536,
+        1047,
+        269,
+        210
+      ],
+      "trim_box": [
+        31,
+        18,
+        238,
+        193
+      ]
+    },
+    "WR264": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR264",
+      "sheet": "assets/regional_trades.png",
+      "source_rect": [
+        805,
+        1047,
+        268,
+        210
+      ],
+      "trim_box": [
+        22,
+        24,
+        244,
+        192
+      ]
+    },
+    "WR271": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR271",
+      "sheet": "assets/regional_trades.png",
+      "source_rect": [
+        0,
+        1257,
+        268,
+        209
+      ],
+      "trim_box": [
+        56,
+        17,
+        211,
+        190
+      ]
+    },
+    "WR272": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR272",
+      "sheet": "assets/regional_trades.png",
+      "source_rect": [
+        268,
+        1257,
+        268,
+        209
+      ],
+      "trim_box": [
+        35,
+        17,
+        232,
+        191
+      ]
+    },
+    "WR273": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR273",
+      "sheet": "assets/regional_trades.png",
+      "source_rect": [
+        536,
+        1257,
+        269,
+        209
+      ],
+      "trim_box": [
+        41,
+        16,
+        227,
+        190
+      ]
+    },
+    "WR274": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR274",
+      "sheet": "assets/regional_trades.png",
+      "source_rect": [
+        805,
+        1257,
+        268,
+        209
+      ],
+      "trim_box": [
+        23,
+        18,
+        244,
+        190
+      ]
+    },
+    "WR311": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR311",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        0,
+        0,
+        265,
+        212
+      ],
+      "trim_box": [
+        29,
+        19,
+        234,
+        193
+      ]
+    },
+    "WR312": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR312",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        265,
+        0,
+        265,
+        212
+      ],
+      "trim_box": [
+        31,
+        19,
+        234,
+        193
+      ]
+    },
+    "WR313": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR313",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        530,
+        0,
+        265,
+        212
+      ],
+      "trim_box": [
+        31,
+        19,
+        234,
+        194
+      ]
+    },
+    "WR314": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR314",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        795,
+        0,
+        265,
+        212
+      ],
+      "trim_box": [
+        31,
+        18,
+        234,
+        193
+      ]
+    },
+    "WR321": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR321",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        0,
+        212,
+        265,
+        212
+      ],
+      "trim_box": [
+        30,
+        19,
+        235,
+        193
+      ]
+    },
+    "WR322": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR322",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        265,
+        212,
+        265,
+        212
+      ],
+      "trim_box": [
+        31,
+        19,
+        235,
+        194
+      ]
+    },
+    "WR323": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR323",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        530,
+        212,
+        265,
+        212
+      ],
+      "trim_box": [
+        22,
+        30,
+        242,
+        193
+      ]
+    },
+    "WR324": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR324",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        795,
+        212,
+        265,
+        212
+      ],
+      "trim_box": [
+        22,
+        30,
+        242,
+        194
+      ]
+    },
+    "WR331": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR331",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        0,
+        424,
+        265,
+        212
+      ],
+      "trim_box": [
+        23,
+        19,
+        241,
+        194
+      ]
+    },
+    "WR332": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR332",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        265,
+        424,
+        265,
+        212
+      ],
+      "trim_box": [
+        23,
+        20,
+        241,
+        194
+      ]
+    },
+    "WR333": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR333",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        530,
+        424,
+        265,
+        212
+      ],
+      "trim_box": [
+        26,
+        19,
+        239,
+        193
+      ]
+    },
+    "WR334": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR334",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        795,
+        424,
+        265,
+        212
+      ],
+      "trim_box": [
+        25,
+        28,
+        238,
+        194
+      ]
+    },
+    "WR341": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR341",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        0,
+        636,
+        265,
+        212
+      ],
+      "trim_box": [
+        23,
+        20,
+        242,
+        194
+      ]
+    },
+    "WR342": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR342",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        265,
+        636,
+        265,
+        212
+      ],
+      "trim_box": [
+        23,
+        21,
+        243,
+        193
+      ]
+    },
+    "WR343": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR343",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        530,
+        636,
+        265,
+        212
+      ],
+      "trim_box": [
+        23,
+        27,
+        243,
+        193
+      ]
+    },
+    "WR344": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR344",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        795,
+        636,
+        265,
+        212
+      ],
+      "trim_box": [
+        23,
+        27,
+        242,
+        193
+      ]
+    },
+    "WR351": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR351",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        0,
+        848,
+        265,
+        212
+      ],
+      "trim_box": [
+        33,
+        19,
+        232,
+        193
+      ]
+    },
+    "WR352": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR352",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        265,
+        848,
+        265,
+        212
+      ],
+      "trim_box": [
+        33,
+        19,
+        231,
+        193
+      ]
+    },
+    "WR353": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR353",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        530,
+        848,
+        265,
+        212
+      ],
+      "trim_box": [
+        23,
+        25,
+        241,
+        193
+      ]
+    },
+    "WR354": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR354",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        795,
+        848,
+        265,
+        212
+      ],
+      "trim_box": [
+        23,
+        25,
+        243,
+        194
+      ]
+    },
+    "WR361": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR361",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        0,
+        1060,
+        265,
+        212
+      ],
+      "trim_box": [
+        27,
+        18,
+        237,
+        193
+      ]
+    },
+    "WR362": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR362",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        265,
+        1060,
+        265,
+        212
+      ],
+      "trim_box": [
+        28,
+        18,
+        237,
+        193
+      ]
+    },
+    "WR363": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR363",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        530,
+        1060,
+        265,
+        212
+      ],
+      "trim_box": [
+        22,
+        30,
+        242,
+        194
+      ]
+    },
+    "WR364": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR364",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        795,
+        1060,
+        265,
+        212
+      ],
+      "trim_box": [
+        22,
+        32,
+        243,
+        194
+      ]
+    },
+    "WR371": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR371",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        0,
+        1272,
+        265,
+        212
+      ],
+      "trim_box": [
+        36,
+        19,
+        228,
+        193
+      ]
+    },
+    "WR372": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR372",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        265,
+        1272,
+        265,
+        212
+      ],
+      "trim_box": [
+        36,
+        19,
+        228,
+        193
+      ]
+    },
+    "WR373": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR373",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        530,
+        1272,
+        265,
+        212
+      ],
+      "trim_box": [
+        30,
+        21,
+        235,
+        193
+      ]
+    },
+    "WR374": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "WR374",
+      "sheet": "assets/regional_repairs.png",
+      "source_rect": [
+        795,
+        1272,
+        265,
+        212
+      ],
+      "trim_box": [
+        29,
+        18,
+        236,
+        193
+      ]
+    },
+    "landmarks_alderreach_hearth": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_alderreach_hearth",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        1045,
+        0,
+        209,
+        209
+      ],
+      "trim_box": [
+        17,
+        24,
+        191,
+        190
+      ]
+    },
+    "landmarks_bell_cathedral": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_bell_cathedral",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        209,
+        1045,
+        209,
+        209
+      ],
+      "trim_box": [
+        18,
+        25,
+        191,
+        190
+      ]
+    },
+    "landmarks_brass_observatory": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_brass_observatory",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        209,
+        836,
+        209,
+        209
+      ],
+      "trim_box": [
+        17,
+        36,
+        191,
+        190
+      ]
+    },
+    "landmarks_canal_lock": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_canal_lock",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        418,
+        209,
+        209,
+        209
+      ],
+      "trim_box": [
+        18,
+        28,
+        190,
+        190
+      ]
+    },
+    "landmarks_courier_gate": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_courier_gate",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        836,
+        1045,
+        209,
+        209
+      ],
+      "trim_box": [
+        18,
+        34,
+        191,
+        191
+      ]
+    },
+    "landmarks_covered_well": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_covered_well",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        209,
+        627,
+        209,
+        209
+      ],
+      "trim_box": [
+        18,
+        41,
+        191,
+        190
+      ]
+    },
+    "landmarks_deep_vault": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_deep_vault",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        836,
+        418,
+        209,
+        209
+      ],
+      "trim_box": [
+        17,
+        35,
+        190,
+        190
+      ]
+    },
+    "landmarks_drowned_palace": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_drowned_palace",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        627,
+        209,
+        209,
+        209
+      ],
+      "trim_box": [
+        18,
+        28,
+        191,
+        191
+      ]
+    },
+    "landmarks_forest_gate": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_forest_gate",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        627,
+        627,
+        209,
+        209
+      ],
+      "trim_box": [
+        17,
+        34,
+        190,
+        190
+      ]
+    },
+    "landmarks_furnace_city": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_furnace_city",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        209,
+        418,
+        209,
+        209
+      ],
+      "trim_box": [
+        17,
+        30,
+        191,
+        191
+      ]
+    },
+    "landmarks_garden_tallowback": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_garden_tallowback",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        418,
+        627,
+        209,
+        209
+      ],
+      "trim_box": [
+        18,
+        35,
+        190,
+        191
+      ]
+    },
+    "landmarks_isles_hearth": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_isles_hearth",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        1045,
+        836,
+        209,
+        209
+      ],
+      "trim_box": [
+        18,
+        28,
+        190,
+        190
+      ]
+    },
+    "landmarks_ivory_capital": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_ivory_capital",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        627,
+        1045,
+        209,
+        209
+      ],
+      "trim_box": [
+        17,
+        24,
+        190,
+        190
+      ]
+    },
+    "landmarks_kharad_hearth": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_kharad_hearth",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        1045,
+        418,
+        209,
+        209
+      ],
+      "trim_box": [
+        17,
+        26,
+        190,
+        191
+      ]
+    },
+    "landmarks_lantern_shrine": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_lantern_shrine",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        836,
+        209,
+        209,
+        209
+      ],
+      "trim_box": [
+        21,
+        17,
+        187,
+        191
+      ]
+    },
+    "landmarks_lighthouse": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_lighthouse",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        418,
+        836,
+        209,
+        209
+      ],
+      "trim_box": [
+        22,
+        17,
+        187,
+        190
+      ]
+    },
+    "landmarks_market_town": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_market_town",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        836,
+        0,
+        209,
+        209
+      ],
+      "trim_box": [
+        18,
+        32,
+        191,
+        191
+      ]
+    },
+    "landmarks_mineral_mine": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_mineral_mine",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        0,
+        418,
+        209,
+        209
+      ],
+      "trim_box": [
+        17,
+        33,
+        191,
+        191
+      ]
+    },
+    "landmarks_mirror_ruins": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_mirror_ruins",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        836,
+        627,
+        209,
+        209
+      ],
+      "trim_box": [
+        18,
+        40,
+        190,
+        191
+      ]
+    },
+    "landmarks_orchard_cottage": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_orchard_cottage",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        0,
+        0,
+        209,
+        209
+      ],
+      "trim_box": [
+        18,
+        42,
+        190,
+        190
+      ]
+    },
+    "landmarks_pirate_cave": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_pirate_cave",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        627,
+        836,
+        209,
+        209
+      ],
+      "trim_box": [
+        17,
+        39,
+        190,
+        190
+      ]
+    },
+    "landmarks_red_roof_village": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_red_roof_village",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        209,
+        0,
+        209,
+        209
+      ],
+      "trim_box": [
+        18,
+        30,
+        191,
+        190
+      ]
+    },
+    "landmarks_reed_hamlet": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_reed_hamlet",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        209,
+        209,
+        209,
+        209
+      ],
+      "trim_box": [
+        17,
+        48,
+        190,
+        190
+      ]
+    },
+    "landmarks_sereva_hearth": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_sereva_hearth",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        1045,
+        627,
+        209,
+        209
+      ],
+      "trim_box": [
+        17,
+        27,
+        190,
+        190
+      ]
+    },
+    "landmarks_seventh_hearth": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_seventh_hearth",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        1045,
+        1045,
+        209,
+        209
+      ],
+      "trim_box": [
+        18,
+        23,
+        190,
+        190
+      ]
+    },
+    "landmarks_sky_sanctuary": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_sky_sanctuary",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        836,
+        836,
+        209,
+        209
+      ],
+      "trim_box": [
+        18,
+        39,
+        190,
+        191
+      ]
+    },
+    "landmarks_snowy_village": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_snowy_village",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        0,
+        1045,
+        209,
+        209
+      ],
+      "trim_box": [
+        18,
+        32,
+        190,
+        190
+      ]
+    },
+    "landmarks_stone_arch": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_stone_arch",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        627,
+        418,
+        209,
+        209
+      ],
+      "trim_box": [
+        18,
+        25,
+        190,
+        190
+      ]
+    },
+    "landmarks_stoneborn_village": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_stoneborn_village",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        418,
+        418,
+        209,
+        209
+      ],
+      "trim_box": [
+        18,
+        36,
+        190,
+        190
+      ]
+    },
+    "landmarks_tent_market": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_tent_market",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        0,
+        627,
+        209,
+        209
+      ],
+      "trim_box": [
+        18,
+        48,
+        190,
+        190
+      ]
+    },
+    "landmarks_veyra_hearth": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_veyra_hearth",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        1045,
+        209,
+        209,
+        209
+      ],
+      "trim_box": [
+        18,
+        20,
+        190,
+        191
+      ]
+    },
+    "landmarks_watermill": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_watermill",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        627,
+        0,
+        209,
+        209
+      ],
+      "trim_box": [
+        17,
+        31,
+        190,
+        191
+      ]
+    },
+    "landmarks_winter_archive": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "landmarks_winter_archive",
+      "sheet": "assets/landmarks.png",
+      "source_rect": [
+        418,
+        1045,
+        209,
+        209
+      ],
+      "trim_box": [
+        18,
+        34,
+        190,
+        190
+      ]
+    },
+    "ocean_packet": {
+      "origin": "Avelune ocean packet sail cycle",
+      "source": "input/sprites/ocean_packet_raw.png",
+      "source_sha256": "05a45317b2346b5e767b34bba1ead6d1720600dbdaefba8b92b29d0fc1d44538"
+    },
+    "party_travel_bram_south": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "party_travel_bram_south",
+      "sheet": "assets/party_travel.png",
+      "source_rect": [
+        836,
+        0,
+        209,
+        209
+      ],
+      "trim_box": [
+        19,
+        19,
+        183,
+        203
+      ]
+    },
+    "party_travel_ferry_east": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "party_travel_ferry_east",
+      "sheet": "assets/party_travel.png",
+      "source_rect": [
+        209,
+        836,
+        209,
+        209
+      ],
+      "trim_box": [
+        17,
+        62,
+        191,
+        191
+      ]
+    },
+    "party_travel_inn": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "party_travel_inn",
+      "sheet": "assets/party_travel.png",
+      "source_rect": [
+        627,
+        1045,
+        209,
+        209
+      ],
+      "trim_box": [
+        17,
+        40,
+        191,
+        191
+      ]
+    },
+    "party_travel_iven_south": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "party_travel_iven_south",
+      "sheet": "assets/party_travel.png",
+      "source_rect": [
+        418,
+        0,
+        209,
+        209
+      ],
+      "trim_box": [
+        41,
+        29,
+        164,
+        202
+      ]
+    },
+    "party_travel_mara_south": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "party_travel_mara_south",
+      "sheet": "assets/party_travel.png",
+      "source_rect": [
+        209,
+        0,
+        209,
+        209
+      ],
+      "trim_box": [
+        48,
+        19,
+        177,
+        199
+      ]
+    },
+    "party_travel_roadkeeper_east": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "party_travel_roadkeeper_east",
+      "sheet": "assets/party_travel.png",
+      "source_rect": [
+        0,
+        627,
+        209,
+        209
+      ],
+      "trim_box": [
+        43,
+        22,
+        172,
+        197
+      ]
+    },
+    "party_travel_roadkeeper_north": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "party_travel_roadkeeper_north",
+      "sheet": "assets/party_travel.png",
+      "source_rect": [
+        0,
+        209,
+        209,
+        209
+      ],
+      "trim_box": [
+        48,
+        26,
+        177,
+        202
+      ]
+    },
+    "party_travel_roadkeeper_south": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "party_travel_roadkeeper_south",
+      "sheet": "assets/party_travel.png",
+      "source_rect": [
+        0,
+        0,
+        209,
+        209
+      ],
+      "trim_box": [
+        48,
+        26,
+        174,
+        201
+      ]
+    },
+    "party_travel_roadkeeper_west": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "party_travel_roadkeeper_west",
+      "sheet": "assets/party_travel.png",
+      "source_rect": [
+        0,
+        418,
+        209,
+        209
+      ],
+      "trim_box": [
+        42,
+        25,
+        175,
+        199
+      ]
+    },
+    "party_travel_sella_south": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "party_travel_sella_south",
+      "sheet": "assets/party_travel.png",
+      "source_rect": [
+        1045,
+        0,
+        209,
+        209
+      ],
+      "trim_box": [
+        34,
+        28,
+        173,
+        206
+      ]
+    },
+    "party_travel_skiff_east": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "party_travel_skiff_east",
+      "sheet": "assets/party_travel.png",
+      "source_rect": [
+        627,
+        836,
+        209,
+        209
+      ],
+      "trim_box": [
+        17,
+        55,
+        191,
+        191
+      ]
+    },
+    "party_travel_tallowback_east": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "party_travel_tallowback_east",
+      "sheet": "assets/party_travel.png",
+      "source_rect": [
+        1045,
+        836,
+        209,
+        209
+      ],
+      "trim_box": [
+        17,
+        59,
+        191,
+        191
+      ]
+    },
+    "party_travel_tavi_south": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "party_travel_tavi_south",
+      "sheet": "assets/party_travel.png",
+      "source_rect": [
+        627,
+        0,
+        209,
+        209
+      ],
+      "trim_box": [
+        42,
+        32,
+        170,
+        202
+      ]
+    },
+    "party_travel_wyla": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "party_travel_wyla",
+      "sheet": "assets/party_travel.png",
+      "source_rect": [
+        0,
+        1045,
+        209,
+        209
+      ],
+      "trim_box": [
+        42,
+        17,
+        166,
+        191
+      ]
+    },
+    "terrain_bare_tree": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_bare_tree",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        784,
+        470,
+        156,
+        157
+      ],
+      "trim_box": [
+        14,
+        18,
+        141,
+        142
+      ]
+    },
+    "terrain_basalt_ridge": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_basalt_ridge",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        940,
+        157,
+        157,
+        157
+      ],
+      "trim_box": [
+        14,
+        31,
+        142,
+        143
+      ]
+    },
+    "terrain_broken_arch": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_broken_arch",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        157,
+        940,
+        157,
+        157
+      ],
+      "trim_box": [
+        13,
+        38,
+        142,
+        142
+      ]
+    },
+    "terrain_cactus": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_cactus",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        627,
+        314,
+        157,
+        156
+      ],
+      "trim_box": [
+        31,
+        14,
+        125,
+        143
+      ]
+    },
+    "terrain_campfire": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_campfire",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        470,
+        1097,
+        157,
+        157
+      ],
+      "trim_box": [
+        14,
+        25,
+        142,
+        142
+      ]
+    },
+    "terrain_cave_rock": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_cave_rock",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        784,
+        157,
+        156,
+        157
+      ],
+      "trim_box": [
+        14,
+        43,
+        142,
+        143
+      ]
+    },
+    "terrain_chest": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_chest",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        627,
+        1097,
+        157,
+        157
+      ],
+      "trim_box": [
+        14,
+        42,
+        142,
+        142
+      ]
+    },
+    "terrain_cliff_ledge": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_cliff_ledge",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        314,
+        784,
+        156,
+        156
+      ],
+      "trim_box": [
+        13,
+        19,
+        142,
+        142
+      ]
+    },
+    "terrain_crystals": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_crystals",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        1097,
+        157,
+        157,
+        157
+      ],
+      "trim_box": [
+        14,
+        23,
+        142,
+        142
+      ]
+    },
+    "terrain_desert_arch": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_desert_arch",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        157,
+        314,
+        157,
+        156
+      ],
+      "trim_box": [
+        14,
+        43,
+        142,
+        142
+      ]
+    },
+    "terrain_dry_shrub": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_dry_shrub",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        784,
+        314,
+        156,
+        156
+      ],
+      "trim_box": [
+        14,
+        31,
+        141,
+        142
+      ]
+    },
+    "terrain_forest_cluster": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_forest_cluster",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        784,
+        0,
+        156,
+        157
+      ],
+      "trim_box": [
+        14,
+        18,
+        141,
+        142
+      ]
+    },
+    "terrain_hovering_rock": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_hovering_rock",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        940,
+        940,
+        157,
+        157
+      ],
+      "trim_box": [
+        15,
+        14,
+        142,
+        143
+      ]
+    },
+    "terrain_ice_spikes": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_ice_spikes",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        627,
+        470,
+        157,
+        157
+      ],
+      "trim_box": [
+        14,
+        16,
+        143,
+        142
+      ]
+    },
+    "terrain_ivory_rubble": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_ivory_rubble",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        0,
+        940,
+        157,
+        157
+      ],
+      "trim_box": [
+        14,
+        25,
+        142,
+        142
+      ]
+    },
+    "terrain_landing_rune": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_landing_rune",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        1097,
+        1097,
+        157,
+        157
+      ],
+      "trim_box": [
+        13,
+        29,
+        143,
+        142
+      ]
+    },
+    "terrain_luminous_pool": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_luminous_pool",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        1097,
+        940,
+        157,
+        157
+      ],
+      "trim_box": [
+        14,
+        53,
+        143,
+        143
+      ]
+    },
+    "terrain_mangrove": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_mangrove",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        314,
+        627,
+        156,
+        157
+      ],
+      "trim_box": [
+        14,
+        21,
+        141,
+        143
+      ]
+    },
+    "terrain_milestone": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_milestone",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        157,
+        1097,
+        157,
+        157
+      ],
+      "trim_box": [
+        24,
+        14,
+        134,
+        143
+      ]
+    },
+    "terrain_mineral_peak": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_mineral_peak",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        314,
+        157,
+        156,
+        157
+      ],
+      "trim_box": [
+        13,
+        33,
+        142,
+        142
+      ]
+    },
+    "terrain_mossy_boulder": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_mossy_boulder",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        1097,
+        0,
+        157,
+        157
+      ],
+      "trim_box": [
+        14,
+        50,
+        142,
+        142
+      ]
+    },
+    "terrain_oak": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_oak",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        470,
+        0,
+        157,
+        157
+      ],
+      "trim_box": [
+        14,
+        18,
+        143,
+        142
+      ]
+    },
+    "terrain_orchard_tree": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_orchard_tree",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        314,
+        0,
+        156,
+        157
+      ],
+      "trim_box": [
+        13,
+        16,
+        141,
+        142
+      ]
+    },
+    "terrain_pale_crystal": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_pale_crystal",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        627,
+        940,
+        157,
+        157
+      ],
+      "trim_box": [
+        13,
+        20,
+        142,
+        142
+      ]
+    },
+    "terrain_palm": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_palm",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        314,
+        314,
+        156,
+        156
+      ],
+      "trim_box": [
+        15,
+        15,
+        140,
+        143
+      ]
+    },
+    "terrain_pine": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_pine",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        627,
+        0,
+        157,
+        157
+      ],
+      "trim_box": [
+        22,
+        14,
+        133,
+        143
+      ]
+    },
+    "terrain_reeds": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_reeds",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        0,
+        627,
+        157,
+        157
+      ],
+      "trim_box": [
+        13,
+        24,
+        143,
+        142
+      ]
+    },
+    "terrain_salt_crystals": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_salt_crystals",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        940,
+        314,
+        157,
+        156
+      ],
+      "trim_box": [
+        14,
+        49,
+        142,
+        143
+      ]
+    },
+    "terrain_sand_dune": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_sand_dune",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        0,
+        314,
+        157,
+        156
+      ],
+      "trim_box": [
+        13,
+        50,
+        142,
+        142
+      ]
+    },
+    "terrain_signpost": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_signpost",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        0,
+        1097,
+        157,
+        157
+      ],
+      "trim_box": [
+        20,
+        14,
+        137,
+        143
+      ]
+    },
+    "terrain_silver_grass": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_silver_grass",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        470,
+        940,
+        157,
+        157
+      ],
+      "trim_box": [
+        14,
+        41,
+        142,
+        143
+      ]
+    },
+    "terrain_snow_boulder": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_snow_boulder",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        157,
+        470,
+        157,
+        157
+      ],
+      "trim_box": [
+        13,
+        48,
+        142,
+        142
+      ]
+    },
+    "terrain_snow_drift": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_snow_drift",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        314,
+        470,
+        156,
+        157
+      ],
+      "trim_box": [
+        13,
+        58,
+        142,
+        143
+      ]
+    },
+    "terrain_snow_peak": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_snow_peak",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        470,
+        157,
+        157,
+        157
+      ],
+      "trim_box": [
+        14,
+        35,
+        143,
+        142
+      ]
+    },
+    "terrain_snow_pine": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_snow_pine",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        0,
+        470,
+        157,
+        157
+      ],
+      "trim_box": [
+        19,
+        14,
+        137,
+        142
+      ]
+    },
+    "terrain_snowbank": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_snowbank",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        1097,
+        470,
+        157,
+        157
+      ],
+      "trim_box": [
+        14,
+        56,
+        143,
+        142
+      ]
+    },
+    "terrain_waterfall": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_waterfall",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        470,
+        784,
+        157,
+        156
+      ],
+      "trim_box": [
+        14,
+        20,
+        143,
+        143
+      ]
+    },
+    "terrain_wheat": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_wheat",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        940,
+        0,
+        157,
+        157
+      ],
+      "trim_box": [
+        13,
+        43,
+        142,
+        142
+      ]
+    },
+    "terrain_wildflowers": {
+      "origin": "Avelune Expanded Art Pack, revision 14",
+      "frame": "terrain_wildflowers",
+      "sheet": "assets/terrain.png",
+      "source_rect": [
+        157,
+        0,
+        157,
+        157
+      ],
+      "trim_box": [
+        14,
+        36,
+        143,
+        142
+      ]
+    }
+  }
+}

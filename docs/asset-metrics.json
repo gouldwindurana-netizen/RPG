@@ -1,0 +1,15 @@
+{
+  "source": "Three accessible user-supplied archives",
+  "spriteFrames": 284,
+  "groundAreas": 108,
+  "originalRuntimeImageBytes": 11757262,
+  "optimizedRuntimeImageBytes": 2357878,
+  "reductionPercent": 79.95,
+  "generatedLandscape": "assets/landscape.webp",
+  "notes": [
+    "Runtime image byte comparison includes atlas, all grounds, animation and world map.",
+    "Generated landscape and four new hero crops are additions, excluded from like-for-like comparison.",
+    "Sprite frames are repacked with three transparent pixels of padding.",
+    "Ground dimensions, animation anchors and collision data remain unchanged."
+  ]
+}
