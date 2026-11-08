@@ -11,3 +11,5 @@
 .party-mini{grid-template-columns:48px 1fr}.party-mini img{width:48px;height:48px}.hero-overview img{width:96px;height:96px}
 @media(max-width:760px){.party-mini{grid-template-columns:24px 1fr}.party-mini img{width:24px;height:24px}}
 @media(max-width:600px){.danger-chip{top:5px;bottom:auto;right:6px;width:92px}.danger-chip span{font-size:13px}.hero-overview img{width:72px;height:72px}}
+.town-strip{display:flex;gap:7px;align-items:center;flex-wrap:wrap;padding:9px 10px;margin-top:12px;border:3px double #c4c4b6;background:#14284c}.town-strip>strong{font-size:17px;font-weight:400;color:var(--gold);margin-right:auto}.town-strip button{font-size:18px;padding:6px 10px;border-color:#64748c}.town-strip .town-heal{border-color:var(--gold);color:var(--gold)}
+@media(max-width:760px){.field-nav{flex-wrap:wrap}.field-nav button{min-width:28%}.town-strip{padding:6px;gap:5px}.town-strip>strong{width:100%;font-size:16px}.town-strip button{font-size:17px;flex:1;padding:6px}.field-nav button kbd{display:none}}

@@ -79,8 +79,12 @@ class AveluneWorld {
       ...this.area.events.filter(event => !this.flags.has(event.id)).map(event => ({ ...event, type: 'event' })),
       ...this.area.stops.map(stop => ({ ...stop, type: 'stop' })),
     ];
-    return options.filter(item => this.distance(item.at) <= 28)
-      .sort((a, b) => this.distance(a.at) - this.distance(b.at))[0];
+    const normal=options.filter(item => this.distance(item.at) <= 28)
+      .sort((a,b)=>this.distance(a.at)-this.distance(b.at))[0];
+    const service=typeof AveluneTownServices!=='undefined'?AveluneTownServices.near(this):null;
+    if(service&&(!normal||normal.type!=='event'&&this.distance(service.at)<this.distance(normal.at)))
+      return {...service,type:'service',serviceType:service.type,service};
+    return normal;
   }
 
   crossedExit() {

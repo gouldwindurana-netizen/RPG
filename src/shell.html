@@ -9,9 +9,10 @@
 <button class="interact" id="interact" hidden type="button"><kbd>E</kbd><span id="interact-label"></span><span aria-hidden="true">↵</span></button>
 <div id="toast" class="toast" role="status" hidden></div>
 </section>
+<section id="town-strip" class="town-strip" hidden aria-label="Town services"></section>
 <section class="party-strip" id="party-strip" aria-label="Party status"></section>
 <section class="road-hud" aria-label="Current objective"><div class="objective"><span class="objective-rune" aria-hidden="true">✦</span><div><p class="kicker" id="objective-tag">THE ROAD AHEAD</p><p id="objective">Collect the repaired mailbag</p><p id="objective-detail">Visit Wyla’s cottage.</p></div></div><button id="navigate" type="button" title="Walk toward the current objective">Follow marker <span aria-hidden="true">↗</span></button></section>
-<nav class="field-nav" aria-label="Adventure tools"><button id="open-party">Party & jobs <kbd>P</kbd></button><button id="open-bag">Items <kbd>I</kbd></button><button id="open-atlas">Atlas <kbd>M</kbd></button><button id="open-journal">Journal <kbd>J</kbd></button><button id="open-services">Haven <kbd>H</kbd></button></nav>
+<nav class="field-nav" aria-label="Adventure tools"><button id="open-party">Party & jobs <kbd>P</kbd></button><button id="open-bag">Items <kbd>I</kbd></button><button id="open-atlas">Atlas <kbd>M</kbd></button><button id="open-journal">Journal <kbd>J</kbd></button><button id="open-magic">Field magic <kbd>F</kbd></button><button id="open-services">Town & rest <kbd>H</kbd></button></nav>
 <div class="touch" aria-label="Touch controls"><div class="dpad"><button data-move="north" aria-label="Walk north">▲</button><button data-move="west" aria-label="Walk west">◀</button><button data-move="south" aria-label="Walk south">▼</button><button data-move="east" aria-label="Walk east">▶</button></div><button id="touch-act">Interact <span>✦</span></button></div>
 <footer><span class="inputs"><kbd>WASD</kbd> Walk · <kbd>Shift</kbd> Run · <kbd>E</kbd> Interact · Click to walk</span><span id="visited"></span><span id="save-state">Journal ready</span></footer>
 </main>
@@ -20,5 +21,5 @@
 <section id="battle-screen" hidden></section>
 <input type="file" id="import-save" accept="application/json,.json" hidden>
 <script>const LAYOUT=@@LAYOUT@@;const ART=@@ART@@;</script>
-<script>@@PIXEL@@</script><script>@@TERRAIN@@</script><script>@@MODEL@@</script><script>@@VIEW@@</script><script>@@COMBAT@@</script><script>@@CAMPAIGN@@</script><script>@@ENEMY@@</script><script>@@BATTLE@@</script><script>@@APP@@</script>
+<script>@@PIXEL@@</script><script>@@TERRAIN@@</script><script>@@MODEL@@</script><script>@@VIEW@@</script><script>@@COMBAT@@</script><script>@@CAMPAIGN@@</script><script>@@ENEMY@@</script><script>@@BATTLE@@</script><script>@@TOWNS@@</script><script>@@SERVICEART@@</script><script>@@SHOPS@@</script><script>@@APP@@</script>
 </body></html>

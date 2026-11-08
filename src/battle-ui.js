@@ -293,7 +293,7 @@ class AveluneBattleUI {
       }
     } else if (this.menu === 'items') {
       eyebrow.textContent = 'SATCHEL · SHARED BY THE PARTY';
-      for (const id of ['potion','ether','revive']) {
+      for (const id of Object.keys(AVELUNE_ITEMS).filter(key=>!AVELUNE_ITEMS[key].fieldOnly)) {
         const item = this.item(id);
         const reserved = this.commands.filter(command => command?.type === 'item' && command.item === id).length;
         const available = Math.max(0,(this.rpg.inventory[id] ?? 0) - reserved);

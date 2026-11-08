@@ -8,10 +8,14 @@ Open **Avelune.html** in a modern browser for the self-contained offline edition
 
 - WASD or arrow keys: walk. Shift: run. Click the ground to walk there.
 - E or Space: interact. **Follow marker** walks toward the tracked objective.
-- P: party and jobs. I: items. M: atlas. J: journal. H: haven. Esc: menu/back.
+- P: party and jobs. I: items. M: atlas. J: journal. H: Town & rest. F: field healing magic. Esc: menu/back.
 - Touch: directional pad, Interact, and the same menus.
 - In battle, choose one order for each living hero and **Resolve round**. Select a hero card to revise an order before committing it. Magic and items have explicit targets. The enemy’s third-round heavy strike is telegraphed; Guard reduces it.
-- **Haven** offers recovery, supplies and equipment where available. Camps and Wyla’s cottage offer free recovery. Job changes are available at safe havens. Rest after changing jobs to replenish newly available charges.
+- **Town & rest** lists the signed INN, ITEMS, ARMS, MAGIC, CLINIC, GUILD and INFO counters. The town strip’s buttons walk to the corresponding merchant and open their service. You can also walk there and press E. Paid inns restore standing allies; clinics revive at 1 HP, followed by inn recovery. Brackenwell’s wayside clinic, Wyla’s cottage and refuges offer free full recovery even with no gold.
+- Buy and sell supplies in quantities of 1/5/10. At the armory, buy named gear, compare stats for each hero, then select **Equip**. Worn copies cannot be sold. Party → Equip weapons and armor lets you change owned gear on the road.
+- Magic shops sell permanent spells for eligible characters. Prepare custom loadouts of up to three spells per tier. **Field magic** casts healing and revival from the same charge pool used in battle. The original starter spellbooks remain available for compatibility.
+- Use tents and cottage kits from Items while outdoors to recover standing allies. The guild changes jobs, reorders the party, and offers promotion after the Alderreach Hearth at level 5 for 120 G per traveler. Front slots attract more attacks; the leader appears in the field.
+- Use **Menu → Save journal** to save immediately; inns, camps and normal autosave also preserve your progress.
 
 ## Implemented scope
 
@@ -21,7 +25,9 @@ Open **Avelune.html** in a modern browser for the self-contained offline edition
 - Four named heroes available together from the beginning: Roadkeeper, Mara, Iven, and Sella.
 - Six interchangeable jobs: **Vanguard, Monk, Ranger, Red Mage, White Mage, Black Mage**. Each changes stats, equipment proficiency, spells, and a passive trait. All purchased equipment ranks remain owned across job changes; effective ranks obey the current job’s limits.
 - Turn-based party commands, speed-based initiative, elemental weaknesses, auto-retargeting, two tiers of limited spell charges, healing/revival, guarding, consumables, retreat, XP, level-ups, upgrades, and a level-30 cap.
-- Inns, camps, shops, one-time treasure and story rewards, autosave, portable save import/export, desktop/touch controls, optional synthesized sound effects, and reduced-motion support.
+- Signed physical services across all 18 main towns/villages/ports/markets; refuge and interior counters across 37 safe areas. Buy/sell shops carry 30 named gear pieces, six consumables and eight purchasable spells, with stock tiers tied to region/progress.
+- Paid inns, clinics, free refuges, field healing/revival, camping supplies, equipment comparisons, spell loadouts, formation, earned promotion, manual save, autosave and portable journal import/export.
+- One-time treasure/story rewards, desktop/touch controls, optional synthesized sound effects and reduced-motion support.
 - A unified original 16px world-art vocabulary, fixed 16×24 character source shared by standing/walking/battles/portraits, thirteen enemy silhouettes, and classic blue/ivory command menus. Buildings, foliage, water, paths, furnishings and regional battlefields share material colors and pixel density.
 
 This is a streamlined complete adaptation of the supplied route, not the design bible’s proposed 35–45-hour commercial campaign. The full catalog of 332 items, 72 books, 48 native skills, 70 quests, crafting, summons, six-character roster/recruitment, bespoke multiphase boss mechanics, and unique art for every enemy are **not** all implemented. Bosses use tuned stats, weaknesses, and a shared heavy-strike cycle; multiple named enemies share silhouettes. Playtime has not been measured with human players.
@@ -50,6 +56,7 @@ The offline file is written to `release/Avelune.html`. The static web build is `
 npm test
 npm run test:browser
 npm run test:visual
+npm run test:services
 ```
 
 Browser tests launch Chromium at `/usr/bin/chromium`; set `CHROMIUM_PATH` to an installed Chromium executable on other systems and `PLAYTEST_OUTPUT` to a writable test-results directory. Browser tests start and stop their own server on port 3101. They include a test-only fixture interface enabled solely by `?test=1`; ordinary play does not expose it.
@@ -64,6 +71,7 @@ The native canvas renderer preserves the authored geometry, collision and travel
 - `docs/PLAYTEST.md`, `docs/balance-results.json`: deterministic full-route and party-composition verification.
 - `docs/BROWSER-QA.md`: actual desktop/mobile Chromium checks and limits.
 - `docs/VISUAL-QA.md` and `docs/VISUAL-POLISH.md`: full-map rendering, walking consistency, and visual integration evidence.
+- `docs/TOWN-SERVICES.md`, `docs/FF1-SERVICES-GAP.md` and `docs/SERVICES-QA.md`: preparation systems, historical reference differences, physical placements, and transaction/recovery verification.
 
 Equivalent runtime images fell from 11,757,262 to 2,357,878 bytes, about **80% smaller**. Source originals were preserved during development. The three larger uploaded art archives exceeded the transfer tool’s 32 MiB limit; their separate contents were not inspected. Existing derived scene artwork in the accessible world-layout archive was used.
 

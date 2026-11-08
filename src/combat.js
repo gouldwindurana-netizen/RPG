@@ -1,6 +1,7 @@
 /*
  * Avelune combat and party model. No renderer or browser globals are required.
- * Global API: AveluneRPG, AVELUNE_JOBS, AVELUNE_SPELLS, AVELUNE_ITEMS.
+ * Global API: AveluneRPG, AVELUNE_JOBS, AVELUNE_SPELLS, AVELUNE_ITEMS,
+ * AVELUNE_GEAR, AVELUNE_TOWN_SPELLS.
  * Commands: {type:'attack'|'guard'|'spell'|'item'|'flee',target:index,spell:id,item:id}.
  * One command per party slot is collected before resolveRound(commands).
  * startBattle(spec) -> {ok,battle}; resolveRound -> {events,outcome,round,rewards}.
@@ -22,6 +23,14 @@ const AVELUNE_SPELLS = Object.freeze({
   quake: {name:'Quake',description:'Stone and earth strike every foe.',tier:2,target:'allEnemies',kind:'damage',element:'stone',power:33},
   renewal: {name:'Renewal',description:'Restore HP to every living ally.',tier:2,target:'allAllies',kind:'heal',power:30},
   raise: {name:'Rekindle',description:'Revive one fallen ally at half HP.',tier:2,target:'ally',kind:'revive',power:0},
+  salve: {name:'Salve',description:'Restore more HP to one living ally.',tier:1,target:'ally',kind:'heal',power:55},
+  halo: {name:'Halo',description:'Starlight strikes every foe.',tier:1,target:'allEnemies',kind:'damage',element:'starlight',power:18},
+  gale: {name:'Gale',description:'A cutting wind strikes one foe.',tier:1,target:'enemy',kind:'damage',element:'gale',power:26},
+  stone: {name:'Stone',description:'A shard of earth strikes one foe.',tier:1,target:'enemy',kind:'damage',element:'stone',power:26},
+  greatermend: {name:'Greater Mend',description:'Restore a great deal of HP to one living ally.',tier:2,target:'ally',kind:'heal',power:130},
+  sunburst: {name:'Sunburst',description:'Brilliant starlight strikes every foe.',tier:2,target:'allEnemies',kind:'damage',element:'starlight',power:42},
+  comet: {name:'Comet',description:'A powerful aether strike against one foe.',tier:2,target:'enemy',kind:'damage',element:'aether',power:100},
+  shelter: {name:'Shelter',description:'Spend a tier II charge to protect the party this round.',tier:2,target:'allAllies',kind:'ward',power:0},
 });
 
 const AVELUNE_JOBS = Object.freeze({
@@ -37,7 +46,37 @@ const AVELUNE_ITEMS = Object.freeze({
   potion: {id:'potion',name:'Potion',price:25,description:'Restore 70 HP to one living ally.',target:'ally'},
   ether: {id:'ether',name:'Ether',price:65,description:'Restore two charges in each unlocked spell tier.',target:'ally'},
   revive: {id:'revive',name:'Dawn feather',price:90,description:'Revive one fallen ally at half HP.',target:'ally'},
+  hipotion: {id:'hipotion',name:'High potion',price:100,description:'Restore 180 HP to one living ally.',target:'ally'},
+  tent: {id:'tent',name:'Tent',price:60,description:'Outdoors: restore half of living allies’ maximum HP and one charge per tier. Cannot revive.',target:'party',fieldOnly:true},
+  cottage: {id:'cottage',name:'Cottage kit',price:220,description:'Outdoors: fully restore living allies’ HP and magic. Cannot revive.',target:'party',fieldOnly:true},
 });
+
+// Named equipment is shared inventory. Owned counts include worn copies; changing
+// jobs removes incompatible equipment without destroying it or its rank upgrades.
+const AVELUNE_GEAR = Object.freeze(Object.fromEntries([
+  ['sword','Sword','weapon',['vanguard','redmage'],['Bronze sword','Iron sword','Starforged sword'],[35,210,760]],
+  ['wraps','Handwraps','weapon',['monk'],['Linen wraps','Iron knuckles','Dawn knuckles'],[30,180,680]],
+  ['bow','Bow','weapon',['ranger'],['Ash bow','Yew bow','Moon bow'],[35,210,760]],
+  ['rapier','Rapier','weapon',['redmage'],['Copper rapier','Silver rapier','Sun rapier'],[35,210,760]],
+  ['staff','Staff','weapon',['whitemage','redmage'],['Willow staff','Ivory staff','Aurora staff'],[30,190,700]],
+  ['rod','Rod','weapon',['blackmage','redmage'],['Oak rod','Crystal rod','Astral rod'],[30,190,700]],
+  ['plate','Plate','armor',['vanguard'],['Bronze plate','Iron plate','Dawn plate'],[45,250,880]],
+  ['mail','Mail','armor',['vanguard','redmage'],['Ring mail','Chain mail','Silver mail'],[40,230,820]],
+  ['leather','Leather','armor',['vanguard','ranger','redmage'],['Leather vest','Ranger coat','Moonhide vest'],[30,180,680]],
+  ['robe','Cloth','armor',['monk','redmage','whitemage','blackmage'],['Linen robe','Runic robe','Starlight robe'],[25,160,620]],
+].flatMap(([family,label,slot,jobs,names,prices])=>names.map((name,i)=>{
+  const tier=i+1,id=family+'_'+tier,attack=slot==='weapon'?[2,5,9][i]:0,defense=slot==='armor'?[1,3,6][i]:0;
+  return [id,Object.freeze({id,name,slot,tier,price:prices[i],jobs:Object.freeze(jobs),attack,defense,description:label+' · '+(slot==='weapon'?'ATK +'+attack:'DEF +'+defense)})];
+}))));
+
+const AVELUNE_TOWN_SPELLS = Object.freeze(Object.fromEntries([
+  ['salve',90,['redmage','whitemage'],'white'],['halo',110,['whitemage'],'white'],
+  ['gale',100,['redmage','blackmage'],'black'],['stone',100,['redmage','blackmage'],'black'],
+  ['greatermend',300,['redmage','whitemage'],'white'],['sunburst',400,['whitemage'],'white'],
+  ['comet',420,['blackmage'],'black'],['shelter',260,['redmage','whitemage'],'white'],
+].map(([id,price,jobs,school])=>[id,Object.freeze({id,...AVELUNE_SPELLS[id],price,jobs:Object.freeze(jobs),school})])));
+
+const AVELUNE_ADVANCED_ROLES = Object.freeze({vanguard:'Knight',monk:'Master',ranger:'Wayfarer',redmage:'Spellblade',whitemage:'Luminary',blackmage:'Arcanist'});
 
 class AveluneRPG {
   constructor(save, options={}) {
@@ -46,19 +85,42 @@ class AveluneRPG {
     this.xp=this._int(data.xp,0,this.xpForLevel(30),0);
     this.gold=this._int(data.gold,0,9999999,120);
     this.inventory={};
-    for (const id of Object.keys(AVELUNE_ITEMS)) this.inventory[id]=this._int(data.inventory?.[id],0,99,id==='potion'?5:id==='ether'?2:1);
+    for (const id of Object.keys(AVELUNE_ITEMS)) this.inventory[id]=this._int(data.inventory?.[id],0,99,id==='potion'?5:id==='ether'?2:id==='revive'?1:0);
+    this.gearOwned={};
+    for(const id of Object.keys(AVELUNE_GEAR)) this.gearOwned[id]=this._int(data.gearOwned?.[id],0,99,0);
     this.campaignRewards=new Set(Array.isArray(data.campaignRewards)?data.campaignRewards.filter(s=>typeof s==='string'&&s.length<=100).slice(0,500):[]);
     this.battlesWon=this._int(data.battlesWon,0,999999,0);
     const cast=[['roadkeeper','Roadkeeper','redmage'],['mara','Mara','vanguard'],['iven','Iven','whitemage'],['sella','Sella','blackmage']];
     this.party=cast.map(([id,name,defaultJob],index)=>{
       const old=Array.isArray(data.party)?data.party.find(h=>h&&h.id===id)??data.party[index]:null;
       const job=Object.hasOwn(AVELUNE_JOBS,old?.job)?old.job:defaultJob;
-      const hero={id,name,job,equipment:{weapon:this._int(old?.equipment?.weapon,0,5,0),armor:this._int(old?.equipment?.armor,0,5,0)}};
+      const hero={id,name,job,promoted:old?.promoted===true,equipment:{weapon:this._int(old?.equipment?.weapon,0,5,0),armor:this._int(old?.equipment?.armor,0,5,0)},equippedGear:{weapon:null,armor:null},learnedSpells:[],spellLoadouts:{}};
+      hero.learnedSpells=Array.isArray(old?.learnedSpells)?[...new Set(old.learnedSpells.filter(key=>Object.hasOwn(AVELUNE_TOWN_SPELLS,key)))]:[];
+      for(const jobId of Object.keys(AVELUNE_JOBS)) {
+        const saved=old?.spellLoadouts?.[jobId];
+        if(!saved||typeof saved!=='object') continue;
+        const loadout={};
+        for(const tier of [1,2]) if(Array.isArray(saved[tier])) loadout[tier]=[...new Set(saved[tier].filter(key=>this._knowsSpell(hero,key,jobId)&&AVELUNE_SPELLS[key].tier===tier))].slice(0,3);
+        hero.spellLoadouts[jobId]=loadout;
+      }
+      for(const slot of ['weapon','armor']) {
+        const key=old?.equippedGear?.[slot],gear=AVELUNE_GEAR[key];
+        if(gear?.slot===slot&&gear.jobs.includes(job)) hero.equippedGear[slot]=key;
+      }
       this._stats(hero);
       hero.hp=this._int(old?.hp,0,hero.maxHp,hero.maxHp);
       hero.charges=hero.maxCharges.map((max,tier)=>this._int(old?.charges?.[tier],0,max,max));
       return hero;
     });
+    const order=Array.isArray(data.party)?data.party.map(h=>h?.id):[];
+    this.party.sort((a,b)=>{const ai=order.indexOf(a.id),bi=order.indexOf(b.id);return (ai<0?99:ai)-(bi<0?99:bi);});
+    const worn={};
+    for(const hero of this.party) for(const slot of ['weapon','armor']) {
+      const id=hero.equippedGear[slot];
+      if(id&&((worn[id]||0)>=this.gearOwned[id])) hero.equippedGear[slot]=null;
+      else if(id) worn[id]=(worn[id]||0)+1;
+      this._stats(hero);
+    }
     // An invalid or abandoned save must still have a recoverable party.
     if (this.party.every(h=>h.hp===0)) this.party[0].hp=1;
     this.battle=null;
@@ -70,22 +132,30 @@ class AveluneRPG {
   get nextLevelXP() { return this.level===30?this.xp:this.xpForLevel(this.level+1); }
   _random() { let x=this.seed||1;x^=x<<13;x^=x>>>17;x^=x<<5;this.seed=x>>>0;return this.seed/4294967296; }
   _element(value) { return ({fire:'ember',ice:'frost',lightning:'bolt',light:'starlight',water:'tide',wind:'gale',earth:'stone'})[String(value).toLowerCase()]||String(value||'').toLowerCase().slice(0,24); }
+  _knowsSpell(hero,id,jobId=hero.job) {
+    return Object.hasOwn(AVELUNE_SPELLS,id)&&(AVELUNE_JOBS[jobId].spells.includes(id)||(hero.learnedSpells.includes(id)&&AVELUNE_TOWN_SPELLS[id]?.jobs.includes(jobId)));
+  }
   _stats(hero) {
     const job=AVELUNE_JOBS[hero.job],level=this.level;
-    hero.level=level;hero.xp=this.xp;hero.role=job.name;
-    hero.maxHp=Math.round(job.hp+(level-1)*job.hpGrowth);
+    const promoted=hero.promoted?1.1:1,weapon=AVELUNE_GEAR[hero.equippedGear?.weapon],armor=AVELUNE_GEAR[hero.equippedGear?.armor];
+    hero.level=level;hero.xp=this.xp;hero.role=hero.promoted?AVELUNE_ADVANCED_ROLES[hero.job]:job.name;
+    hero.maxHp=Math.round((job.hp+(level-1)*job.hpGrowth)*promoted);
     // Ranks are owned investments. A job's proficiency limits their current effect,
     // without destroying upgrades when the player experiments with another job.
-    hero.attack=Math.round(job.attack+(level-1)*job.attackGrowth+Math.min(hero.equipment.weapon,job.weaponCap)*3);
-    hero.defense=Math.round(job.defense+(level-1)*job.defenseGrowth+Math.min(hero.equipment.armor,job.armorCap)*2);
+    hero.attack=Math.round((job.attack+(level-1)*job.attackGrowth+Math.min(hero.equipment.weapon,job.weaponCap)*3+(weapon?.jobs.includes(hero.job)?weapon.attack:0))*promoted);
+    hero.defense=Math.round((job.defense+(level-1)*job.defenseGrowth+Math.min(hero.equipment.armor,job.armorCap)*2+(armor?.jobs.includes(hero.job)?armor.defense:0))*promoted);
     hero.speed=Math.round(job.speed+(level-1)*job.speedGrowth);
-    const bonus=['whitemage','blackmage'].includes(hero.job)?1:0;
+    const bonus=(['whitemage','blackmage'].includes(hero.job)?1:0)+(hero.promoted?1:0);
     hero.maxCharges=job.spells.length?[3+Math.floor((level-1)/3)+bonus,level>=5?1+Math.floor((level-5)/4)+bonus:0]:[0,0];
-    hero.spells=job.spells.filter(id=>AVELUNE_SPELLS[id].tier===1||level>=5);
+    hero.knownSpells=[...new Set([...job.spells,...hero.learnedSpells])].filter(id=>this._knowsSpell(hero,id)&&(AVELUNE_SPELLS[id].tier===1||level>=5));
+    const loadout=hero.spellLoadouts[hero.job]||{};
+    hero.preparedSpells={};
+    for(const tier of [1,2]) hero.preparedSpells[tier]=(loadout[tier]??job.spells).filter(id=>hero.knownSpells.includes(id)&&AVELUNE_SPELLS[id].tier===tier);
+    hero.spells=[...hero.preparedSpells[1],...hero.preparedSpells[2]];
   }
 
   snapshot() {
-    return {version:1,seed:this.seed,xp:this.xp,gold:this.gold,inventory:{...this.inventory},battlesWon:this.battlesWon,campaignRewards:[...this.campaignRewards],party:this.party.map(h=>({id:h.id,job:h.job,hp:h.hp,charges:[...h.charges],equipment:{...h.equipment}}))};
+    return {version:1,seed:this.seed,xp:this.xp,gold:this.gold,inventory:{...this.inventory},gearOwned:{...this.gearOwned},battlesWon:this.battlesWon,campaignRewards:[...this.campaignRewards],party:this.party.map(h=>({id:h.id,job:h.job,promoted:h.promoted,hp:h.hp,charges:[...h.charges],equipment:{...h.equipment},equippedGear:{...h.equippedGear},learnedSpells:[...h.learnedSpells],spellLoadouts:Object.fromEntries(Object.entries(h.spellLoadouts).map(([job,tiers])=>[job,Object.fromEntries(Object.entries(tiers).map(([tier,ids])=>[tier,[...ids]]))]))}))};
   }
 
   assignJob(index,jobId) {
@@ -95,6 +165,7 @@ class AveluneRPG {
     if (hero.job===jobId) return {ok:false,text:hero.name+' already follows this calling.'};
     const alive=hero.hp>0,hpRatio=hero.hp/hero.maxHp,ratios=hero.maxCharges.map((n,i)=>n?hero.charges[i]/n:0);
     hero.job=jobId;
+    for(const slot of ['weapon','armor']) if(hero.equippedGear[slot]&&!AVELUNE_GEAR[hero.equippedGear[slot]].jobs.includes(jobId)) hero.equippedGear[slot]=null;
     this._stats(hero);
     hero.hp=alive?Math.max(1,Math.floor(hero.maxHp*hpRatio)):0;
     hero.charges=hero.maxCharges.map((n,i)=>Math.floor(n*ratios[i]));
@@ -125,17 +196,174 @@ class AveluneRPG {
     this._restore();
     return {ok:true,text:'HP and all spell charges restored.'};
   }
+  restAtInn(cost=0) {
+    if(this.battle) return {ok:false,text:'You cannot rest during battle.'};
+    if(!Number.isInteger(cost)||cost<0||this.gold<cost) return {ok:false,text:'Not enough gold for a room.'};
+    if(!this.party.some(h=>h.hp>0&&(h.hp<h.maxHp||h.charges.some((n,i)=>n<h.maxCharges[i])))) return {ok:false,text:'Every standing ally is already rested. Visit the chapel for fallen allies.'};
+    this.gold-=cost;
+    for(const h of this.party) if(h.hp>0){h.hp=h.maxHp;h.charges=[...h.maxCharges];}
+    return {ok:true,cost,text:'Standing allies recover all HP and magic. The chapel can revive fallen allies.'};
+  }
   _restore() { for(const h of this.party){h.hp=h.maxHp;h.charges=[...h.maxCharges];} }
+
+  reviveAtClinic(index,cost=30) {
+    if(this.battle) return {ok:false,text:'Visit the chapel outside battle.'};
+    const h=this.party[index];
+    if(!h||!Number.isInteger(cost)||cost<0) return {ok:false,text:'Choose a fallen ally and a valid offering.'};
+    if(h.hp>0) return {ok:false,text:h.name+' is already standing.'};
+    if(this.gold<cost) return {ok:false,text:'Not enough gold for the chapel offering.'};
+    this.gold-=cost;h.hp=1;
+    return {ok:true,cost,amount:1,text:h.name+' returns with 1 HP. Rest at the inn to recover strength and magic.'};
+  }
+
+  useFieldSupply(itemId,context={}) {
+    if(this.battle) return {ok:false,text:'Camping supplies cannot be used during battle.'};
+    if(!['tent','cottage'].includes(itemId)) return {ok:false,text:'Choose a camping supply.'};
+    if(context?.outdoors!==true&&context?.camp!==true) return {ok:false,text:'Camping supplies can only be used outdoors or at a campsite.'};
+    const item=Object.hasOwn(AVELUNE_ITEMS,itemId)?AVELUNE_ITEMS[itemId]:null;
+    if(this.inventory[itemId]<1) return {ok:false,text:'No '+item.name+' remaining.'};
+    const living=this.party.filter(h=>h.hp>0);
+    if(!living.some(h=>h.hp<h.maxHp||h.charges.some((n,i)=>n<h.maxCharges[i]))) return {ok:false,text:'No standing ally needs to recover. Camping cannot revive fallen allies.'};
+    let amount=0;
+    for(const h of living) {
+      const healed=itemId==='cottage'?h.maxHp-h.hp:Math.min(h.maxHp-h.hp,Math.ceil(h.maxHp/2));
+      h.hp+=healed;amount+=healed;
+      h.charges=h.charges.map((n,i)=>itemId==='cottage'?h.maxCharges[i]:Math.min(h.maxCharges[i],n+1));
+    }
+    this.inventory[itemId]--;
+    return {ok:true,amount,text:item.name+' used. Standing allies recover HP and magic; fallen allies need the chapel.'};
+  }
+
+  castField(index,spellId,targetIndex) {
+    if(this.battle) return {ok:false,text:'Choose magic through the battle commands.'};
+    const h=this.party[index],spell=AVELUNE_SPELLS[spellId];
+    if(!h||!spell||!h.spells.includes(spellId)) return {ok:false,text:'That ally has not prepared this spell.'};
+    if(h.hp===0) return {ok:false,text:h.name+' must be revived before casting.'};
+    if(!['heal','revive'].includes(spell.kind)) return {ok:false,text:spell.name+' is used in battle.'};
+    if(h.charges[spell.tier-1]<1) return {ok:false,text:'No tier '+spell.tier+' charges remaining.'};
+    const targets=spell.target==='allAllies'?this.party.filter(p=>p.hp>0):[this.party[targetIndex]].filter(Boolean);
+    const affected=targets.filter(p=>spell.kind==='revive'?p.hp===0:p.hp>0&&p.hp<p.maxHp);
+    if(!affected.length) return {ok:false,text:spell.kind==='revive'?'Choose a fallen ally.':'No chosen ally needs healing.'};
+    h.charges[spell.tier-1]--;
+    let amount=0;
+    for(const target of affected) {
+      const healed=spell.kind==='revive'?Math.max(1,Math.floor(target.maxHp/2)):Math.min(target.maxHp-target.hp,Math.round((spell.power+this.level*4)*(h.job==='whitemage'?1.2:1)));
+      target.hp+=healed;amount+=healed;
+    }
+    return {ok:true,amount,targets:affected.map(p=>p.id),text:h.name+' casts '+spell.name+'. '+amount+' HP restored.'};
+  }
+
+  moveHero(index,destination) {
+    if(this.battle) return {ok:false,text:'Formation cannot change during battle.'};
+    if(!Number.isInteger(index)||!Number.isInteger(destination)||index<0||destination<0||index>=this.party.length||destination>=this.party.length||index===destination) return {ok:false,text:'Choose a different party position.'};
+    const [hero]=this.party.splice(index,1);this.party.splice(destination,0,hero);
+    return {ok:true,text:hero.name+' moves to position '+(destination+1)+'. Front ranks draw more enemy attacks.'};
+  }
+
+  promote(index,eligible=false) {
+    if(this.battle) return {ok:false,text:'Advancement is unavailable during battle.'};
+    const h=this.party[index];
+    if(!h) return {ok:false,text:'Choose a party member.'};
+    if(h.promoted) return {ok:false,text:h.name+' has already advanced.'};
+    if(eligible!==true||this.level<5) return {ok:false,text:'Reach level 5 and restore the Alderreach hearth before advancing.'};
+    if(this.gold<120) return {ok:false,text:'Advancement requires 120 gold.'};
+    const alive=h.hp>0,hpRatio=h.hp/h.maxHp,ratios=h.maxCharges.map((n,i)=>n?h.charges[i]/n:0);
+    this.gold-=120;h.promoted=true;this._stats(h);
+    h.hp=alive?Math.max(1,Math.floor(h.maxHp*hpRatio)):0;
+    h.charges=h.maxCharges.map((n,i)=>Math.floor(n*ratios[i]));
+    return {ok:true,cost:120,text:h.name+' advances to '+h.role+'. Rest to replenish magic.'};
+  }
 
   buy(itemId,quantity=1) {
     if(this.battle) return {ok:false,text:'Shopping is unavailable during battle.'};
-    const item=AVELUNE_ITEMS[itemId];
+    const item=Object.hasOwn(AVELUNE_ITEMS,itemId)?AVELUNE_ITEMS[itemId]:null;
     if(!item||!Number.isInteger(quantity)||quantity<1||quantity>99) return {ok:false,text:'Choose a valid item quantity.'};
     if(this.inventory[itemId]+quantity>99) return {ok:false,text:'You can carry at most 99 of each item.'};
     const cost=item.price*quantity;
     if(this.gold<cost) return {ok:false,text:'Not enough gold.'};
     this.gold-=cost;this.inventory[itemId]+=quantity;
     return {ok:true,text:quantity+' × '+item.name+' purchased.',cost};
+  }
+
+  sell(itemId,quantity=1) {
+    if(this.battle) return {ok:false,text:'Shopping is unavailable during battle.'};
+    const item=Object.hasOwn(AVELUNE_ITEMS,itemId)?AVELUNE_ITEMS[itemId]:null;
+    if(!item||!Number.isInteger(quantity)||quantity<1||quantity>99) return {ok:false,text:'Choose a valid item quantity.'};
+    if(this.inventory[itemId]<quantity) return {ok:false,text:'You do not have enough '+item.name+'.'};
+    const value=Math.floor(item.price/2)*quantity;
+    this.inventory[itemId]-=quantity;this.gold=Math.min(9999999,this.gold+value);
+    return {ok:true,value,text:quantity+' × '+item.name+' sold for '+value+' gold.'};
+  }
+
+  _wornGear(id) { return this.party.reduce((n,h)=>n+Object.values(h.equippedGear).filter(key=>key===id).length,0); }
+  quoteGear(index,gearId) {
+    const h=this.party[index],gear=Object.hasOwn(AVELUNE_GEAR,gearId)?AVELUNE_GEAR[gearId]:null;
+    if(!h||!gear) return {ok:false,text:'Choose a party member and equipment.'};
+    const compatible=gear.jobs.includes(h.job);
+    const preview={...h,equippedGear:{...h.equippedGear,[gear.slot]:gearId}};
+    this._stats(preview);
+    const {attack,defense}=preview;
+    return {ok:compatible,text:compatible?'':AVELUNE_JOBS[h.job].name+' cannot use '+gear.name+'.',attack,defense,attackDelta:attack-h.attack,defenseDelta:defense-h.defense,equipped:h.equippedGear[gear.slot]===gearId,available:this.gearOwned[gearId]-this._wornGear(gearId),cost:gear.price};
+  }
+  buyGear(gearId,quantity=1) {
+    if(this.battle) return {ok:false,text:'Shopping is unavailable during battle.'};
+    const gear=Object.hasOwn(AVELUNE_GEAR,gearId)?AVELUNE_GEAR[gearId]:null;
+    if(!gear||!Number.isInteger(quantity)||quantity<1||quantity>99) return {ok:false,text:'Choose valid equipment and quantity.'};
+    if(this.gearOwned[gearId]+quantity>99) return {ok:false,text:'You can carry at most 99 copies of each piece.'};
+    const cost=gear.price*quantity;
+    if(this.gold<cost) return {ok:false,text:'Not enough gold.'};
+    this.gold-=cost;this.gearOwned[gearId]+=quantity;
+    return {ok:true,cost,text:quantity+' × '+gear.name+' purchased. Equip it from the outfitter or party menu.'};
+  }
+  sellGear(gearId,quantity=1) {
+    if(this.battle) return {ok:false,text:'Shopping is unavailable during battle.'};
+    const gear=Object.hasOwn(AVELUNE_GEAR,gearId)?AVELUNE_GEAR[gearId]:null;
+    if(!gear||!Number.isInteger(quantity)||quantity<1||quantity>99) return {ok:false,text:'Choose valid equipment and quantity.'};
+    if(this.gearOwned[gearId]-this._wornGear(gearId)<quantity) return {ok:false,text:'Unequip worn copies before selling them.'};
+    const value=Math.floor(gear.price/2)*quantity;
+    this.gearOwned[gearId]-=quantity;this.gold=Math.min(9999999,this.gold+value);
+    return {ok:true,value,text:quantity+' × '+gear.name+' sold for '+value+' gold.'};
+  }
+  equipGear(index,slot,gearId) {
+    if(this.battle) return {ok:false,text:'Equipment cannot change during battle.'};
+    const h=this.party[index];
+    if(!h||!['weapon','armor'].includes(slot)) return {ok:false,text:'Choose a valid party member and slot.'};
+    if(gearId!==null) {
+      const gear=Object.hasOwn(AVELUNE_GEAR,gearId)?AVELUNE_GEAR[gearId]:null;
+      if(!gear||gear.slot!==slot||!gear.jobs.includes(h.job)) return {ok:false,text:'This job cannot use that equipment.'};
+      if(h.equippedGear[slot]===gearId) return {ok:false,text:gear.name+' is already equipped.'};
+      if(this.gearOwned[gearId]-this._wornGear(gearId)<1) return {ok:false,text:'No unworn copy is available.'};
+    } else if(h.equippedGear[slot]===null) return {ok:false,text:'That slot is already empty.'};
+    h.equippedGear[slot]=gearId;this._stats(h);
+    return {ok:true,text:h.name+(gearId?' equips '+AVELUNE_GEAR[gearId].name: ' removes their '+slot)+'.'};
+  }
+
+  quoteSpell(index,spellId) {
+    const h=this.party[index],spell=Object.hasOwn(AVELUNE_TOWN_SPELLS,spellId)?AVELUNE_TOWN_SPELLS[spellId]:null;
+    if(!h||!spell) return {ok:false,text:'Choose a party member and spell.',known:false,eligible:false};
+    const known=h.learnedSpells.includes(spellId),eligible=spell.jobs.includes(h.job)&&(spell.tier===1||this.level>=5);
+    return {ok:eligible&&!known,cost:spell.price,known,eligible,text:known?h.name+' already knows '+spell.name+'.':!spell.jobs.includes(h.job)?'This job cannot learn '+spell.name+'.':!eligible?'Reach level 5 to learn tier II magic.':''};
+  }
+  learnSpell(index,spellId) {
+    if(this.battle) return {ok:false,text:'Magic cannot be learned during battle.'};
+    const quote=this.quoteSpell(index,spellId);
+    if(!quote.ok) return quote;
+    if(this.gold<quote.cost) return {ok:false,text:'Not enough gold.'};
+    const h=this.party[index],spell=AVELUNE_TOWN_SPELLS[spellId],active=h.preparedSpells[spell.tier];
+    this.gold-=quote.cost;h.learnedSpells.push(spellId);
+    if(active.length<3) {
+      h.spellLoadouts[h.job]??={};h.spellLoadouts[h.job][spell.tier]=[...active,spellId];
+    }
+    this._stats(h);
+    return {ok:true,cost:quote.cost,prepared:h.spells.includes(spellId),text:h.name+' learns '+spell.name+'.'+(h.spells.includes(spellId)?'':' Prepare it in a set of up to three spells per tier.')};
+  }
+  prepareSpells(index,tier,ids) {
+    if(this.battle) return {ok:false,text:'Spells cannot be prepared during battle.'};
+    const h=this.party[index];
+    if(!h||![1,2].includes(tier)||!Array.isArray(ids)||ids.length>3||new Set(ids).size!==ids.length) return {ok:false,text:'Prepare up to three distinct spells per tier.'};
+    if(ids.some(id=>!h.knownSpells.includes(id)||AVELUNE_SPELLS[id].tier!==tier)) return {ok:false,text:'Choose known, unlocked spells from this tier.'};
+    h.spellLoadouts[h.job]??={};h.spellLoadouts[h.job][tier]=[...ids];this._stats(h);
+    return {ok:true,text:h.name+' prepares '+ids.length+' tier '+tier+' spell'+(ids.length===1?'':'s')+'.'};
   }
 
   quoteUpgrade(index,slot) {
@@ -158,8 +386,9 @@ class AveluneRPG {
     return this._applyItem(index,itemId);
   }
   _applyItem(index,itemId) {
-    const h=this.party[index],item=AVELUNE_ITEMS[itemId];
+    const h=this.party[index],item=Object.hasOwn(AVELUNE_ITEMS,itemId)?AVELUNE_ITEMS[itemId]:null;
     if(!h||!item) return {ok:false,text:'Choose a valid ally and item.'};
+    if(item.fieldOnly) return {ok:false,text:item.name+' must be used outdoors through the camping supplies menu.'};
     if(this.inventory[itemId]<1) return {ok:false,text:'No '+item.name+' remaining.'};
     let amount=0;
     if(itemId==='revive') {
@@ -167,8 +396,8 @@ class AveluneRPG {
       amount=h.hp=Math.max(1,Math.floor(h.maxHp/2));
     } else {
       if(h.hp===0) return {ok:false,text:h.name+' needs a Dawn feather first.'};
-      if(itemId==='potion') {
-        amount=Math.min(70,h.maxHp-h.hp);
+      if(itemId==='potion'||itemId==='hipotion') {
+        amount=Math.min(itemId==='hipotion'?180:70,h.maxHp-h.hp);
         if(!amount) return {ok:false,text:h.name+' is already at full HP.'};
         h.hp+=amount;
       } else {
@@ -248,7 +477,7 @@ class AveluneRPG {
           if(!targets.length) {emit(s.name+' has no valid target.',{kind:'miss',...actor});continue;}
           if(s.kind==='heal'&&targets.every(t=>this.party[t].hp===this.party[t].maxHp)) {emit('No ally needs '+s.name+'.',{kind:'miss',...actor});continue;}
           h.charges[s.tier-1]--;
-          if(s.kind==='ward') {ward=true;emit(h.name+' casts Ward. The party is protected this round.',{kind:'spell',...actor});continue;}
+          if(s.kind==='ward') {ward=true;emit(h.name+' casts '+s.name+'. The party is protected this round.',{kind:'spell',...actor});continue;}
           for(const ti of targets) {
             if(s.kind==='damage') {
               const e=b.enemies[ti];

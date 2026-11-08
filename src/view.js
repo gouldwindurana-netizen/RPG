@@ -176,7 +176,7 @@ class AveluneView {
     const pose = this.animateActor(model);
     this.shadow(ctx, pose.x, pose.y+1, 14);
     if (typeof AvelunePixelArt !== 'undefined') {
-      AvelunePixelArt.drawHero(ctx, 'roadkeeper', pose.direction, pose.frame, pose.x, pose.y);
+      AvelunePixelArt.drawHero(ctx, model.leaderId||'roadkeeper', pose.direction, pose.frame, pose.x, pose.y);
     } else {
       const key = 'walk_' + pose.facing;
       const clip = this.art.motion?.clips[key];
@@ -264,9 +264,15 @@ class AveluneView {
       if (box.left + box.w < cx-18 || box.left > cx+w+18 || box.top > cy+h+26 || y < cy-12) continue;
       visible.push({asset, x, y, width:obj.width, box});
     }
+    if(typeof AveluneTownServices!=='undefined')for(const service of AveluneTownServices.forArea(model.area,model)){
+      const x=model.center(service.at[0]),y=model.center(service.at[1]);
+      if(x<cx-30||x>cx+w+30||y<cy-12||y>cy+h+42)continue;
+      visible.push({service,x,y});
+    }
     visible.sort((a,b)=>a.y-b.y);
     for (const obj of visible) {
       if (obj.player) this.actor(ctx,model,t);
+      else if(obj.service)AveluneServiceArt.draw(ctx,obj.service,obj.x,obj.y);
       else this.scenery(ctx,obj,obj.box,model,t);
     }
     ctx.restore();
