@@ -43,7 +43,7 @@ test('each blocked overworld shore has a visible water boundary',()=>{
   for(const area of Object.values(layout.areas).filter(a=>a.kind==='overworld')){
     for(let y=1;y<area.height-1;y++)for(let x=1;x<area.width-1;x++)if(area.collision[y][x]==='.'){
       for(const [dx,dy]of [[1,0],[-1,0],[0,1],[0,-1]]){
-        if(area.collision[y+dy][x+dx]==='#')assert.equal(area.terrain[y+dy][x+dx],'=',area.id+' has visible coast at '+[x+dx,y+dy]);
+        if(area.collision[y+dy][x+dx]==='#')assert.ok('=~'.includes(area.terrain[y+dy][x+dx]),area.id+' has visible coast at '+[x+dx,y+dy]);
       }
     }
   }

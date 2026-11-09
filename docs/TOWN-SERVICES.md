@@ -1,6 +1,6 @@
 # Town services
 
-All 18 villages, towns, ports and markets use compact 36×34 town maps with orthogonal streets, a central square, seven signed services and an overworld gate aligned with the mapped approach. Original story doors, named buildings and events remain available at their new town positions. `serviceSpots` anchors merchants at storefronts; services are non-solid and yield interaction priority to unfinished story events.
+All 18 villages, towns, ports and markets use compact 36×34 town maps with orthogonal streets, a central square, seven signed services and an overworld gate aligned with the mapped approach. Original story doors, named buildings and events remain available at their new town positions. Exterior `serviceEntrances` identify real shop doors. `serviceCounters` places keepers inside rooms. The directory guides the player through the doorway and to the counter before opening a service. Physical services are non-solid and yield priority to unfinished story events.
 
 Brackenwell retains Wyla’s cottage, Tilda’s Smithy-Inn, Festival Barn, orchard press and communal bakehouse. All healing beds are paid inns. Clinics charge 30 G to revive one fallen ally at 1 HP, without restoring mana; follow with an inn stay. The clinic has no free full-party care. Camps and refuges consume an owned Tent or Cottage and preserve fallen companions. Jobs are selected only before a new journey. Guilds provide formation and promotion within the selected job.
 
@@ -28,7 +28,7 @@ Town exits lead to traversable overworld maps with miniature destinations. Regio
 }
 ```
 
-Types are `inn`, `item`, `weapon`, `armor`, `magic`, `chapel`, `guild`, `rumor`, and `camp`. A single armory normally exposes both weapon and armor catalogs; a magic merchant exposes both `white` and `black` catalogs. The Oakmere Armory interior has separate weapon and armor counters. `interior` identifies a nearby original door destination for a guide or description; interacting with the marker opens that service directly. `rumor` records also include current regional advice.
+`forArea(exterior)` returns no physical NPCs; `directory(exterior, world)` resolves indoor destinations with a scene and entrance route. Types are `inn`, `item`, `weapon`, `armor`, `magic`, `chapel`, `guild`, `rumor`, and `camp`. A single armory normally exposes both weapon and armor catalogs; a magic merchant exposes both `white` and `black` catalogs. The Oakmere Armory interior has separate weapon and armor counters. `interior` identifies a nearby original door destination for a guide or description; interacting with the marker opens that service directly. `rumor` records also include current regional advice.
 
 `directory(area, world?)` returns the same records for a clickable local guide. `near(world)` finds the nearest service within 24 logical pixels, yielding to a pending authored story interaction within 28 pixels. The application should keep original story events and stops ahead of service targeting where their ranges overlap. `tier(area, world?)` is available independently for shop stock filtering.
 

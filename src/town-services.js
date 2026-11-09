@@ -1,4 +1,4 @@
-/* Discoverable, non-solid services attached to the supplied town frontages. */
+/* Physical service counters live indoors; town directories point to real doors. */
 const AVELUNE_TOWN_KINDS = new Set(['village', 'town', 'port', 'market']);
 const AVELUNE_REFUGE_KINDS = new Set(['camp', 'shrine', 'hearth', 'landing']);
 const AVELUNE_SERVICE_TIERS = Object.freeze({ alderreach: 1, veyra: 2, kharad: 3, sereva: 3, isles: 3, ordel: 4, edrin: 5 });
@@ -39,10 +39,20 @@ class AveluneTownServices {
     if (!variants.has(gateKey)) variants.set(gateKey, this.place(area, specs, world));
     const stockTier = this.tier(area, world);
     return variants.get(gateKey).map(service => ({ ...service, at: [...service.at], catalogs: [...service.catalogs],
-      stockTier, rumor: service.type === 'rumor' ? this.rumor(area, world) : undefined }));
+      stockTier, scene:area.id, rumor: service.type === 'rumor' ? this.rumor(area.parent&&world?.layout?.areas[area.parent]||area, world) : undefined }));
   }
 
-  static directory(area, world) { return this.forArea(area, world); }
+  static directory(area, world) {
+    if(!area?.serviceEntrances)return this.forArea(area,world);
+    const layout=world?.layout||(typeof LAYOUT!=='undefined'?LAYOUT:null);
+    if(!layout)return [];
+    return area.serviceEntrances.flatMap(entrance=>{
+      const target=layout.areas[entrance.scene];
+      const service=this.forArea(target,world).find(counter=>counter.type===entrance.type);
+      return service?[{...service,scene:target.id,source:entrance.source||service.source,
+        entrance:{scene:area.id,at:[...entrance.at],routeId:entrance.routeId,stopId:entrance.stopId}}]:[];
+    });
+  }
 
   static near(world) {
     if (!world?.area) return null;
@@ -55,44 +65,11 @@ class AveluneTownServices {
   }
 
   static specs(area) {
-    const entry = (key, type, name, label, description, extra = {}) => ({key, type, name, label, description, free: false, catalogs: [], ...extra});
-    if (area.id === 'wyla_cottage') return [
-      entry('care', 'inn', 'Wyla’s guest room', 'INN', 'Pay for a night in the spare room to restore living companions’ HP and magic.', {preferred: [9, 9], match: /PROP001/}),
-      entry('advice', 'rumor', 'Wyla’s road advice', 'TALK', 'A familiar voice and a direction for the road ahead.', {preferred: [21, 15], match: /PROP005/})
-    ];
-    if (['oakmere_clinic', 'infirmary'].includes(area.id)) return [
-      entry('chapel', 'chapel', 'Clinic revival', 'REVIVE', 'Revive a fallen companion for 30 G. They return with 1 HP; the inn restores HP and magic afterward.', {preferred: [22, 15], match: /PROP007/})
-    ];
-    if (area.id === 'smithy_inn') return [
-      entry('inn', 'inn', 'Tilda’s rooms', 'INN', 'Buy a night’s rest to restore living allies’ HP and magic.', {preferred: [8, 10], match: /PROP009/}),
-      entry('armory', 'weapon', 'Tilda’s forge counter', 'ARMS', 'Buy and sell weapons and armor. Compare a piece before equipping it.', {preferred: [23, 10], match: /PROP002/, catalogs: ['weapon', 'armor']})
-    ];
-    if (area.id === 'oakmere_armory') return [
-      entry('weapons', 'weapon', 'Oakmere weapon counter', 'WEAPONS', 'Weapons for every calling, with the strength of each piece shown before buying.', {preferred: [19, 9], match: /PROP011/, catalogs: ['weapon']}),
-      entry('armor', 'armor', 'Oakmere armor counter', 'ARMOR', 'Fit the party with armor suited to each job.', {preferred: [20, 15], match: /PROP012/, catalogs: ['armor']})
-    ];
-    if (AVELUNE_REFUGE_KINDS.has(area.kind)) return [
-      entry('camp', 'camp', area.kind === 'landing' ? 'Mooring rest stop' : 'Roadkeeper’s campsite', 'CAMP', 'Use a Tent or Cottage from your bag to recover living companions’ HP and magic. Fallen allies need revival first.', {offset: [-4, 4], match: /campfire|shelter|infirmary|sanctuary|hearth|bell|gantry|arch/i}),
-      entry('guild', 'guild', 'Traveling formation mentor', 'GUILD', 'Arrange the company and train within the jobs chosen at the beginning.', {free: true, offset: [4, 4], match: /shelter|pavilion|infirmary|sanctuary|hearth|bell|gantry|arch/i}),
-      entry('rumor', 'rumor', 'Roadkeeper', 'TALK', 'Ask about the next crossing and the work that keeps it open.', {offset: [0, -2], match: /Road post/i})
-    ];
-    if (!AVELUNE_TOWN_KINDS.has(area.kind)) return [];
-    const home = area.id === 'alderreach_01';
-    const entries = [
-      entry('inn', 'inn', home ? 'Tilda’s Smithy-Inn' : `${area.name} wayfarers’ inn`, 'INN', 'Buy a night’s rest to restore living companions’ HP and magic.', {match: [/inn/i,/shelter/i,/bathhouse/i,/bakehouse|residences|stilt|cottage/i], offset: [-4, 3], interior: home ? 'smithy_inn' : undefined}),
-      entry('items', 'item', home ? 'Bakehouse provisions' : `${area.name} provisions`, 'ITEMS', 'Buy healing supplies, remedies, and travel gear. Sell spare supplies here.', {match: /produce stall|apothecary|market|exchange|bakehouse|kiosk|office|boatbuilder/i, offset: [4, 3], catalogs: ['item']}),
-      entry('armory', 'weapon', home ? 'Tilda’s forge stall' : `${area.name} armory`, 'ARMS', 'Buy and sell weapons and armor; compare equipment for every party job.', {match: /armory|smithy|furnace|guild|tool|foundry|lampwright|shed|boatbuilder/i, offset: [-5, 6], catalogs: ['weapon', 'armor'], interior: area.id === 'alderreach_07' ? 'oakmere_armory' : home ? 'smithy_inn' : undefined}),
-      entry('magic', 'magic', home ? 'Orchard spellwright' : `${area.name} spellwright`, 'MAGIC', 'Learn white and black magic for eligible jobs. Stronger spell stock follows the trade roads.', {match: /observatory|chart|lamp|records|pavilion|well|hall|press/i, offset: [5, 6], catalogs: ['white', 'black']}),
-      entry('chapel', 'chapel', home ? 'Brackenwell wardkeeper' : `${area.name} wardkeeper`, 'REVIVE', 'Revive a fallen companion for 30 G. They return with 1 HP; the inn restores HP and magic afterward.', {match: [/clinic|infirmary/i,/shrine|well/i,/shelter|cottage/i], offset: [-8, 3], interior: area.id === 'alderreach_07' ? 'oakmere_clinic' : area.id === 'edrin_05' ? 'infirmary' : undefined}),
-      entry('guild', 'guild', home ? 'Festival roadkeepers’ guild' : `${area.name} formation mentor`, 'GUILD', 'Arrange the party’s formation and advance within the jobs chosen at the beginning.', {free: true, match: /guild|hall|office|press|court|exchange|barn/i, offset: [8, 3]}),
-      entry('rumor', 'rumor', `${area.name} road guide`, 'TALK', 'Ask for local directions and news of the next road.', {match: /Road post/i, offset: [0, -2]})
-    ];
-    if (home) {
-      const positions = {inn:[43,21], items:[40,30], armory:[38,22], magic:[16,20], chapel:[25,22], guild:[24,32], rumor:[32,27]};
-      const frontages = {inn:/Tilda/, items:/Communal bakehouse/, armory:/Tilda/, magic:/Orchard press/, chapel:/Wyla/, guild:/Festival Barn/, rumor:/Road post/};
-      for (const spec of entries) { spec.preferred = positions[spec.key]; spec.match = frontages[spec.key]; }
-    }
-    return entries;
+    if(area.indoor)return (area.serviceCounters||[]).map(counter=>({free:false,catalogs:[],...counter}));
+    if(!AVELUNE_REFUGE_KINDS.has(area.kind))return [];
+    return [{key:'camp',type:'camp',name:area.kind==='landing'?'Mooring campsite':'Roadkeeper’s campsite',label:'CAMP',
+      description:'Use a Tent or Cottage from your bag to recover living companions’ HP and MP. Fallen allies need revival first.',
+      free:false,catalogs:[],offset:[-4,4],source:'Sheltered campsite',match:/campfire|shelter|hearth|bell|gantry|arch/i}];
   }
 
   static place(area, specs, world) {
@@ -133,7 +110,7 @@ class AveluneTownServices {
       if (!at) continue;
       placed.push({id:`${area.id}:service:${spec.key}`, type:spec.type, name:spec.name, label:spec.label,
         at:[...at], asset:`service_${spec.type}`, catalogs:spec.catalogs, description:spec.description,
-        free:spec.free, interior:spec.interior, source:anchor.name || anchor.asset, solid:false});
+        free:spec.free, interior:spec.interior, source:spec.source || anchor.name || anchor.asset, solid:false});
     }
     return placed;
   }

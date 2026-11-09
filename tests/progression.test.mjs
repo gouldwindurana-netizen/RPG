@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 
 const ctx=vm.createContext({Set,Map});
-for(const name of ['model','combat','campaign','town-services'])vm.runInContext(fs.readFileSync(new URL('../src/'+name+'.js',import.meta.url),'utf8'),ctx);
+for(const name of ['model','item-catalog','combat','campaign','town-services'])vm.runInContext(fs.readFileSync(new URL('../src/'+name+'.js',import.meta.url),'utf8'),ctx);
 vm.runInContext('this.API={AveluneWorld,AveluneRPG,AveluneCampaign,AVELUNE_SPELLS,avelunePath,AveluneDanger,AveluneTownServices}',ctx);
 const {AveluneWorld,AveluneRPG,AveluneCampaign:C,AVELUNE_SPELLS:spells,avelunePath,AveluneDanger,AveluneTownServices:T}=ctx.API;
 const layout=JSON.parse(fs.readFileSync(new URL('../src/world.json',import.meta.url),'utf8'));
@@ -66,7 +66,7 @@ export function simulateCriticalPath(seed=2026,includePostgame=false,options={})
  while(!world.has(includePostgame?'seventh_star':'ending')){
   const event=world.objectives()[0]?.event||nextAvailable(world);assert.ok(event,'Available objective before finale');
   trips+=travelTo(world,event.scene);walkTo(world,event.at);
-  const listed=T.forArea(world.area,world),services={...C.services(world.area,world),inn:listed.some(s=>s.type==='inn')};if(services.inn)recover(rpg,{inn:true,innCost:services.innCost});if(listed.some(s=>s.type==='item'))provision(rpg);
+  const listed=T.directory(world.area,world),services={...C.services(world.area,world),inn:listed.some(s=>s.type==='inn')};if(services.inn)recover(rpg,{inn:true,innCost:services.innCost});if(listed.some(s=>s.type==='item'))provision(rpg);
   const spec=C.bossFor(event.id,rpg,world);
   if(spec){
    const multiplier=typeof options.bossMultiplier==='function'?options.bossMultiplier(spec):options.bossMultiplier||1;
@@ -84,9 +84,9 @@ export function simulateCriticalPath(seed=2026,includePostgame=false,options={})
 test('real collision movement reaches ending, all postgame events, and every area',()=>{
  const world=new AveluneWorld(layout);let events=0,trips=0;
  while(events<layout.events.length){const event=world.objectives()[0]?.event||nextAvailable(world);assert.ok(event,'Every remaining event is reachable');trips+=travelTo(world,event.scene);walkTo(world,event.at);const applied=world.applyEvent(event.id);assert.ok(applied&&!applied.missing&&!applied.already,event.id);events++;const restored=new AveluneWorld(layout,world.snapshot());assert.equal(JSON.stringify(restored.snapshot()),JSON.stringify(world.snapshot()));}
- assert.equal(world.has('seventh_star'),true);assert.equal(world.reachable().size,108);
+ assert.equal(world.has('seventh_star'),true);assert.equal(world.reachable().size,Object.keys(layout.areas).length);
  for(const area of Object.values(layout.areas)){trips+=travelTo(world,area.id);for(const stop of area.stops)assert.ok(avelunePath(world,stop.at),area.id+' to '+stop.id);}
- assert.equal(world.visited.size,108);assert.ok(trips>100);
+ assert.equal(world.visited.size,Object.keys(layout.areas).length);assert.ok(trips>100);
 });
 
 test('default party can finish main campaign with earned rewards, legal camps and no random grinding',()=>{

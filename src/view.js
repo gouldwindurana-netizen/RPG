@@ -274,10 +274,18 @@ class AveluneView {
       if(x<cx-30||x>cx+w+30||y<cy-12||y>cy+h+42)continue;
       visible.push({service,x,y});
     }
+    const doorSigns=new Map();
+    for(const entrance of model.area.serviceEntrances||[]){
+      const key=entrance.at.join(',');let sign=doorSigns.get(key);
+      if(!sign){sign={at:entrance.at,labels:[]};doorSigns.set(key,sign)}
+      if(!sign.labels.includes(entrance.label))sign.labels.push(entrance.label);
+    }
+    for(const sign of doorSigns.values())visible.push({sign:{label:sign.labels.join('/')},x:model.center(sign.at[0]),y:model.center(sign.at[1])});
     visible.sort((a,b)=>a.y-b.y);
     for (const obj of visible) {
       if (obj.player) this.actor(ctx,model,t);
       else if(obj.service)AveluneServiceArt.draw(ctx,obj.service,obj.x,obj.y);
+      else if(obj.sign)AveluneServiceArt.sign(ctx,obj.sign,obj.x,obj.y);
       else this.scenery(ctx,obj,obj.box,model,t);
     }
     ctx.restore();

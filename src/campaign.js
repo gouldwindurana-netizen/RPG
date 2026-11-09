@@ -171,6 +171,8 @@ class AveluneCampaign {
       xp: eventId === 'barn_wickling' ? 36 : Math.round(35 * level), gold: Math.round(25 + 18 * level),
       intent, boss: true,
     };
+    // This introductory encounter precedes the first companion's recruitment.
+    if(eventId==='barn_wickling'&&rpg?.party?.length===1){enemy.hp=76;enemy.attack=7;}
     return { name, boss: true, eventId, level, region: area?.region || 'alderreach',
       backdrop: this.region(area).field, intent, victory, enemies: [enemy] };
   }
@@ -206,9 +208,18 @@ class AveluneCampaign {
       backdrop: this.region(area).field, enemies };
   }
 
+  static syncRecruitment(rpg, world) {
+    const joined=[];
+    for(const [flag,id,name]of [['bridge','mara','Mara'],['iven','iven','Iven'],['sella','sella','Sella']]){
+      if(world?.has?.(flag)&&typeof rpg?.recruit==='function'&&rpg.recruit(id).ok)joined.push(name);
+    }
+    return joined;
+  }
+
   static rewardForEvent(event, rpg, world) {
     const empty = { gold: 0, xp: 0, items: {}, text: '', already: true };
     if (!event?.id || !rpg || !world?.has?.(event.id)) return empty;
+    const joined=this.syncRecruitment(rpg,world);
     if (!(rpg.campaignRewards instanceof Set)) rpg.campaignRewards = new Set(Array.isArray(rpg.campaignRewards) ? rpg.campaignRewards : []);
     if (rpg.campaignRewards.has(event.id)) return empty;
     rpg.campaignRewards.add(event.id);
@@ -250,7 +261,7 @@ class AveluneCampaign {
     if (reward.gold) parts.push(reward.gold + ' gold');
     if (reward.xp) parts.push(reward.xp + ' XP');
     for (const [item, amount] of Object.entries(reward.items)) parts.push(amount + ' ' + ({ potion: 'potion', ether: 'ether', revive: 'phoenix plume' }[item]) + (amount > 1 ? 's' : ''));
-    reward.text = [reward.text, parts.length ? 'Received ' + parts.join(', ') + '.' : ''].filter(Boolean).join(' ');
+    reward.text = [joined.length?joined.join(' and ')+' joined the active party.':'',reward.text, parts.length ? 'Received ' + parts.join(', ') + '.' : ''].filter(Boolean).join(' ');
     return reward;
   }
 }

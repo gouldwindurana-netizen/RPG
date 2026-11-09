@@ -33,6 +33,8 @@ class AveluneServicesUI {
     catch(error){this.failed=true;this.message=error.message||'That action is unavailable.';if(this.mount?.isConnected)this._draw();return {ok:false,text:this.message};}
   }
   _note(value,className='town-note') {return this._el('p',value,className);}
+  _spell(hero,id) {return this.getRPG().spellFor?.(hero,id)||AVELUNE_SPELLS[id];}
+  _spellDetail(spell) {return spell.mpCost+' MP · '+({enemy:'One foe',allEnemies:'All foes',ally:'One ally',allAllies:'Living party'}[spell.target]||'Party')+' · '+spell.description;}
   _frameRows() {
     // Keep the existing actions in a single classic menu window, rather than
     // presenting every item as a separate card.
@@ -44,10 +46,10 @@ class AveluneServicesUI {
     }
   }
   _tabs(entries,selected,change) {const tabs=this._el('div',undefined,'town-tabs');for(const [id,label]of entries){const b=this._action(label,()=>{change(id);this.message='';this._draw();});b.classList.toggle('selected',id===selected);b.setAttribute('aria-pressed',String(id===selected));tabs.append(b);}return tabs;}
-  _heroes(change) {const r=this.getRPG(),tabs=this._tabs(r.party.map((h,i)=>[i,h.name]),this.state.hero,index=>{this.state.hero=index;change?.(index);});tabs.classList.add('town-heroes');return tabs;}
+  _heroes(change) {const r=this.getRPG(),tabs=this._tabs(r.party.map((h,i)=>[i,h.name]),this.state.hero,index=>{this.state.hero=index;change?.(index);});tabs.classList.add('town-heroes');tabs.style.setProperty('--hero-count',String(r.party.length));tabs.style.setProperty('--hero-columns-mobile',String(Math.min(2,r.party.length)));return tabs;}
   _hp(hero) {const wrap=this._el('div',undefined,'town-vitals');wrap.append(this._el('span',hero.hp===0?'FALLEN':'HP '+hero.hp+' / '+hero.maxHp,hero.hp===0?'town-fallen':''));const bar=this._el('span',undefined,'town-hp');const fill=this._el('i');fill.style.width=(100*hero.hp/hero.maxHp)+'%';bar.append(fill);wrap.append(bar);return wrap;}
   _mp(hero) {const wrap=this._el('div',undefined,'town-mana');wrap.append(this._el('span','MP '+hero.mp+' / '+hero.maxMp));const bar=this._el('span',undefined,'town-mana-bar'),fill=this._el('i');fill.style.width=(hero.maxMp?Math.max(0,Math.min(100,100*hero.mp/hero.maxMp)):0)+'%';bar.setAttribute('aria-hidden','true');bar.append(fill);wrap.append(bar);return wrap;}
-  _heroSummary(hero) {const box=this._el('div',undefined,'town-hero-summary');box.append(this._el('strong',hero.name+' · '+hero.role),this._hp(hero),this._mp(hero));return box;}
+  _heroSummary(hero) {const box=this._el('div',undefined,'town-hero-summary');box.append(this._el('strong',hero.name+' · '+hero.role),this._hp(hero),this._mp(hero));if(hero.attackRank)box.append(this._el('small','Attack '+['','I','II','III','IV'][hero.attackRank]+' · '+hero.attackHits+' hit'+(hero.attackHits===1?'':'s')+(hero.attackNextLevel?' · next growth Lv. '+hero.attackNextLevel:' · mastered'),'town-attack-growth'));return box;}
   _row(title,description,action,meta='') {const row=this._el('div',undefined,'town-row'),info=this._el('div',undefined,'town-row-info'),heading=this._el('strong');const price=title.match(/^(.*?)( · )(\d+ G)$/);if(price){heading.append(this._el('span',price[1],'town-row-name'),this._el('span',price[2],'town-row-separator'),this._el('span',price[3],'town-row-price'));}else heading.textContent=title;info.append(heading);if(description)info.append(this._el('small',description));if(meta)info.append(this._el('span',meta,'town-row-meta'));row.append(info);if(action)row.append(action);return row;}
   _price() {const w=this.getWorld();if(this.service?.type==='camp')return 0;if(Number.isFinite(this.service?.cost))return Math.max(1,this.service.cost);return 8+(typeof AveluneCampaign!=='undefined'?AveluneCampaign.recommendedLevel(w.area,w):Math.max(1,this.service?.stockTier||1))*3;}
   _stock(tier) {return (this.service?.stockTier||1)>=Math.max(1,tier||1);}
@@ -61,7 +63,7 @@ class AveluneServicesUI {
   }
   _inn() {
     const r=this.getRPG(),price=this._price();this.mount.append(this._note(this.service.description||'A safe bed, a warm meal, and a fresh start for every traveler.'));
-    const party=this._el('div',undefined,'town-party-summary');r.party.forEach(h=>party.append(this._heroSummary(h)));this.mount.append(party);
+    const party=this._el('div',undefined,'town-party-summary');party.style.setProperty('--party-columns',String(Math.min(2,r.party.length)));r.party.forEach(h=>party.append(this._heroSummary(h)));this.mount.append(party);
     this.mount.append(this._note('A night at the inn restores living allies’ HP and all MP. Take fallen allies to the clinic first. Your journey is saved here.'));
     const box=this._el('div',undefined,'town-rest');box.append(this._el('strong','A room for the party · '+price+' G'));
     if(this.state.confirm){box.append(this._note('Stay until morning?'),this._action('Confirm rest',()=>this._run(()=>this.options.onRest(this.service)),{primary:true,disabled:r.gold<price}),this._action('Not yet',()=>{this.state.confirm=false;this._draw();}));}
@@ -70,7 +72,7 @@ class AveluneServicesUI {
   }
   _camp() {
     const r=this.getRPG();this.mount.append(this._note(this.service.description||'A sheltered place to make camp. Recovery consumes a Tent or Cottage from your bag.'));
-    const party=this._el('div',undefined,'town-party-summary');r.party.forEach(h=>party.append(this._heroSummary(h)));this.mount.append(party);
+    const party=this._el('div',undefined,'town-party-summary');party.style.setProperty('--party-columns',String(Math.min(2,r.party.length)));r.party.forEach(h=>party.append(this._heroSummary(h)));this.mount.append(party);
     this.mount.append(this._note('Camping supplies restore living allies. Take fallen companions to a clinic or use a revival item first.'));
     for(const id of ['tent','cottage']){const item=AVELUNE_ITEMS[id],owned=r.inventory[id]||0;this.mount.append(this._row(item.name+' · '+owned+' in bag',item.description,this._action('Use '+item.name,()=>this._run(()=>this.options.onRest({...this.service,supply:id})),{primary:owned>0,disabled:owned<1,note:owned?'Consumes one '+item.name+'.':'Buy camping supplies at an item shop.'})));}
   }
@@ -92,7 +94,7 @@ class AveluneServicesUI {
     if(this.type!=='armor')this.mount.append(this._tabs([['weapon','Weapons'],['armor','Armor']],slot,n=>this.state.slot=n));
     if(this.state.tab!=='sell'){this.mount.append(this._heroes(),this._heroSummary(h));const current=h.equippedGear?.[slot],name=current&&AVELUNE_GEAR[current]?.name;this.mount.append(this._note('Equipped '+slot+': '+(name||'Starter '+AVELUNE_JOBS[h.job][slot].toLowerCase())+' · ATK '+h.attack+' · DEF '+h.defense));}
     if(this.state.tab==='sell')this.mount.append(this._quantity());
-    for(const [id,gear]of Object.entries(AVELUNE_GEAR)){if(gear.slot!==slot)continue;const owned=r.gearOwned[id]||0,quote=r.quoteGear(this.state.hero,id),stock=this._stock(gear.tier),worn=r.party.filter(hero=>hero.equippedGear?.[slot]===id).length,available=Math.max(0,owned-worn),delta=(n)=>n>0?'+'+n:String(n||0);let action,meta='Owned: '+owned+(worn?' · equipped: '+worn:'');
+    for(const [id,gear]of Object.entries(AVELUNE_GEAR)){if(gear.slot!==slot)continue;const owned=r.gearOwned[id]||0,quote=r.quoteGear(this.state.hero,id),stock=this._stock(gear.tier),worn=(r.roster||r.party).filter(hero=>hero.equippedGear?.[slot]===id).length,available=Math.max(0,owned-worn),delta=(n)=>n>0?'+'+n:String(n||0);let action,meta='Owned: '+owned+(worn?' · equipped: '+worn:'');
       if(this.state.tab==='sell'){const total=Math.floor(gear.price/2)*q;action=this._action('Sell '+q+' · '+total+' G',()=>this._run(()=>r.sellGear(id,q)),{disabled:available<q,note:available<q?'Only unequipped copies can be sold.':'Unequipped: '+available,key:'gear-'+id});}
       else {const eligible=quote.ok;meta+=' · '+(eligible?'ATK '+h.attack+' → '+quote.attack+' ('+delta(quote.attackDelta)+') · DEF '+h.defense+' → '+quote.defense+' ('+delta(quote.defenseDelta)+')':quote.text||'This job cannot use it.');
         if(this.state.tab==='buy')action=this._action('Buy · '+gear.price+' G',()=>this._run(()=>r.buyGear(id)),{disabled:!stock||r.gold<gear.price||owned>=99,note:!stock?'Sold in a later town.':r.gold<gear.price?'Need '+(gear.price-r.gold)+' more G.':!eligible?'For another party member’s calling.':'Buy first, then choose Equip.',key:'gear-'+id});
@@ -101,21 +103,36 @@ class AveluneServicesUI {
     if(this.state.tab==='equip'&&h.equippedGear?.[slot])this.mount.append(this._action('Return to starter '+slot,()=>this._run(()=>r.equipGear(this.state.hero,slot,null)),{note:'Keep the removed piece in your shared equipment bag.'}));
   }
   _magicShop() {
-    const r=this.getRPG(),h=r.party[this.state.hero];this.mount.append(this._note(this.service.description||'A spell is learned by one traveler. Prepare up to three spells of each tier.'),this._heroes(()=>this.state.loadouts={}),this._heroSummary(h),this._tabs([['buy','Learn spells'],['prepare','Prepare spells']],this.state.tab,n=>this.state.tab=n));
+    const r=this.getRPG(),h=r.party[this.state.hero];this.mount.append(this._note(this.service.description||'Learn distinct spell families, then strengthen a family without adding duplicate versions to your spellbook.'),this._heroes(()=>this.state.loadouts={}),this._heroSummary(h),this._tabs([['buy','Learn & upgrade'],['prepare','Prepare spells']],this.state.tab,n=>this.state.tab=n));
     if(this.state.tab==='prepare'){this._prepare();return;}
-    this.mount.append(this._tabs([['all','All magic'],['white','White'],['black','Black']],this.state.school,n=>this.state.school=n));
-    for(const [id,s]of Object.entries(AVELUNE_TOWN_SPELLS)){if(this.state.school!=='all'&&s.school!==this.state.school)continue;const quote=r.quoteSpell(this.state.hero,id),stock=this._stock(s.tier);const note=quote.known?'Already learned.':!stock?'Sold in a later town.':!quote.eligible?quote.text:r.gold<s.price?'Not enough gold.':'Learn permanently for '+h.name+'.';
-      this.mount.append(this._row(s.name+' · Tier '+s.tier+' · '+s.price+' G',s.mpCost+' MP · '+s.description,this._action(quote.known?'Learned':'Learn · '+s.price+' G',()=>this._run(()=>r.learnSpell(this.state.hero,id)),{disabled:quote.known||!quote.eligible||!stock||r.gold<s.price,note,key:'spell-'+id}),s.jobs.map(j=>AVELUNE_JOBS[j].name).join(' / ')));}
+    this.mount.append(this._note('Ranks replace the earlier version: Bolt I → Bolt II → Bolt III. Rank II requires level 5; rank III requires level 12. Unique utility spells remain separate.'),this._tabs([['all','All magic'],['white','White'],['black','Black']],this.state.school,n=>this.state.school=n));
+    for(const [id,entry]of Object.entries(AVELUNE_TOWN_SPELLS)){
+      if(this.state.school!=='all'&&entry.school!==this.state.school)continue;
+      const quote=r.quoteSpell(this.state.hero,id),known=quote.known||h.knownSpells.includes(id),spell=this._spell(h,id)||entry;
+      if(known){
+        const upgrade=r.quoteSpellUpgrade?.(this.state.hero,id),maxed=!upgrade||upgrade.rank>=upgrade.maxRank||!upgrade.nextSpell;
+        const next=upgrade?.nextSpell,label=maxed?(spell.rankMax>1?'Mastered':'Learned'):'Upgrade to '+['','I','II','III'][upgrade.nextRank]+' · '+upgrade.cost+' G';
+        const note=maxed?(spell.rankMax>1?'The highest rank is already learned.':'A unique spell; no duplicate ranks.'):
+          !upgrade.ok?upgrade.text:r.gold<upgrade.cost?'Need '+(upgrade.cost-r.gold)+' more G.':'Replace '+spell.name+' with '+next.name+'.';
+        const action=this._action(label,()=>this._run(()=>r.upgradeSpell(this.state.hero,id)),{disabled:maxed||!upgrade.ok||r.gold<upgrade.cost,note,key:'upgrade-'+id});
+        action.dataset.upgradeSpell=id;
+        const preview=next?'Next: '+next.name+' · '+next.mpCost+' MP · '+({enemy:'one foe',allEnemies:'all foes',ally:'one ally',allAllies:'living party'}[next.target]||'party')+(upgrade.levelRequired?' · Lv. '+upgrade.levelRequired:''):'Known · '+(spell.rankMax>1?'family rank '+spell.rank+' / '+spell.rankMax:'unique magic');
+        this.mount.append(this._row(spell.name,this._spellDetail(spell),action,preview));
+      }else{
+        const stock=this._stock(entry.tier),price=quote.cost??entry.price,note=!stock?'Sold in a later town.':!quote.eligible?quote.text:r.gold<price?'Not enough gold.':'Learn this family permanently for '+h.name+'.';
+        this.mount.append(this._row(spell.name+' · '+price+' G',this._spellDetail(spell),this._action('Learn · '+price+' G',()=>this._run(()=>r.learnSpell(this.state.hero,id)),{disabled:!quote.eligible||!stock||r.gold<price,note,key:'spell-'+id}),entry.jobs.map(j=>AVELUNE_JOBS[j].name).join(' / ')));
+      }
+    }
   }
   _prepare() {
     const r=this.getRPG(),h=r.party[this.state.hero],known=h.knownSpells||h.spells;
     if(!known.length){this.mount.append(this._note('This calling does not use magic. Each traveler’s job was chosen at the beginning and remains fixed.'));return;}
     this.state.loadouts??={};
-    for(const tier of [1,2]){const spells=known.filter(id=>AVELUNE_SPELLS[id]?.tier===tier);if(!spells.length)continue;const active=h.spells.filter(id=>AVELUNE_SPELLS[id].tier===tier),key=h.id+'-'+tier;
-      const draft=this.state.loadouts[key]??=active.slice(),section=this._el('section',undefined,'town-spell-tier');section.append(this._el('h3','Tier '+tier+' · '+draft.length+' / 3 selected'),this._note('Choose up to three, then save this tier’s loadout. Each spell spends its MP cost from the caster’s mana pool.'));
+    for(const tier of [1,2]){const spells=known.filter(id=>AVELUNE_SPELLS[id]?.tier===tier);if(!spells.length)continue;const active=h.spells.filter(id=>AVELUNE_SPELLS[id].tier===tier),key=h.id+'-'+tier,label=tier===1?'family':'advanced';
+      const draft=this.state.loadouts[key]??=active.slice(),section=this._el('section',undefined,'town-spell-tier');section.append(this._el('h3',(tier===1?'Family':'Advanced')+' spellbook · '+draft.length+' / 3 prepared'),this._note('Choose up to three spell families for this book. Each family appears once, at its learned rank.'));
       if(draft.length>3)section.append(this._note('Your original spellbook is active. Remove '+(draft.length-3)+' spell'+(draft.length-3===1?'':'s')+' to save a custom loadout.'));
-      const choices=this._el('div',undefined,'town-spell-grid');for(const id of spells){const spell=AVELUNE_SPELLS[id],selected=draft.includes(id);const button=this._action((selected?'◆ ':'◇ ')+spell.name,()=>{this.state.loadouts[key]=selected?draft.filter(x=>x!==id):[...draft,id];this.message='';this._draw();},{disabled:!selected&&draft.length>=3,note:spell.mpCost+' MP · '+spell.description,key:'prepare-'+id});button.classList.toggle('selected',selected);button.setAttribute('aria-pressed',String(selected));choices.append(button);}
-      const same=active.length===draft.length&&active.every(id=>draft.includes(id));section.append(choices,this._action('Save tier '+tier+' loadout',()=>this._run(()=>r.prepareSpells(this.state.hero,tier,draft),()=>delete this.state.loadouts[key]),{primary:true,disabled:draft.length>3||same,note:same?'This loadout is already active.':draft.length>3?'Choose no more than three spells.':draft.length+' spells will be prepared.',key:'save-loadout-'+tier}));this.mount.append(section);}
+      const choices=this._el('div',undefined,'town-spell-grid');for(const id of spells){const spell=this._spell(h,id),selected=draft.includes(id);const button=this._action((selected?'◆ ':'◇ ')+spell.name,()=>{this.state.loadouts[key]=selected?draft.filter(x=>x!==id):[...draft,id];this.message='';this._draw();},{disabled:!selected&&draft.length>=3,note:this._spellDetail(spell),key:'prepare-'+id});button.classList.toggle('selected',selected);button.setAttribute('aria-pressed',String(selected));choices.append(button);}
+      const same=active.length===draft.length&&active.every(id=>draft.includes(id));section.append(choices,this._action('Save '+label+' loadout',()=>this._run(()=>r.prepareSpells(this.state.hero,tier,draft),()=>delete this.state.loadouts[key]),{primary:true,disabled:draft.length>3||same,note:same?'This loadout is already active.':draft.length>3?'Choose no more than three spells.':draft.length+' families will be prepared.',key:'save-loadout-'+tier}));this.mount.append(section);}
   }
   _guild() {
     const r=this.getRPG();this.mount.append(this._note(this.service.description||'Arrange the company and train within the jobs chosen at the start.'),this._note('Jobs are permanent for this journey. The guild changes formation and offers promotion within each chosen job.'),this._tabs([['formation','Formation'],['promotion','Promotion']],this.state.guild,n=>this.state.guild=n));
@@ -126,9 +143,9 @@ class AveluneServicesUI {
   }
   _rumor() {this.mount.append(this._note(this.service.description||'Travelers share news around the town.'),this._el('blockquote',this.service.rumor||'Visit the inn before a long journey. Carry healing supplies, prepare your spells, and keep your strongest defender in the front rank.','town-rumor'));}
   directory(services=[]) {
-    this.service=null;this.state={};this._begin('town-directory','TOWN SERVICES','Prepare for the road',()=>{this.mount.append(this._note('Follow a sign to the counter, then press E or Interact. Inns restore HP and magic; shops prepare your party for the next journey.'));
+    this.service=null;this.state={};this._begin('town-directory','TOWN SERVICES','Prepare for the road',()=>{this.mount.append(this._note('Enter a signed building, then speak to its keeper. Inns restore HP and magic; shop counters prepare your party for the next journey.'));
       if(!services.length){this.mount.append(this._note('There are no town services here. Use the mailbag or field magic to heal, or return to a town.'));return;}
-      const rest=services.find(s=>s.type==='inn'||s.type==='camp');if(rest){this.service=rest;const price=this._price();this.service=null;this.mount.append(this._action(rest.type==='camp'?'Make camp · supply required':'Rest at the inn · '+price+' G',()=>this.open(rest),{primary:true,note:rest.type==='camp'?'Use a Tent or Cottage from your bag.':'Recover living allies’ HP and MP.'}));}
+      const rest=services.find(s=>s.type==='inn'||s.type==='camp');if(rest){this.service=rest;const price=this._price();this.service=null;this.mount.append(this._action(rest.type==='camp'?'Make camp · supply required':'Rest at the inn · '+price+' G',()=>this.options.navigateTo&&rest.scene&&rest.scene!==this.getWorld().id?this.options.navigateTo(rest):this.open(rest),{primary:true,note:rest.type==='camp'?'Use a Tent or Cottage from your bag.':'Recover living allies’ HP and MP.'}));}
       const labels={inn:'INN',camp:'CAMP',item:'ITEMS',weapon:'ARMORY',armor:'ARMOR',magic:'MAGIC',chapel:'CLINIC',guild:'GUILD',rumor:'NEWS'};for(const s of services){const label=labels[s.type]||s.type.toUpperCase();this.mount.append(this._row(label+' · '+s.name,s.description,this._action(this.options.navigateTo?'Walk to '+label:'Visit '+label,()=>this.options.navigateTo?this.options.navigateTo(s):this.open(s),{key:'directory-'+s.id}),s.type==='inn'?'Paid HP + magic recovery':s.type==='chapel'?'30 G · revive at 1 HP':s.type==='camp'?'Tent or Cottage required':''));}
     });
   }
@@ -137,13 +154,14 @@ class AveluneServicesUI {
     this.state.hero=Math.max(0,Math.min(this.getRPG().party.length-1,Math.floor(heroIndex)||0));this._draw();
   }
   magicField() {
-    this.service=null;this.state={hero:Math.max(0,this.getRPG().party.findIndex(h=>h.spells.some(id=>['heal','revive'].includes(AVELUNE_SPELLS[id]?.kind)))),spell:null};
-    this._begin('field-magic','FIELD MAGIC','The traveling spellbook',()=>{const r=this.getRPG(),h=r.party[this.state.hero];this.mount.append(this._note('Field spells spend the same MP pool as battle. Rest at an inn or use an Ether to restore mana.'),this._heroes(()=>this.state.spell=null),this._heroSummary(h));const healing=h.spells.filter(id=>['heal','revive'].includes(AVELUNE_SPELLS[id]?.kind));
-      if(!healing.length){this.mount.append(this._note(h.name+' has no prepared field spells. Choose another caster or prepare known healing magic at a town magic counter. Jobs remain fixed for the journey.'));return;}
+    const party=this.getRPG().party;
+    this.service=null;this.state={hero:Math.max(0,party.findIndex(h=>h.spells.some(id=>['heal','revive'].includes(this._spell(h,id)?.kind)))),spell:null};
+    this._begin('field-magic','FIELD MAGIC','The traveling spellbook',()=>{const r=this.getRPG(),h=r.party[this.state.hero];this.mount.append(this._note('Field spells spend the same MP pool as battle. Each family uses its highest learned rank.'),this._heroes(()=>this.state.spell=null),this._heroSummary(h));const healing=h.spells.filter(id=>['heal','revive'].includes(this._spell(h,id)?.kind));
+      if(!healing.length){this.mount.append(this._note(h.name+' has no prepared field spells. Use another recruited caster, prepare known healing magic at a town counter, or recover with supplies and inns. Jobs remain fixed for the journey.'));return;}
       if(!healing.includes(this.state.spell))this.state.spell=healing[0];
-      const spells=this._el('div',undefined,'town-spell-grid');for(const id of healing){const s=AVELUNE_SPELLS[id],b=this._action(s.name+' · '+s.mpCost+' MP',()=>{this.state.spell=id;this.message='';this._draw();},{note:s.description,key:'field-spell-'+id});b.classList.toggle('selected',this.state.spell===id);b.setAttribute('aria-pressed',String(this.state.spell===id));spells.append(b);}this.mount.append(spells);const s=AVELUNE_SPELLS[this.state.spell],cost=s.mpCost,canCast=h.mp>=cost;this.mount.append(this._note('Selected: '+s.name+' · '+cost+' MP · '+h.mp+' / '+h.maxMp+' MP remaining.'));
-      if(s.target==='allAllies'){const valid=r.party.some(t=>t.hp>0&&t.hp<t.maxHp);this.mount.append(this._action('Cast '+s.name+' on the party',()=>this._run(()=>r.castField(this.state.hero,this.state.spell,0)),{primary:true,disabled:h.hp===0||!canCast||!valid,note:h.hp===0?'A fallen ally cannot cast.':!canCast?'Not enough MP. Rest or use an Ether.':!valid?'Everyone standing has full HP.':'Uses '+cost+' MP.'}));}
-      else for(const [i,target]of r.party.entries()){const valid=s.kind==='revive'?target.hp===0:target.hp>0&&target.hp<target.maxHp;this.mount.append(this._row(target.name+' · '+target.role,'HP '+target.hp+' / '+target.maxHp,this._action('Cast on '+target.name,()=>this._run(()=>r.castField(this.state.hero,this.state.spell,i)),{primary:valid&&canCast,disabled:h.hp===0||!canCast||!valid,note:h.hp===0?'A fallen ally cannot cast.':!canCast?'Not enough MP. Rest or use an Ether.':!valid?(target.hp===0?'Needs revival first.':s.kind==='revive'?'Already standing.':'Already at full HP.'):'Uses '+cost+' MP.',key:'field-target-'+target.id})));}
+      const spells=this._el('div',undefined,'town-spell-grid');for(const id of healing){const spell=this._spell(h,id),b=this._action(spell.name+' · '+spell.mpCost+' MP',()=>{this.state.spell=id;this.message='';this._draw();},{note:this._spellDetail(spell),key:'field-spell-'+id});b.classList.toggle('selected',this.state.spell===id);b.setAttribute('aria-pressed',String(this.state.spell===id));spells.append(b);}this.mount.append(spells);const spell=this._spell(h,this.state.spell),cost=spell.mpCost,canCast=h.mp>=cost;this.mount.append(this._note('Selected: '+spell.name+' · '+cost+' MP · '+h.mp+' / '+h.maxMp+' MP remaining.'));
+      if(spell.target==='allAllies'){const valid=r.party.some(t=>t.hp>0&&t.hp<t.maxHp);this.mount.append(this._action('Cast '+spell.name+' on the party',()=>this._run(()=>r.castField(this.state.hero,this.state.spell,0)),{primary:true,disabled:h.hp===0||!canCast||!valid,note:h.hp===0?'A fallen ally cannot cast.':!canCast?'Not enough MP. Rest or use an Ether.':!valid?'Everyone standing has full HP.':'Uses '+cost+' MP.'}));}
+      else for(const [i,target]of r.party.entries()){const valid=spell.kind==='revive'?target.hp===0:target.hp>0&&target.hp<target.maxHp;this.mount.append(this._row(target.name+' · '+target.role,'HP '+target.hp+' / '+target.maxHp,this._action('Cast on '+target.name,()=>this._run(()=>r.castField(this.state.hero,this.state.spell,i)),{primary:valid&&canCast,disabled:h.hp===0||!canCast||!valid,note:h.hp===0?'A fallen ally cannot cast.':!canCast?'Not enough MP. Rest or use an Ether.':!valid?(target.hp===0?'Needs revival first.':spell.kind==='revive'?'Already standing.':'Already at full HP.'):'Uses '+cost+' MP.',key:'field-target-'+target.id})));}
     });
   }
 }

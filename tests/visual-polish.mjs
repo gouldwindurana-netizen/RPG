@@ -149,8 +149,8 @@ try {
     if(representatives.has(area.id))await desktop.locator('.view-frame').screenshot({path:path.join(output,'theme-'+representatives.get(area.id)+'.png')});
     assert.deepEqual(errors,[],area.id+' introduces no JavaScript or resource errors');
   }
-  assert.equal(maps.length,108);
-  pass('All 108 authored maps render after area travel without JavaScript or resource errors');
+  assert.equal(maps.length,Object.keys(layout.areas).length);
+  pass('All '+maps.length+' authored and service maps render after area travel without JavaScript or resource errors');
 
   const mobile=await boot({viewport:{width:390,height:844},isMobile:true,hasTouch:true},'Mobile');
   const mobileOutside=await viewport(mobile,'mobile-field');

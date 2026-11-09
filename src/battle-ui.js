@@ -102,12 +102,12 @@ class AveluneBattleUI {
 
   alive() { return this.rpg.party.map((hero,index) => hero.hp > 0 ? index : -1).filter(index => index >= 0); }
   enemies() { return this.displayEnemies ?? this.encounter?.enemies ?? []; }
-  spell(id) { return typeof AVELUNE_SPELLS !== 'undefined' ? AVELUNE_SPELLS[id] : null; }
+  spell(id,hero=this.rpg.party[this.actor]) { return this.rpg.spellFor?.(hero,id) ?? (typeof AVELUNE_SPELLS !== 'undefined' ? AVELUNE_SPELLS[id] : null); }
   item(id) { return typeof AVELUNE_ITEMS !== 'undefined' ? AVELUNE_ITEMS[id] : null; }
 
-  commandName(command) {
+  commandName(command,hero=this.rpg.party[this.actor]) {
     if (!command) return 'Awaiting order';
-    if (command.type === 'spell') return this.spell(command.spell)?.name ?? command.spell;
+    if (command.type === 'spell') return this.spell(command.spell,hero)?.name ?? command.spell;
     if (command.type === 'item') return this.item(command.item)?.name ?? command.item;
     return {attack:'Attack', guard:'Guard', flee:'Retreat'}[command.type] ?? command.type;
   }
@@ -150,9 +150,9 @@ class AveluneBattleUI {
   target(command) {
     let target = 'enemy';
     if (command.type === 'spell') target = this.spell(command.spell)?.target ?? 'enemy';
-    if (command.type === 'item') target = 'ally';
-    if (target === 'allEnemies' || target === 'allAllies') {
-      this.queue({...command, target:0});
+    if (command.type === 'item') target = this.item(command.item)?.target || 'ally';
+    if (['allEnemies','allAllies','party','escape','self'].includes(target)) {
+      this.queue({...command, target:target==='self'?this.actor:0});
       return;
     }
     this.pending = {...command};
@@ -211,12 +211,13 @@ class AveluneBattleUI {
   renderParty() {
     const list = this.el('battle-party');
     list.replaceChildren();
+    list.dataset.partySize=String(this.rpg.party.length);
     (this.displayParty ?? this.rpg.party).forEach((hero,index) => {
       const current = this.phase === 'command' && index === this.actor;
       const card = this.node('button', null, 'battle-hero' + (current ? ' current' : '') + (hero.hp <= 0 ? ' fallen' : '') + (this.commands[index] ? ' ordered' : ''));
       card.type = 'button';
       card.disabled = !['command','ready'].includes(this.phase);
-      card.setAttribute('aria-label', hero.name + ', ' + hero.hp + ' of ' + hero.maxHp + ' health, ' + hero.mp + ' of ' + hero.maxMp + ' MP. ' + this.commandName(this.commands[index]));
+      card.setAttribute('aria-label', hero.name + ', ' + hero.hp + ' of ' + hero.maxHp + ' health, ' + hero.mp + ' of ' + hero.maxMp + ' MP. ' + this.commandName(this.commands[index],hero));
       const head = this.node('span', null, 'battle-hero-head');
       head.append(this.node('strong',hero.name), this.node('small','Lv. ' + hero.level));
       card.append(head, this.node('span', hero.role ?? hero.job ?? '', 'battle-hero-job'));
@@ -227,7 +228,7 @@ class AveluneBattleUI {
       fill.style.width = Math.max(0,Math.min(100,hero.hp/hero.maxHp*100)) + '%';
       track.append(fill);
       const mana=this.node('span',null,'battle-charges battle-mana');mana.append(this.node('span','MP '+hero.mp+' / '+hero.maxMp));const manaBar=this.node('span',null,'battle-mana-bar'),manaFill=this.node('i');manaFill.style.width=(hero.maxMp?Math.max(0,Math.min(100,100*hero.mp/hero.maxMp)):0)+'%';manaBar.setAttribute('aria-hidden','true');manaBar.append(manaFill);mana.append(manaBar);
-      card.append(hp,track,mana,this.node('span',hero.hp <= 0 ? 'Fallen' : this.commandName(this.commands[index]),'battle-order'));
+      card.append(hp,track,mana,this.node('span',hero.hp <= 0 ? 'Fallen' : this.commandName(this.commands[index],hero),'battle-order'));
       card.addEventListener('click', () => {
         if (this.menu === 'target' && this.targetSide === 'party') {
           if (this.validAllyTarget(hero)) this.chooseTarget(index);
@@ -238,7 +239,7 @@ class AveluneBattleUI {
   }
 
   validAllyTarget(hero) {
-    const revive = this.pending?.item === 'revive' || (this.pending?.spell && this.spell(this.pending.spell)?.kind === 'revive');
+    const revive = this.item(this.pending?.item)?.effect === 'revive' || this.pending?.item === 'revive' || (this.pending?.spell && this.spell(this.pending.spell)?.kind === 'revive');
     return revive ? hero.hp <= 0 : hero.hp > 0;
   }
 
@@ -276,11 +277,12 @@ class AveluneBattleUI {
     if (this.menu === 'main') {
       list.classList.add('battle-main-commands');
       list.append(
-        this.button('Attack', () => this.target({type:'attack'}), 'Strike one enemy'),
+        this.button('Attack '+(['','I','II','III','IV'][hero.attackRank]||'I'), () => this.target({type:'attack'}), (hero.attackHits||1)+' hit'+(hero.attackHits===1?'':'s')+' · '+(hero.attackNextLevel?'next growth Lv. '+hero.attackNextLevel:'fully developed')),
         this.button('Magic', () => { this.menu = 'magic'; this.render(); }, 'Cast a spell with MP', !hero?.spells?.length),
         this.button('Guard', () => this.queue({type:'guard'}), 'Reduce incoming damage'),
-        this.button('Item', () => { this.menu = 'items'; this.render(); }, 'Aid an ally'),
+        this.button('Item', () => { this.menu = 'items'; this.render(); }, 'Use supplies or combat tools'),
       );
+      list.append(this.node('p',(hero.attackHits||1)+' hit'+(hero.attackHits===1?'':'s')+' per Attack'+(hero.attackNextLevel?' · improves at Lv. '+hero.attackNextLevel:' · highest rank'),'battle-attack-growth'));
       const retreat = this.button('Retreat', () => { this.menu = 'flee'; this.render(); }, this.spec.boss ? 'Guardians seal the road' : 'The whole party attempts escape', this.spec.boss);
       retreat.classList.add('battle-retreat');
       list.append(retreat);
@@ -297,8 +299,8 @@ class AveluneBattleUI {
       for (const id of Object.keys(AVELUNE_ITEMS).filter(key=>!AVELUNE_ITEMS[key].fieldOnly)) {
         const item = this.item(id);
         const reserved = this.commands.filter(command => command?.type === 'item' && command.item === id).length;
-        const available = Math.max(0,(this.rpg.inventory[id] ?? 0) - reserved);
-        list.append(this.button((item?.name ?? {potion:'Potion',ether:'Ether',revive:'Phoenix salve'}[id]) + ' ×' + available, () => this.target({type:'item',item:id}), item?.description ?? {potion:'Restore an ally’s health.',ether:'Restore an ally’s MP.',revive:'Return a fallen ally to battle.'}[id], available <= 0));
+        const available = Math.max(0,(this.rpg.inventory[id] ?? 0) - reserved),blocked=this.spec.boss&&item?.bossAllowed===false;
+        list.append(this.button((item?.name ?? {potion:'Potion',ether:'Ether',revive:'Phoenix salve'}[id]) + ' ×' + available, () => this.target({type:'item',item:id}), (blocked?'Cannot be used against a guardian. ':'' )+(item?.description ?? {potion:'Restore an ally’s health.',ether:'Restore an ally’s MP.',revive:'Return a fallen ally to battle.'}[id]), available <= 0 || blocked));
       }
     } else if (this.menu === 'target') {
       const label = this.commandName(this.pending);
@@ -484,9 +486,10 @@ class AveluneBattleUI {
       ctx.restore();
       if (hit) this.drawHit(ctx,event,x,y - 19 * scale,progress);
     });
-    (this.displayParty ?? this.rpg.party).forEach((hero,index) => {
+    const party=this.displayParty ?? this.rpg.party;
+    party.forEach((hero,index) => {
       const x = w - 47 + (index % 2) * 8;
-      const y = 49 + index * 27;
+      const y = 49 + (4-party.length)*13 + index * 27;
       const acting = event?.actorSide === 'party' && event.actorIndex === index;
       const hit = event?.targetSide === 'party' && event.targetIndex === index;
       const offset = acting && !this.reduce ? -4 : 0;

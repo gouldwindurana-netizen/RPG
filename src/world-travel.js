@@ -113,6 +113,15 @@ const AveluneOverworld = {
       }
       route.a=a.overworld;route.b=b.overworld;route.stops=stops;
     }
+    // Keep the supplied standalone file's river and bridge edits in generated maps.
+    for(const [id,fields]of Object.entries(layout.uploadedWorldOverrides||{})){
+      const area=layout.areas[id];if(!area)continue;
+      for(const field of ['terrain','collision']){
+        if(!fields[field])continue;const rows=area[field].map(row=>[...row]);
+        for(const [x,y,value]of fields[field])if(rows[y]&&x>=0&&x<rows[y].length)rows[y][x]=value;
+        area[field]=rows.map(row=>row.join(''));
+      }
+    }
     layout.overworldVersion=1;
     return layout;
   }

@@ -42,9 +42,10 @@ try{
   await page.goto('http://localhost:'+port+'/?test=1');await page.waitForFunction(()=>window.__avelune?.state.ready);
   await snapshot(page,'title-'+width);
   await page.locator('#new-game').click();await page.locator('#begin-adventure').click();await page.waitForFunction(()=>__avelune.state.dialogKind==='notice');await page.locator('#dialog-content button').click();await settle(page);
-  await checkField(page,width);await snapshot(page,'field-'+width);
+  assert.deepEqual(await page.evaluate(()=>__avelune.rpg.party.map(h=>h.id)),['roadkeeper']);await checkField(page,width);await snapshot(page,'field-'+width);
   pass(width+'px title and exploration use classic windows, readable numeric status and no overflow');
 
+  await page.evaluate(()=>{for(const id of ['mara','iven','sella'])__avelune.rpg.recruit(id);__avelune.syncLocation()});await checkField(page,width);await snapshot(page,'field-full-party-'+width);
   await page.locator('#open-party').click();assert.equal(await page.locator('.job-card').count(),0);assert.equal(await page.evaluate(()=>__avelune.rpg.assignJob(0,'ranger').ok),false);
   const position=await page.evaluate(()=>({x:__avelune.world.x,y:__avelune.world.y}));
   await page.keyboard.press('ArrowDown');await page.waitForTimeout(100);assert.deepEqual(await page.evaluate(()=>({x:__avelune.world.x,y:__avelune.world.y})),position,'Modal input does not move the world');
@@ -53,14 +54,14 @@ try{
   await snapshot(page,'status-'+width);await page.keyboard.press('Escape');assert.equal(await page.locator('#veil').isHidden(),true);
 
   await page.evaluate(()=>{__avelune.rpg.gold=500;__avelune.syncLocation()});
-  await page.getByRole('button',{name:'Item shop',exact:true}).click();await page.waitForFunction(()=>__avelune.state.dialogKind==='town-service',null,{timeout:15000});
+  await page.getByRole('button',{name:'Item shop',exact:true}).click();await page.waitForFunction(()=>__avelune.state.dialogKind==='town-service'&&__avelune.world.area.indoor,null,{timeout:20000});
   const inventory=await page.evaluate(()=>__avelune.rpg.inventory.potion),gold=await page.evaluate(()=>__avelune.rpg.gold);
   await page.locator('.town-row').filter({has:page.locator('.town-row-info > strong',{hasText:/^Potion ·/})}).getByRole('button',{name:/^Buy/}).click();
   assert.equal(await page.evaluate(()=>__avelune.rpg.inventory.potion),inventory+1);assert.equal(await page.evaluate(()=>__avelune.rpg.gold),gold-25);
   await snapshot(page,'shop-'+width);await page.locator('#close-dialog').click();
 
   await page.evaluate(()=>{__avelune.rpg.party[1].hp=1;__avelune.syncLocation()});await page.locator('#open-magic').click();await page.getByRole('button',{name:'Iven',exact:true}).click();await snapshot(page,'magic-'+width);
-  const mp=await page.evaluate(()=>__avelune.rpg.party[2].mp),cost=await page.evaluate(()=>AVELUNE_SPELLS.mend.mpCost);await page.getByRole('button',{name:/^Cast on Mara/}).click();assert.ok(await page.evaluate(()=>__avelune.rpg.party[1].hp>1));assert.equal(await page.evaluate(()=>__avelune.rpg.party[2].mp),mp-cost);await page.locator('#close-dialog').click();
+  const mp=await page.evaluate(()=>__avelune.rpg.party[2].mp),cost=await page.evaluate(()=>__avelune.rpg.spellFor(__avelune.rpg.party[2],'mend').mpCost);await page.getByRole('button',{name:/^Cast on Mara/}).click();assert.ok(await page.evaluate(()=>__avelune.rpg.party[1].hp>1));assert.equal(await page.evaluate(()=>__avelune.rpg.party[2].mp),mp-cost);await page.locator('#close-dialog').click();
   pass(width+'px status, merchant purchase and field magic remain functional with modal input isolation');
 
   await page.evaluate(()=>__avelune.startBattle({name:'Bramble Boar',boss:false,enemies:[{id:'boar',name:'Bramble Boar',hp:60,attack:8,defense:2,speed:5,xp:10,gold:5,sprite:'boar',weakness:'ember'}]}));await settle(page);

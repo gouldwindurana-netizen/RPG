@@ -24,7 +24,7 @@ try{
   const town=await dimensions(page);assert.equal(await page.evaluate(()=>__avelune.world.area.classicTown),true);
   assert.ok(await page.getByRole('button',{name:'Revive',exact:true}).isVisible());
   await page.screenshot({path:output+'/compact-town.png'});pass('Compact starting town has signed services and a paid clinic');
-  await page.evaluate(()=>{__avelune.rpg.gold=0;__avelune.rpg.party[1].hp=0;__avelune.rpg.party[0].hp=1;__avelune.servicesUI.open(__avelune.townServices().find(s=>s.type==='chapel'))});
+  await page.evaluate(async()=>{__avelune.rpg.recruit('mara');__avelune.rpg.gold=0;__avelune.rpg.party[1].hp=0;__avelune.rpg.party[0].hp=1;const d=__avelune.townServices().find(s=>s.type==='chapel');await __avelune.visit(d.scene);__avelune.servicesUI.open(__avelune.townServices().find(s=>s.type==='chapel'))});
   assert.equal(await page.getByRole('button',{name:/^Receive care/}).count(),0);
   const fallen=page.locator('.town-row').filter({has:page.locator('.town-row-info > strong',{hasText:/^Mara ·/})});
   assert.equal(await fallen.getByRole('button',{name:/^Revive · 30 G/}).isDisabled(),true);
@@ -32,7 +32,7 @@ try{
   await fallen.getByRole('button',{name:/^Revive · 30 G/}).click();
   assert.deepEqual(await page.evaluate(()=>[__avelune.rpg.gold,__avelune.rpg.party[1].hp,__avelune.rpg.party[0].hp]),[0,1,1]);
   await page.locator('#close-dialog').click();pass('Clinic refuses zero gold and revives only one ally for30G');
-  await leaveTown(page);
+  await page.evaluate(async()=>{await __avelune.visit('alderreach_01');__avelune.closeDialog()});await leaveTown(page);
   const world=await dimensions(page);assert.ok(world.width>town.width&&world.height>town.height,'Overworld shows a wider area');
   assert.match(await page.locator('#region').textContent(),/OVERWORLD/);
   assert.equal(await page.locator('#town-strip').isVisible(),false);

@@ -46,3 +46,8 @@
 .town-mana>span:first-child{white-space:nowrap}.town-mana-bar{display:block;flex:1;min-width:28px;max-width:140px;height:6px;border:1px solid #6178ae;background:#040932}
 .town-mana-bar i{display:block;height:100%;background:#67ccff}
 @media(max-width:600px){.town-mana{font-size:18px;gap:7px}.town-party-summary .town-mana{display:block}.town-party-summary .town-mana-bar{margin-top:4px;max-width:none;width:100%}}
+/* Recruitable parties leave no empty character tabs or recovery cards. */
+.town-heroes{grid-template-columns:repeat(var(--hero-count,4),minmax(0,1fr))}
+.town-party-summary{grid-template-columns:repeat(var(--party-columns,2),minmax(0,1fr))}
+.town-attack-growth{color:#c4d4ff;line-height:1.15}
+@media(max-width:600px){.town-heroes{grid-template-columns:repeat(var(--hero-columns-mobile,2),minmax(0,1fr))}}

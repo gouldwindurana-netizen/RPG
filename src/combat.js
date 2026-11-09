@@ -10,39 +10,37 @@
  * Jobs are selected once through constructor options.jobs before the journey.
  * Every spell spends MP from one persistent pool shared by field and battle magic.
  */
-const AVELUNE_SPELLS = Object.freeze({
-  spark: {mpCost:4,name:'Ember',description:'A focused flame. Strong against ember-weak foes.',tier:1,target:'enemy',kind:'damage',element:'ember',power:26},
-  frost: {mpCost:4,name:'Frost',description:'A shard of winter. Strong against frost-weak foes.',tier:1,target:'enemy',kind:'damage',element:'frost',power:26},
-  bolt: {mpCost:4,name:'Bolt',description:'A crack of lightning. Strong against bolt-weak foes.',tier:1,target:'enemy',kind:'damage',element:'bolt',power:26},
-  smite: {mpCost:4,name:'Starlight',description:'A ray of the seven stars strikes one foe.',tier:1,target:'enemy',kind:'damage',element:'starlight',power:23},
-  mend: {mpCost:4,name:'Mend',description:'Restore one living ally’s HP.',tier:1,target:'ally',kind:'heal',power:32},
-  ward: {mpCost:6,name:'Ward',description:'Reduce damage to the party for the rest of this round.',tier:1,target:'allAllies',kind:'ward',power:0},
-  flare: {mpCost:12,name:'Emberstorm',description:'Flames strike every foe.',tier:2,target:'allEnemies',kind:'damage',element:'ember',power:35},
-  tempest: {mpCost:10,name:'Tempest',description:'Gale winds strike every foe.',tier:2,target:'allEnemies',kind:'damage',element:'gale',power:33},
-  deluge: {mpCost:10,name:'Deluge',description:'A tide strikes every foe.',tier:2,target:'allEnemies',kind:'damage',element:'tide',power:33},
-  quake: {mpCost:10,name:'Quake',description:'Stone and earth strike every foe.',tier:2,target:'allEnemies',kind:'damage',element:'stone',power:33},
-  renewal: {mpCost:12,name:'Renewal',description:'Restore HP to every living ally.',tier:2,target:'allAllies',kind:'heal',power:30},
-  raise: {mpCost:16,name:'Rekindle',description:'Revive one fallen ally at half HP.',tier:2,target:'ally',kind:'revive',power:0},
-  salve: {mpCost:6,name:'Salve',description:'Restore more HP to one living ally.',tier:1,target:'ally',kind:'heal',power:55},
-  halo: {mpCost:7,name:'Halo',description:'Starlight strikes every foe.',tier:1,target:'allEnemies',kind:'damage',element:'starlight',power:18},
-  gale: {mpCost:4,name:'Gale',description:'A cutting wind strikes one foe.',tier:1,target:'enemy',kind:'damage',element:'gale',power:26},
-  stone: {mpCost:4,name:'Stone',description:'A shard of earth strikes one foe.',tier:1,target:'enemy',kind:'damage',element:'stone',power:26},
-  greatermend: {mpCost:12,name:'Greater Mend',description:'Restore a great deal of HP to one living ally.',tier:2,target:'ally',kind:'heal',power:130},
-  sunburst: {mpCost:14,name:'Sunburst',description:'Brilliant starlight strikes every foe.',tier:2,target:'allEnemies',kind:'damage',element:'starlight',power:42},
-  comet: {mpCost:16,name:'Comet',description:'A powerful aether strike against one foe.',tier:2,target:'enemy',kind:'damage',element:'aether',power:100},
-  shelter: {mpCost:10,name:'Shelter',description:'Protect the party from damage this round.',tier:2,target:'allAllies',kind:'ward',power:0},
-});
+const AVELUNE_SPELL_ALIASES=Object.freeze({flare:'spark',tempest:'gale',deluge:'tide',quake:'stone',salve:'mend',greatermend:'mend',halo:'smite',sunburst:'smite',shelter:'ward'});
+const AVELUNE_LEGACY_SPELL_RANKS=Object.freeze({flare:2,tempest:2,deluge:2,quake:2,salve:2,greatermend:3,halo:2,sunburst:3,shelter:1});
+const AVELUNE_BASE_SPELLS={
+ spark:{name:'Ember',description:'Fire magic. Later ranks strike all foes.',tier:1,target:'enemy',kind:'damage',element:'ember',power:26,mpCost:4},
+ frost:{name:'Frost',description:'Ice magic. Later ranks strike all foes.',tier:1,target:'enemy',kind:'damage',element:'frost',power:26,mpCost:4},
+ bolt:{name:'Bolt',description:'Lightning magic. Later ranks strike all foes.',tier:1,target:'enemy',kind:'damage',element:'bolt',power:26,mpCost:4},
+ gale:{name:'Gale',description:'Wind magic. Later ranks strike all foes.',tier:1,target:'enemy',kind:'damage',element:'gale',power:26,mpCost:4},
+ stone:{name:'Stone',description:'Earth magic. Later ranks strike all foes.',tier:1,target:'enemy',kind:'damage',element:'stone',power:26,mpCost:4},
+ tide:{name:'Tide',description:'Water magic. Later ranks strike all foes.',tier:1,target:'enemy',kind:'damage',element:'tide',power:26,mpCost:4},
+ smite:{name:'Starlight',description:'Holy light. Later ranks strike all foes.',tier:1,target:'enemy',kind:'damage',element:'starlight',power:23,mpCost:4},
+ mend:{name:'Mend',description:'Restore one living ally. Higher ranks restore more HP.',tier:1,target:'ally',kind:'heal',power:32,mpCost:4},
+ ward:{name:'Ward',description:'Protect the party for this round.',tier:1,target:'allAllies',kind:'ward',power:0,mpCost:6,rankMax:1},
+ renewal:{name:'Renewal',description:'Restore HP to every living ally.',tier:2,target:'allAllies',kind:'heal',power:30,mpCost:12,rankMax:1},
+ raise:{name:'Rekindle',description:'Revive one fallen ally at half HP.',tier:2,target:'ally',kind:'revive',power:0,mpCost:16,rankMax:1},
+ comet:{name:'Comet',description:'A powerful aether strike against one foe.',tier:2,target:'enemy',kind:'damage',element:'aether',power:100,mpCost:16,rankMax:1},
+};
+const AVELUNE_SPELLS=Object.freeze(Object.fromEntries([
+ ...Object.entries(AVELUNE_BASE_SPELLS).map(([id,s])=>[id,Object.freeze({...s,id,familyName:s.name,rankMax:s.rankMax||3,name:s.name+(s.rankMax===1?'':' I')})]),
+ ...Object.entries(AVELUNE_SPELL_ALIASES).map(([id,family])=>[id,Object.freeze({...AVELUNE_BASE_SPELLS[family],id,family,legacy:true,rankMax:AVELUNE_BASE_SPELLS[family].rankMax||3})])
+]));
 
 const AVELUNE_JOBS = Object.freeze({
   vanguard: {id:'vanguard',mp:0,mpGrowth:0,name:'Vanguard',description:'Heavy armor and reliable strength. The front rank draws attacks.',color:'#d59b66',hp:52,hpGrowth:10,attack:13,attackGrowth:2.4,defense:5,defenseGrowth:1.2,speed:7,speedGrowth:.25,weapon:'Sword',armor:'Plate',weaponCap:5,armorCap:5,spells:[],passive:'Iron guard: guarding reduces damage by 65%.'},
   monk: {id:'monk',mp:0,mpGrowth:0,name:'Monk',description:'An unarmed striker whose fists grow with experience.',color:'#d2ab75',hp:46,hpGrowth:9,attack:12,attackGrowth:2.8,defense:2,defenseGrowth:.8,speed:10,speedGrowth:.4,weapon:'Handwraps',armor:'Cloth',weaponCap:3,armorCap:2,spells:[],passive:'Focused strike: critical hits deal double damage.'},
   ranger: {id:'ranger',mp:0,mpGrowth:0,name:'Ranger',description:'A quick scout with a high critical rate and reliable escapes.',color:'#9ebd7b',hp:40,hpGrowth:8,attack:10,attackGrowth:2.3,defense:3,defenseGrowth:.9,speed:13,speedGrowth:.5,weapon:'Bow',armor:'Leather',weaponCap:5,armorCap:3,spells:[],passive:'Keen eye: 18% critical chance; improves party escape odds.'},
-  redmage: {id:'redmage',mp:24,mpGrowth:4,name:'Red Mage',description:'A versatile sword bearer with healing and elemental magic.',color:'#d77c85',hp:40,hpGrowth:8,attack:9,attackGrowth:2,defense:3,defenseGrowth:.9,speed:9,speedGrowth:.35,weapon:'Rapier',armor:'Mail',weaponCap:4,armorCap:4,spells:['spark','frost','bolt','mend','ward','tempest','deluge'],passive:'Versatile: combines martial equipment with both schools of magic.'},
+  redmage: {id:'redmage',mp:24,mpGrowth:4,name:'Red Mage',description:'A versatile sword bearer with healing and elemental magic.',color:'#d77c85',hp:40,hpGrowth:8,attack:9,attackGrowth:2,defense:3,defenseGrowth:.9,speed:9,speedGrowth:.35,weapon:'Rapier',armor:'Mail',weaponCap:4,armorCap:4,spells:['spark','frost','bolt','mend','ward'],passive:'Versatile: combines martial equipment with both schools of magic.'},
   whitemage: {id:'whitemage',mp:28,mpGrowth:6,name:'White Mage',description:'A healer who restores allies and calls down starlight.',color:'#e9d9b4',hp:34,hpGrowth:7,attack:6,attackGrowth:1.8,defense:2,defenseGrowth:.7,speed:8,speedGrowth:.3,weapon:'Staff',armor:'Robe',weaponCap:3,armorCap:2,spells:['mend','smite','ward','renewal','raise'],passive:'Mercy: healing is 20% stronger; a generous mana pool sustains recovery.'},
-  blackmage: {id:'blackmage',mp:28,mpGrowth:6,name:'Black Mage',description:'A fragile caster with broad elemental coverage.',color:'#9e9cd7',hp:30,hpGrowth:7,attack:6,attackGrowth:1.8,defense:1,defenseGrowth:.7,speed:8,speedGrowth:.3,weapon:'Rod',armor:'Robe',weaponCap:3,armorCap:2,spells:['spark','frost','bolt','flare','tempest','deluge','quake'],passive:'Aethercraft: damage magic is 15% stronger; a generous mana pool sustains spells.'},
+  blackmage: {id:'blackmage',mp:28,mpGrowth:6,name:'Black Mage',description:'A fragile caster with broad elemental coverage.',color:'#9e9cd7',hp:30,hpGrowth:7,attack:6,attackGrowth:1.8,defense:1,defenseGrowth:.7,speed:8,speedGrowth:.3,weapon:'Rod',armor:'Robe',weaponCap:3,armorCap:2,spells:['spark','frost','bolt'],passive:'Aethercraft: damage magic is 15% stronger; a generous mana pool sustains spells.'},
 });
 
-const AVELUNE_ITEMS = Object.freeze({
+const AVELUNE_ITEMS = typeof AVELUNE_ITEM_CATALOG!=='undefined'?AVELUNE_ITEM_CATALOG:Object.freeze({
   potion: {id:'potion',name:'Potion',price:25,description:'Restore 70 HP to one living ally.',target:'ally'},
   ether: {id:'ether',name:'Ether',price:65,description:'Restore 24 MP to one living ally.',target:'ally'},
   revive: {id:'revive',name:'Dawn feather',price:90,description:'Revive one fallen ally at half HP.',target:'ally'},
@@ -69,11 +67,11 @@ const AVELUNE_GEAR = Object.freeze(Object.fromEntries([
   return [id,Object.freeze({id,name,slot,tier,price:prices[i],jobs:Object.freeze(jobs),attack,defense,description:label+' · '+(slot==='weapon'?'ATK +'+attack:'DEF +'+defense)})];
 }))));
 
-const AVELUNE_TOWN_SPELLS = Object.freeze(Object.fromEntries([
-  ['salve',90,['redmage','whitemage'],'white'],['halo',110,['whitemage'],'white'],
-  ['gale',100,['redmage','blackmage'],'black'],['stone',100,['redmage','blackmage'],'black'],
-  ['greatermend',300,['redmage','whitemage'],'white'],['sunburst',400,['whitemage'],'white'],
-  ['comet',420,['blackmage'],'black'],['shelter',260,['redmage','whitemage'],'white'],
+const AVELUNE_TOWN_SPELLS=Object.freeze(Object.fromEntries([
+ ['spark',70,['redmage','blackmage'],'black'],['frost',70,['redmage','blackmage'],'black'],['bolt',70,['redmage','blackmage'],'black'],
+ ['gale',100,['redmage','blackmage'],'black'],['stone',100,['redmage','blackmage'],'black'],['tide',110,['redmage','blackmage'],'black'],
+ ['mend',70,['redmage','whitemage'],'white'],['smite',90,['whitemage'],'white'],['ward',90,['redmage','whitemage'],'white'],
+ ['renewal',300,['whitemage'],'white'],['raise',360,['whitemage'],'white'],['comet',420,['blackmage'],'black'],
 ].map(([id,price,jobs,school])=>[id,Object.freeze({id,...AVELUNE_SPELLS[id],price,jobs:Object.freeze(jobs),school})])));
 
 const AVELUNE_ADVANCED_ROLES = Object.freeze({vanguard:'Knight',monk:'Master',ranger:'Wayfarer',redmage:'Spellblade',whitemage:'Luminary',blackmage:'Arcanist'});
@@ -93,17 +91,20 @@ class AveluneRPG {
     this.jobsLocked=true;
     const chosen=Array.isArray(options.jobs)&&options.jobs.length===4?options.jobs:[];
     const cast=[['roadkeeper','Roadkeeper','redmage'],['mara','Mara','vanguard'],['iven','Iven','whitemage'],['sella','Sella','blackmage']];
-    this.party=cast.map(([id,name,defaultJob],index)=>{
-      const record=Array.isArray(data.party)?data.party[index]:null;
-      const old=Array.isArray(data.party)?data.party.find(h=>h&&h.id===id)??(record&&!record.id?record:null):null;
+    this.roster=cast.map(([id,name,defaultJob],index)=>{
+      const records=Array.isArray(data.roster)?data.roster:Array.isArray(data.party)?data.party:[];
+      const record=records[index],old=records.find(h=>h&&h.id===id)??(record&&!record.id?record:null);
       const job=Object.hasOwn(AVELUNE_JOBS,old?.job)?old.job:Object.hasOwn(AVELUNE_JOBS,chosen[index])?chosen[index]:defaultJob;
-      const hero={id,name,job,promoted:old?.promoted===true,equipment:{weapon:this._int(old?.equipment?.weapon,0,5,0),armor:this._int(old?.equipment?.armor,0,5,0)},equippedGear:{weapon:null,armor:null},learnedSpells:[],spellLoadouts:{}};
-      hero.learnedSpells=Array.isArray(old?.learnedSpells)?[...new Set(old.learnedSpells.filter(key=>Object.hasOwn(AVELUNE_TOWN_SPELLS,key)))]:[];
+      const hero={id,name,job,promoted:old?.promoted===true,equipment:{weapon:this._int(old?.equipment?.weapon,0,5,0),armor:this._int(old?.equipment?.armor,0,5,0)},equippedGear:{weapon:null,armor:null},learnedSpells:[],spellLoadouts:{},spellRanks:{}};
+      hero.learnedSpells=Array.isArray(old?.learnedSpells)?[...new Set(old.learnedSpells.map(key=>this._canonicalSpell(key)).filter(key=>Object.hasOwn(AVELUNE_TOWN_SPELLS,key)))]:[];
+      for(const key of Object.keys(AVELUNE_BASE_SPELLS))hero.spellRanks[key]=this._int(old?.spellRanks?.[key],1,AVELUNE_SPELLS[key].rankMax,1);
+      for(const key of Array.isArray(old?.learnedSpells)?old.learnedSpells:[]){const family=this._canonicalSpell(key);if(AVELUNE_SPELLS[family])hero.spellRanks[family]=Math.max(hero.spellRanks[family],AVELUNE_LEGACY_SPELL_RANKS[key]||1)}
+      if(old&&(data.version||1)<3&&this.level>=5){const legacy=job==='blackmage'?['spark','gale','stone','tide']:job==='redmage'?['gale','tide']:[];for(const family of legacy){if(!hero.learnedSpells.includes(family)&&!AVELUNE_JOBS[job].spells.includes(family))hero.learnedSpells.push(family);hero.spellRanks[family]=Math.max(hero.spellRanks[family],2)}}
       for(const jobId of Object.keys(AVELUNE_JOBS)) {
         const saved=old?.spellLoadouts?.[jobId];
         if(!saved||typeof saved!=='object') continue;
         const loadout={};
-        for(const tier of [1,2]) if(Array.isArray(saved[tier])) loadout[tier]=[...new Set(saved[tier].filter(key=>this._knowsSpell(hero,key,jobId)&&AVELUNE_SPELLS[key].tier===tier))].slice(0,3);
+        for(const tier of [1,2]){if((data.version||1)>=3&&!Array.isArray(saved[tier]))continue;const ids=((data.version||1)>=3?saved[tier]:[...(Array.isArray(saved[1])?saved[1]:[]),...(Array.isArray(saved[2])?saved[2]:[])]).map(key=>this._canonicalSpell(key));loadout[tier]=[...new Set(ids.filter(key=>this._knowsSpell(hero,key,jobId)&&AVELUNE_SPELLS[key].tier===tier))].slice(0,3)}
         hero.spellLoadouts[jobId]=loadout;
       }
       for(const slot of ['weapon','armor']) {
@@ -115,17 +116,15 @@ class AveluneRPG {
       hero.mp=Number.isFinite(old?.mp)?this._int(old.mp,0,hero.maxMp,hero.maxMp):this._legacyMana(old,hero);
       return hero;
     });
-    const order=Array.isArray(data.party)?data.party.map(h=>h?.id):[];
-    this.party.sort((a,b)=>{const ai=order.indexOf(a.id),bi=order.indexOf(b.id);return (ai<0?99:ai)-(bi<0?99:bi);});
+    const activeRecords=Array.isArray(data.party)?data.party:[];
+    const oldIds=activeRecords.map(h=>h?.id).filter(id=>cast.some(c=>c[0]===id));
+    const joined=options.fullParty===true?cast.map(c=>c[0]):Array.isArray(data.joinedIds)?data.joinedIds:oldIds.length?oldIds:['roadkeeper'];
+    this.joinedIds=new Set(['roadkeeper',...joined.filter(id=>cast.some(c=>c[0]===id))]);
+    this.party=this.roster.filter(h=>this.joinedIds.has(h.id));
+    this.party.sort((a,b)=>{const ai=oldIds.indexOf(a.id),bi=oldIds.indexOf(b.id);return(ai<0?99:ai)-(bi<0?99:bi)});
     const worn={};
-    for(const hero of this.party) for(const slot of ['weapon','armor']) {
-      const id=hero.equippedGear[slot];
-      if(id&&((worn[id]||0)>=this.gearOwned[id])) hero.equippedGear[slot]=null;
-      else if(id) worn[id]=(worn[id]||0)+1;
-      this._stats(hero);
-    }
-    // An invalid or abandoned save must still have a recoverable party.
-    if (this.party.every(h=>h.hp===0)) this.party[0].hp=1;
+    for(const hero of this.roster)for(const slot of ['weapon','armor']){const id=hero.equippedGear[slot];if(id&&((worn[id]||0)>=this.gearOwned[id]))hero.equippedGear[slot]=null;else if(id)worn[id]=(worn[id]||0)+1;this._stats(hero)}
+    if(this.party.every(h=>h.hp===0))this.party[0].hp=1;
     this.battle=null;
   }
 
@@ -135,8 +134,31 @@ class AveluneRPG {
   get nextLevelXP() { return this.level===30?this.xp:this.xpForLevel(this.level+1); }
   _random() { let x=this.seed||1;x^=x<<13;x^=x>>>17;x^=x<<5;this.seed=x>>>0;return this.seed/4294967296; }
   _element(value) { return ({fire:'ember',ice:'frost',lightning:'bolt',light:'starlight',water:'tide',wind:'gale',earth:'stone'})[String(value).toLowerCase()]||String(value||'').toLowerCase().slice(0,24); }
-  _knowsSpell(hero,id,jobId=hero.job) {
-    return Object.hasOwn(AVELUNE_SPELLS,id)&&(AVELUNE_JOBS[jobId].spells.includes(id)||(hero.learnedSpells.includes(id)&&AVELUNE_TOWN_SPELLS[id]?.jobs.includes(jobId)));
+  _canonicalSpell(id){return typeof id==='string'?(Object.hasOwn(AVELUNE_SPELL_ALIASES,id)?AVELUNE_SPELL_ALIASES[id]:id):'';}
+  _knowsSpell(hero,id,jobId=hero.job){id=this._canonicalSpell(id);return Object.hasOwn(AVELUNE_BASE_SPELLS,id)&&(AVELUNE_JOBS[jobId].spells.includes(id)||(hero.learnedSpells.includes(id)&&AVELUNE_TOWN_SPELLS[id]?.jobs.includes(jobId)));}
+  spellFor(heroOrIndex,spellId){
+    const h=typeof heroOrIndex==='number'?this.party[heroOrIndex]:heroOrIndex,id=this._canonicalSpell(spellId),base=AVELUNE_SPELLS[id];
+    if(!h||!base||base.legacy)return null;
+    const rank=this._int(h.spellRanks?.[id],1,base.rankMax,1),suffix=['',' I',' II',' III'][rank];
+    const values=base.kind==='heal'&&base.target==='ally'?[{power:32,mpCost:4},{power:68,mpCost:7},{power:130,mpCost:12}]:[{power:base.power,mpCost:base.mpCost},{power:42,mpCost:9,target:'allEnemies'},{power:70,mpCost:15,target:'allEnemies'}];
+    return {...base,...(base.rankMax>1?values[rank-1]:{}),id,rank,name:base.familyName+(base.rankMax>1?suffix:''),rankMax:base.rankMax};
+  }
+  recruit(id){
+    if(this.battle)return {ok:false,text:'Finish the encounter before recruiting.'};
+    const hero=this.roster.find(h=>h.id===id);if(!hero)return {ok:false,text:'That companion is not known.'};
+    if(this.joinedIds.has(id))return {ok:false,already:true,text:hero.name+' is already traveling with you.'};
+    this._stats(hero);hero.hp=hero.maxHp;hero.mp=hero.maxMp;this.joinedIds.add(id);this.party.push(hero);
+    return {ok:true,hero,text:hero.name+' joins the party as '+hero.role+'.'};
+  }
+  reconcileRecruitment(ids){
+    if(this.battle)return {ok:false,text:'Finish the encounter first.'};
+    const order=this.party.map(h=>h.id),allowed=new Set(['roadkeeper',...ids]);
+    this.joinedIds=new Set(this.roster.filter(h=>allowed.has(h.id)).map(h=>h.id));
+    this.party=this.roster.filter(h=>this.joinedIds.has(h.id)).sort((a,b)=>{
+      const ai=order.indexOf(a.id),bi=order.indexOf(b.id);return(ai<0?99:ai)-(bi<0?99:bi);
+    });
+    if(this.party.every(h=>h.hp===0))this.party[0].hp=1;
+    return {ok:true};
   }
   _legacyMana(old,hero) {
     if(!Array.isArray(old?.charges)||hero.maxMp===0)return hero.maxMp;
@@ -154,16 +176,18 @@ class AveluneRPG {
     hero.attack=Math.round((job.attack+(level-1)*job.attackGrowth+Math.min(hero.equipment.weapon,job.weaponCap)*3+(weapon?.jobs.includes(hero.job)?weapon.attack:0))*promoted);
     hero.defense=Math.round((job.defense+(level-1)*job.defenseGrowth+Math.min(hero.equipment.armor,job.armorCap)*2+(armor?.jobs.includes(hero.job)?armor.defense:0))*promoted);
     hero.speed=Math.round(job.speed+(level-1)*job.speedGrowth);
+    hero.attackRank=1+[5,12,20].filter(n=>level>=n).length;hero.attackHits=hero.attackRank;hero.attackNextLevel=[5,12,20].find(n=>level<n)||null;
     hero.maxMp=Math.round((job.mp+(level-1)*job.mpGrowth)*(hero.promoted?1.1:1));
-    hero.knownSpells=[...new Set([...job.spells,...hero.learnedSpells])].filter(id=>this._knowsSpell(hero,id)&&(AVELUNE_SPELLS[id].tier===1||level>=5));
+    hero.knownSpells=[...new Set([...job.spells,...hero.learnedSpells].map(id=>this._canonicalSpell(id)))].filter(id=>this._knowsSpell(hero,id)&&(AVELUNE_SPELLS[id].tier===1||level>=5));
     const loadout=hero.spellLoadouts[hero.job]||{};
     hero.preparedSpells={};
     for(const tier of [1,2]) hero.preparedSpells[tier]=(loadout[tier]??job.spells).filter(id=>hero.knownSpells.includes(id)&&AVELUNE_SPELLS[id].tier===tier);
     hero.spells=[...hero.preparedSpells[1],...hero.preparedSpells[2]];
   }
 
-  snapshot() {
-    return {version:2,jobsLocked:true,seed:this.seed,xp:this.xp,gold:this.gold,inventory:{...this.inventory},gearOwned:{...this.gearOwned},battlesWon:this.battlesWon,campaignRewards:[...this.campaignRewards],party:this.party.map(h=>({id:h.id,job:h.job,promoted:h.promoted,hp:h.hp,mp:h.mp,equipment:{...h.equipment},equippedGear:{...h.equippedGear},learnedSpells:[...h.learnedSpells],spellLoadouts:Object.fromEntries(Object.entries(h.spellLoadouts).map(([job,tiers])=>[job,Object.fromEntries(Object.entries(tiers).map(([tier,ids])=>[tier,[...ids]]))]))}))};
+  snapshot(){
+    const serialize=h=>({id:h.id,job:h.job,promoted:h.promoted,hp:h.hp,mp:h.mp,spellRanks:{...h.spellRanks},equipment:{...h.equipment},equippedGear:{...h.equippedGear},learnedSpells:[...h.learnedSpells],spellLoadouts:Object.fromEntries(Object.entries(h.spellLoadouts).map(([job,tiers])=>[job,Object.fromEntries(Object.entries(tiers).map(([tier,ids])=>[tier,[...ids]]))]))});
+    return {version:3,jobsLocked:true,joinedIds:[...this.joinedIds],seed:this.seed,xp:this.xp,gold:this.gold,inventory:{...this.inventory},gearOwned:{...this.gearOwned},battlesWon:this.battlesWon,campaignRewards:[...this.campaignRewards],party:this.party.map(serialize),roster:this.roster.map(serialize)};
   }
 
   assignJob(index,jobId) {
@@ -175,13 +199,13 @@ class AveluneRPG {
     const from=this.level;
     this.xp=Math.min(this.xpForLevel(30),this.xp+Math.floor(amount));
     const levels=[];
-    for (const hero of this.party) {
+    for (const hero of this.roster) {
       const maxHp=hero.maxHp,maxMp=hero.maxMp,alive=hero.hp>0;
       this._stats(hero);
       if (this.level>from) {
         if (alive) hero.hp=Math.min(hero.maxHp,hero.hp+hero.maxHp-maxHp);
         if(alive) hero.mp=Math.min(hero.maxMp,hero.mp+hero.maxMp-maxMp);
-        levels.push({name:hero.name,from,to:this.level});
+        if(this.joinedIds.has(hero.id))levels.push({name:hero.name,from,to:this.level});
       }
     }
     return {ok:true,amount:Math.floor(amount),levels,text:levels.length?'The party reached level '+this.level+'.':Math.floor(amount)+' experience gained.'};
@@ -234,7 +258,7 @@ class AveluneRPG {
 
   castField(index,spellId,targetIndex) {
     if(this.battle) return {ok:false,text:'Choose magic through the battle commands.'};
-    const h=this.party[index],spell=AVELUNE_SPELLS[spellId];
+    const h=this.party[index];spellId=this._canonicalSpell(spellId);const spell=this.spellFor(h,spellId);
     if(!h||!spell||!h.spells.includes(spellId)) return {ok:false,text:'That ally has not prepared this spell.'};
     if(h.hp===0) return {ok:false,text:h.name+' must be revived before casting.'};
     if(!['heal','revive'].includes(spell.kind)) return {ok:false,text:spell.name+' is used in battle.'};
@@ -293,7 +317,7 @@ class AveluneRPG {
     return {ok:true,value,text:quantity+' × '+item.name+' sold for '+value+' gold.'};
   }
 
-  _wornGear(id) { return this.party.reduce((n,h)=>n+Object.values(h.equippedGear).filter(key=>key===id).length,0); }
+  _wornGear(id) { return this.roster.reduce((n,h)=>n+Object.values(h.equippedGear).filter(key=>key===id).length,0); }
   quoteGear(index,gearId) {
     const h=this.party[index],gear=Object.hasOwn(AVELUNE_GEAR,gearId)?AVELUNE_GEAR[gearId]:null;
     if(!h||!gear) return {ok:false,text:'Choose a party member and equipment.'};
@@ -336,28 +360,37 @@ class AveluneRPG {
     return {ok:true,text:h.name+(gearId?' equips '+AVELUNE_GEAR[gearId].name: ' removes their '+slot)+'.'};
   }
 
-  quoteSpell(index,spellId) {
-    const h=this.party[index],spell=Object.hasOwn(AVELUNE_TOWN_SPELLS,spellId)?AVELUNE_TOWN_SPELLS[spellId]:null;
-    if(!h||!spell) return {ok:false,text:'Choose a party member and spell.',known:false,eligible:false};
-    const known=h.learnedSpells.includes(spellId),eligible=spell.jobs.includes(h.job)&&(spell.tier===1||this.level>=5);
-    return {ok:eligible&&!known,cost:spell.price,known,eligible,text:known?h.name+' already knows '+spell.name+'.':!spell.jobs.includes(h.job)?'This job cannot learn '+spell.name+'.':!eligible?'Reach level 5 to learn tier II magic.':''};
+  quoteSpell(index,spellId){
+    const h=this.party[index],id=this._canonicalSpell(spellId),spell=AVELUNE_TOWN_SPELLS[id];
+    if(!h||!spell)return {ok:false,text:'Choose a party member and spell.',known:false,eligible:false};
+    const known=h.knownSpells.includes(id),eligible=spell.jobs.includes(h.job)&&(spell.tier===1||this.level>=5);
+    return {ok:eligible&&!known,cost:spell.price,known,eligible,text:known?h.name+' already knows '+spell.familyName+'.':!spell.jobs.includes(h.job)?'This job cannot learn '+spell.familyName+'.':!eligible?'Reach level 5 to learn this unique spell.':''};
   }
-  learnSpell(index,spellId) {
-    if(this.battle) return {ok:false,text:'Magic cannot be learned during battle.'};
-    const quote=this.quoteSpell(index,spellId);
-    if(!quote.ok) return quote;
-    if(this.gold<quote.cost) return {ok:false,text:'Not enough gold.'};
-    const h=this.party[index],spell=AVELUNE_TOWN_SPELLS[spellId],active=h.preparedSpells[spell.tier];
-    this.gold-=quote.cost;h.learnedSpells.push(spellId);
-    if(active.length<3) {
-      h.spellLoadouts[h.job]??={};h.spellLoadouts[h.job][spell.tier]=[...active,spellId];
-    }
-    this._stats(h);
-    return {ok:true,cost:quote.cost,prepared:h.spells.includes(spellId),text:h.name+' learns '+spell.name+'.'+(h.spells.includes(spellId)?'':' Prepare it in a set of up to three spells per tier.')};
+  learnSpell(index,spellId){
+    if(this.battle)return {ok:false,text:'Magic cannot be learned during battle.'};
+    const id=this._canonicalSpell(spellId),quote=this.quoteSpell(index,id);if(!quote.ok)return quote;
+    if(this.gold<quote.cost)return {ok:false,text:'Not enough gold.'};
+    const h=this.party[index],spell=AVELUNE_SPELLS[id],active=h.preparedSpells[spell.tier];this.gold-=quote.cost;h.learnedSpells.push(id);h.spellRanks[id]||=1;
+    if(active.length<3){h.spellLoadouts[h.job]??={};h.spellLoadouts[h.job][spell.tier]=[...active,id]}
+    this._stats(h);return {ok:true,cost:quote.cost,prepared:h.spells.includes(id),text:h.name+' learns '+this.spellFor(h,id).name+'.'};
+  }
+  quoteSpellUpgrade(index,spellId){
+    const h=this.party[index],id=this._canonicalSpell(spellId),spell=this.spellFor(h,id);
+    if(!h||!spell||!h.knownSpells.includes(id))return {ok:false,eligible:false,text:'Learn this spell family first.'};
+    const rank=spell.rank,maxRank=spell.rankMax,nextRank=rank+1,levelRequired=nextRank===2?5:12,cost=nextRank===2?180:480;
+    const eligible=rank<maxRank&&this.level>=levelRequired;
+    const nextSpell=rank<maxRank?this.spellFor({...h,spellRanks:{...h.spellRanks,[id]:nextRank}},id):null;
+    return {ok:eligible,eligible,cost,rank,nextRank,maxRank,levelRequired,spell,nextSpell,text:rank>=maxRank?'This spell is fully developed.':!eligible?'Reach level '+levelRequired+' for '+nextSpell.name+'.':''};
+  }
+  upgradeSpell(index,spellId){
+    if(this.battle)return {ok:false,text:'Visit a magic counter outside battle.'};
+    const id=this._canonicalSpell(spellId),q=this.quoteSpellUpgrade(index,id);if(!q.ok)return q;if(this.gold<q.cost)return {ok:false,text:'Not enough gold.'};
+    const h=this.party[index];this.gold-=q.cost;h.spellRanks[id]=q.nextRank;this._stats(h);return {ok:true,cost:q.cost,rank:q.nextRank,text:h.name+' upgrades '+q.nextSpell.name+'.'};
   }
   prepareSpells(index,tier,ids) {
     if(this.battle) return {ok:false,text:'Spells cannot be prepared during battle.'};
     const h=this.party[index];
+    ids=Array.isArray(ids)?ids.map(id=>this._canonicalSpell(id)):ids;
     if(!h||![1,2].includes(tier)||!Array.isArray(ids)||ids.length>3||new Set(ids).size!==ids.length) return {ok:false,text:'Prepare up to three distinct spells per tier.'};
     if(ids.some(id=>!h.knownSpells.includes(id)||AVELUNE_SPELLS[id].tier!==tier)) return {ok:false,text:'Choose known, unlocked spells from this tier.'};
     h.spellLoadouts[h.job]??={};h.spellLoadouts[h.job][tier]=[...ids];this._stats(h);
@@ -384,28 +417,29 @@ class AveluneRPG {
     return this._applyItem(index,itemId);
   }
   _applyItem(index,itemId) {
-    const h=this.party[index],item=Object.hasOwn(AVELUNE_ITEMS,itemId)?AVELUNE_ITEMS[itemId]:null;
-    if(!h||!item) return {ok:false,text:'Choose a valid ally and item.'};
-    if(item.fieldOnly) return {ok:false,text:item.name+' must be used outdoors through the camping supplies menu.'};
-    if(this.inventory[itemId]<1) return {ok:false,text:'No '+item.name+' remaining.'};
-    let amount=0;
-    if(itemId==='revive') {
-      if(h.hp>0) return {ok:false,text:h.name+' is already standing.'};
-      amount=h.hp=Math.max(1,Math.floor(h.maxHp/2));
-    } else {
-      if(h.hp===0) return {ok:false,text:h.name+' needs a Dawn feather first.'};
-      if(itemId==='potion'||itemId==='hipotion') {
-        amount=Math.min(itemId==='hipotion'?180:70,h.maxHp-h.hp);
-        if(!amount) return {ok:false,text:h.name+' is already at full HP.'};
-        h.hp+=amount;
-      } else {
-        amount=Math.min(24,h.maxMp-h.mp);
-        if(!amount) return {ok:false,text:h.name+' has no missing MP.'};
-        h.mp+=amount;
-      }
-    }
+    const item=Object.hasOwn(AVELUNE_ITEMS,itemId)?AVELUNE_ITEMS[itemId]:null;
+    if(!item)return {ok:false,text:'Choose a valid item.'};
+    if(item.fieldOnly)return {ok:false,text:item.name+' must be used through the camping supplies menu.'};
+    if(item.battleOnly&&!this.battle)return {ok:false,text:item.name+' can only be used in battle.'};
+    if(this.inventory[itemId]<1)return {ok:false,text:'No '+item.name+' remaining.'};
+    const effect=item.effect||({potion:'heal',hipotion:'heal',ether:'mana',revive:'revive'}[itemId]);
+    if(!['heal','mana','revive','restore','partyHeal'].includes(effect))return {ok:false,text:'Choose this item through its battle command.'};
+    const indices=effect==='partyHeal'?this.party.flatMap((h,i)=>h.hp>0?[i]:[]):[index];
+    if(!indices.length||indices.some(i=>!Number.isInteger(i)||!this.party[i]))return {ok:false,text:'Choose a valid ally.'};
+    if(effect==='revive'&&this.party[index].hp>0)return {ok:false,text:this.party[index].name+' is already standing.'};
+    if(effect!=='revive'&&effect!=='partyHeal'&&this.party[index].hp===0)return {ok:false,text:this.party[index].name+' needs revival first.'};
+    const changes=indices.map(i=>{const h=this.party[i];let hp=0,mp=0;
+      if(effect==='revive')hp=Math.max(1,Math.floor(h.maxHp*(item.hpFraction||.5)));
+      if(effect==='heal'||effect==='partyHeal')hp=Math.min(item.amount||(itemId==='hipotion'?180:70),h.maxHp-h.hp);
+      if(effect==='mana')mp=Math.min(item.amount||24,h.maxMp-h.mp);
+      if(effect==='restore'){hp=h.maxHp-h.hp;mp=h.maxMp-h.mp;}
+      return {index:i,hp,mp};
+    }).filter(c=>c.hp>0||c.mp>0);
+    if(!changes.length)return {ok:false,text:'No eligible ally needs that recovery.'};
+    for(const c of changes){this.party[c.index].hp+=c.hp;this.party[c.index].mp+=c.mp;}
     this.inventory[itemId]--;
-    return {ok:true,amount,resource:itemId==='ether'?'mp':'hp',text:h.name+' recovers '+amount+(itemId==='ether'?' MP.':' HP.')};
+    const hp=changes.reduce((n,c)=>n+c.hp,0),mp=changes.reduce((n,c)=>n+c.mp,0);
+    return {ok:true,changes,amount:mp&&!hp?mp:hp,resource:mp&&!hp?'mp':'hp',text:item.name+' restores '+[hp?hp+' HP':'',mp?mp+' MP':''].filter(Boolean).join(' and ')+'.'};
   }
 
   startBattle(spec) {
@@ -457,14 +491,32 @@ class AveluneRPG {
           emit('The escape route is blocked!',{kind:'flee',...actor});continue;
         }
         if(c.type==='item') {
-          const ti=c.item==='revive'?fallenAlly(c.target):aliveAlly(c.target);
-          const result=this._applyItem(ti,c.item);
-          emit(result.text,{kind:result.ok?'heal':'miss',...actor,target:this.party[ti]?.id,targetSide:'party',targetIndex:ti,amount:result.amount||0,resource:result.resource});
+          const item=Object.hasOwn(AVELUNE_ITEMS,c.item)?AVELUNE_ITEMS[c.item]:null;
+          if(!item||item.fieldOnly){emit('That item is unavailable.',{kind:'miss',...actor});continue;}if(this.inventory[c.item]<1){emit('No '+item.name+' remaining.',{kind:'miss',...actor});continue;}
+          if(item.effect==='escape'){
+            if(b.boss){emit('The guardian blocks the smoke. The item is kept.',{kind:'miss',...actor});continue;}
+            this.inventory[c.item]--;b.outcome='fled';emit('Smoke conceals the party’s escape.',{kind:'flee',...actor});continue;
+          }
+          if(item.effect==='ward'){
+            const until=round+(item.rounds||3)-1;
+            if((b.tonicUntil||0)>=until){emit('The party is already fully protected.',{kind:'miss',...actor});continue;}
+            this.inventory[c.item]--;b.tonicUntil=until;emit('Ward tonic protects the party for three rounds.',{kind:'guard',...actor});continue;
+          }
+          if(item.effect==='damage'){
+            const targets=(item.target==='allEnemies'?b.enemies.flatMap((e,i)=>e.hp>0?[i]:[]):[aliveEnemy(c.target)]).filter(i=>i>=0);
+            if(!targets.length){emit('There is no valid target.',{kind:'miss',...actor});continue;}
+            this.inventory[c.item]--;
+            for(const ti of targets){const e=b.enemies[ti],weak=e.weakness===item.element,resist=e.resistance===item.element,amount=Math.max(1,Math.round(((item.power||45)+this.level*2)*(weak?1.6:resist?.6:1)-e.defense*.15));e.hp=Math.max(0,e.hp-amount);emit(h.name+' uses '+item.name+' on '+e.name+' for '+amount+(weak?' — weakness!':'.'),{kind:'damage',...actor,target:e.id,targetSide:'enemy',targetIndex:ti,amount,element:item.element,weak});}
+            continue;
+          }
+          const ti=item.effect==='revive'||c.item==='revive'?fallenAlly(c.target):aliveAlly(c.target),result=this._applyItem(ti,c.item);
+          if(!result.ok){emit(result.text,{kind:'miss',...actor});continue;}
+          for(const change of result.changes)for(const [resource,amount]of [['hp',change.hp],['mp',change.mp]])if(amount>0){const target=this.party[change.index];emit(item.name+' restores '+amount+' '+resource.toUpperCase()+' to '+target.name+'.',{kind:'heal',...actor,target:target.id,targetSide:'party',targetIndex:change.index,amount,resource});}
           continue;
         }
         if(c.type==='spell') {
-          const s=AVELUNE_SPELLS[c.spell];
-          if(!s||!h.spells.includes(c.spell)) {emit(h.name+' cannot cast that spell.',{kind:'miss',...actor});continue;}
+          const spellId=this._canonicalSpell(c.spell),s=this.spellFor(h,spellId);
+          if(!s||!h.spells.includes(spellId)) {emit(h.name+' cannot cast that spell.',{kind:'miss',...actor});continue;}
           if(h.mp<s.mpCost) {emit(h.name+' needs '+s.mpCost+' MP for '+s.name+'.',{kind:'miss',...actor});continue;}
           let targets=[];
           if(s.target==='enemy') targets=[aliveEnemy(c.target)];
@@ -495,9 +547,9 @@ class AveluneRPG {
         const ti=aliveEnemy(c.target);
         if(ti<0) continue;
         const e=b.enemies[ti],critical=this._random()<(h.job==='ranger'?.18:.08);
-        const damage=Math.max(1,Math.round((h.attack*(.85+this._random()*.3)-e.defense*.55)*(critical?(h.job==='monk'?2:1.6):1)));
+        const hits=h.attackHits,damage=Math.max(1,Math.round((h.attack*(.85+this._random()*.3)-e.defense*.55)*(1+(hits-1)*.3)*(critical?(h.job==='monk'?2:1.6):1)));
         e.hp=Math.max(0,e.hp-damage);
-        emit(h.name+' strikes '+e.name+' for '+damage+(critical?' — critical!':'.'),{kind:'attack',...actor,target:e.id,targetSide:'enemy',targetIndex:ti,amount:damage,critical});
+        emit(h.name+' strikes '+e.name+(hits>1?' with '+hits+' hits':'')+' for '+damage+(critical?' — critical!':'.'),{kind:'attack',...actor,target:e.id,targetSide:'enemy',targetIndex:ti,amount:damage,critical,hits,attackRank:h.attackRank});
       } else {
         const e=b.enemies[action.index];
         if(e.hp===0) continue;
@@ -507,7 +559,7 @@ class AveluneRPG {
         for(const target of available){roll-=target.weight;if(roll<0){ti=target.index;break;}}
         const h=this.party[ti],heavy=round%3===0;
         const guardMultiplier=guards.has(ti)?(h.job==='vanguard'?.35:.45):1;
-        const damage=Math.max(1,Math.round((e.attack*(.85+this._random()*.3)*(heavy?1.7:1)-h.defense*.55)*guardMultiplier*(ward?.65:1)));
+        const damage=Math.max(1,Math.round((e.attack*(.85+this._random()*.3)*(heavy?1.7:1)-h.defense*.55)*guardMultiplier*(ward?.65:1)*((b.tonicUntil||0)>=round?.8:1)));
         h.hp=Math.max(0,h.hp-damage);
         emit(e.name+(heavy?' unleashes a heavy strike on ':' strikes ')+h.name+' for '+damage+(guards.has(ti)?' (guarded).':'.'),{kind:'attack',actor:e.id,actorSide:'enemy',actorIndex:action.index,target:h.id,targetSide:'party',targetIndex:ti,amount:damage,heavy});
         if(h.hp===0) emit(h.name+' falls. A Dawn feather can revive them.',{kind:'down',target:h.id,targetSide:'party',targetIndex:ti});

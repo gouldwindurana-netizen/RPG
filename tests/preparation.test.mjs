@@ -4,10 +4,10 @@ import vm from 'node:vm';
 import fs from 'node:fs';
 
 const context=vm.createContext({});
-vm.runInContext(fs.readFileSync(new URL('../src/combat.js',import.meta.url),'utf8')+'\nthis.API={AveluneRPG,AVELUNE_GEAR,AVELUNE_TOWN_SPELLS,AVELUNE_SPELLS,AVELUNE_ITEMS,AVELUNE_JOBS};',context);
+vm.runInContext(fs.readFileSync(new URL('../src/item-catalog.js',import.meta.url),'utf8')+'\n'+fs.readFileSync(new URL('../src/combat.js',import.meta.url),'utf8')+'\nthis.API={AveluneRPG,AVELUNE_GEAR,AVELUNE_TOWN_SPELLS,AVELUNE_SPELLS,AVELUNE_ITEMS,AVELUNE_JOBS};',context);
 const {AveluneRPG,AVELUNE_GEAR,AVELUNE_TOWN_SPELLS,AVELUNE_SPELLS,AVELUNE_ITEMS,AVELUNE_JOBS}=context.API;
 const plain=value=>JSON.parse(JSON.stringify(value));
-const rich=()=>{const r=new AveluneRPG(null,{seed:42});r.gold=50000;return r;};
+const rich=()=>{const r=new AveluneRPG(null,{fullParty:true,seed:42});r.gold=50000;return r;};
 const fight=r=>r.startBattle({enemies:[{id:'dummy',name:'Practice foe',hp:9999,attack:1,speed:1}]});
 const unchanged=(r,action)=>{const before=JSON.stringify(r.snapshot());assert.equal(action().ok,false);assert.equal(JSON.stringify(r.snapshot()),before);};
 
@@ -22,7 +22,7 @@ test('outfitters offer complete weapon and armor tiers with usable, priced stock
       assert.ok(gear.slot==='weapon'?gear.attack>0&&gear.defense===0:gear.defense>0&&gear.attack===0);
     }
   }
-  assert.equal(Object.keys(AVELUNE_TOWN_SPELLS).length,8);
+  assert.equal(Object.keys(AVELUNE_TOWN_SPELLS).length,12);
   for(const spell of Object.values(AVELUNE_TOWN_SPELLS)) {
     assert.ok(spell.price>0&&spell.jobs.length);assert.equal(spell.name,AVELUNE_SPELLS[spell.id].name);
   }
@@ -153,7 +153,7 @@ test('magic purchases enforce job, tier and payment while preparation has three 
   for(const ids of [['mend','mend'],['mend','gale','ward','spark'],['comet'],['raise']]) unchanged(r,()=>r.prepareSpells(0,1,ids));
   r.gainXP(r.xpForLevel(5));assert.equal(r.learnSpell(3,'comet').ok,true);
   assert.equal(r.prepareSpells(3,2,['comet']).ok,true);
-  r.gold=0;unchanged(r,()=>r.learnSpell(2,'greatermend'));
+  r.gold=0;unchanged(r,()=>r.upgradeSpell(2,'mend'));
 });
 
 test('fixed jobs, mana, learned spells, equipment, promotion and formation survive save round trips',()=>{
@@ -187,10 +187,10 @@ test('legacy and malformed saves cannot mint gear, spell licenses, duplicate cop
   const old=new AveluneRPG({version:1,gold:80,inventory:{potion:2,ether:1,revive:0},party:[{id:'roadkeeper',job:'redmage',equipment:{weapon:2,armor:1},hp:9,charges:[1,0]}]});
   assert.equal(old.inventory.hipotion,0);assert.equal(old.inventory.tent,0);assert.equal(old.inventory.cottage,0);
   assert.equal(old.party[0].equipment.weapon,2);assert.ok(old.party[0].spells.includes('mend'));
-  const save=plain(old.snapshot());save.gearOwned.sword_1=1;
-  save.party[0].equippedGear.weapon='sword_1';save.party[1].equippedGear.weapon='sword_1';
-  save.party[0].learnedSpells=['gale','gale','missing','__proto__'];
-  save.party[0].spellLoadouts={redmage:{1:['gale','gale','mend','ward','spark','__proto__'],2:['comet']}};
+  old.recruit('mara');const save=plain(old.snapshot());save.gearOwned.sword_1=1;
+  save.roster.find(h=>h.id==='roadkeeper').equippedGear.weapon='sword_1';save.roster.find(h=>h.id==='mara').equippedGear.weapon='sword_1';
+  save.roster[0].learnedSpells=['gale','gale','missing','__proto__'];
+  save.roster[0].spellLoadouts={redmage:{1:['gale','gale','mend','ward','spark','__proto__'],2:['comet']}};
   const restored=new AveluneRPG(save);
   assert.equal(restored.party.filter(h=>h.equippedGear.weapon==='sword_1').length,1);
   assert.deepEqual(plain(restored.party[0].learnedSpells),['gale']);
@@ -218,4 +218,21 @@ test('level growth expands mana without refilling spent reserves or reviving fal
   const before=caster.maxMp;r.gainXP(r.xpForLevel(2));
   assert.equal(caster.mp,caster.maxMp-before);assert.ok(caster.mp<caster.maxMp);
   assert.equal(fallen.hp,0);assert.equal(fallen.mp,0);assert.equal(r.party[1].maxMp,0);
+});
+
+test('spell family ranks have level and payment gates, replace one family entry and cap at III',()=>{
+  const r=rich(),h=r.party[3];const start=r.spellFor(h,'bolt');assert.equal(start.name,'Bolt I');
+  unchanged(r,()=>r.upgradeSpell(3,'bolt'));
+  r.gainXP(r.xpForLevel(5));h.mp=3;const gold=r.gold,q=r.quoteSpellUpgrade(3,'bolt');
+  assert.equal(q.nextRank,2);assert.equal(q.levelRequired,5);assert.equal(q.nextSpell.name,'Bolt II');assert.equal(r.upgradeSpell(3,'bolt').ok,true);assert.equal(r.gold,gold-q.cost);assert.equal(h.mp,3);
+  assert.equal(r.spellFor(h,'bolt').target,'allEnemies');assert.equal(h.spells.filter(id=>id==='bolt').length,1);unchanged(r,()=>r.upgradeSpell(3,'bolt'));
+  r.gainXP(r.xpForLevel(12));r.gold=0;unchanged(r,()=>r.upgradeSpell(3,'bolt'));r.gold=5000;assert.equal(r.upgradeSpell(3,'bolt').ok,true);assert.equal(r.spellFor(h,'bolt').name,'Bolt III');unchanged(r,()=>r.upgradeSpell(3,'bolt'));
+  unchanged(r,()=>r.upgradeSpell(2,'ward'));assert.equal(r.spellFor(2,'ward').rankMax,1);
+});
+
+test('old overlapping spells migrate into one upgraded family while unique utilities stay separate',()=>{
+  const r=new AveluneRPG({version:2,xp:18*11*12,party:[{id:'roadkeeper',job:'redmage',learnedSpells:['salve','greatermend','gale','tempest'],spellLoadouts:{redmage:{1:['mend','salve','greatermend'],2:['tempest']}}}]});
+  const h=r.party[0];assert.equal(r.spellFor(h,'mend').name,'Mend III');assert.equal(r.spellFor(h,'gale').name,'Gale II');
+  assert.equal(h.learnedSpells.filter(id=>id==='mend').length,1);assert.equal(h.spells.filter(id=>id==='mend').length,1);assert.ok(h.spells.every(id=>!AVELUNE_SPELLS[id].legacy));
+  const full=rich();full.gainXP(full.xpForLevel(5));assert.ok(full.party[2].spells.includes('renewal'));assert.ok(full.party[2].spells.includes('raise'));
 });

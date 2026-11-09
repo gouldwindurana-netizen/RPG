@@ -45,7 +45,7 @@ const AveluneOverworldArt = (() => {
         else if(area.collision[y]?.[x]==='.')hills(c,u,v,p,area.theme==='snow');
         else mountain(c,u,v,p,area.theme==='snow');
       } else if(type==='b') {
-        c.fillStyle=p.water;c.fillRect(u,v,16,16);c.fillStyle=p.wood;c.fillRect(u,v+5,16,7);c.fillStyle=p.woodBright;c.fillRect(u,v+5,16,1);c.fillRect(u,v+10,16,1);c.fillStyle=p.ink;c.fillRect(u,v+12,16,1);
+        c.fillStyle=p.water;c.fillRect(u,v,16,16);const bu=read(x,y-1)==='b',bd=read(x,y+1)==='b',t0=bu?0:3,t1=bd?16:13;c.fillStyle=p.wood;c.fillRect(u,v+t0,16,t1-t0);c.fillStyle=p.woodBright;for(let q=t0+1;q<t1;q+=4)c.fillRect(u,v+q,16,1);c.fillStyle=p.ink;c.fillRect(u,v+t0,1,t1-t0);c.fillRect(u+15,v+t0,1,t1-t0);
       } else if(type==='d'||type==='p'||type==='r') {
         // A world road is a narrow trail between miniature landmarks.
         c.fillStyle=p.path;c.fillRect(u+5,v+5,6,6);
