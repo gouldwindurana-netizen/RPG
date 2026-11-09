@@ -1,8 +1,8 @@
 # Town services
 
-All 18 villages, towns, ports and markets use compact 36×34 town maps with orthogonal streets, a central square, seven signed services and a southern overworld exit. Original story doors, named buildings and events remain available at their new town positions. `serviceSpots` anchors merchants at storefronts; services are non-solid and yield interaction priority to unfinished story events.
+All 18 villages, towns, ports and markets use compact 36×34 town maps with orthogonal streets, a central square, seven signed services and an overworld gate aligned with the mapped approach. Original story doors, named buildings and events remain available at their new town positions. `serviceSpots` anchors merchants at storefronts; services are non-solid and yield interaction priority to unfinished story events.
 
-Brackenwell retains Wyla’s cottage, Tilda’s Smithy-Inn, Festival Barn, orchard press and communal bakehouse. All healing beds are paid inns. Clinics charge 30 G to revive one fallen ally at 1 HP, without restoring spell charges; follow with an inn stay. The clinic has no free full-party care. Camps and refuges consume an owned Tent or Cottage and preserve fallen companions. Jobs can still be changed freely at safe havens.
+Brackenwell retains Wyla’s cottage, Tilda’s Smithy-Inn, Festival Barn, orchard press and communal bakehouse. All healing beds are paid inns. Clinics charge 30 G to revive one fallen ally at 1 HP, without restoring mana; follow with an inn stay. The clinic has no free full-party care. Camps and refuges consume an owned Tent or Cottage and preserve fallen companions. Jobs are selected only before a new journey. Guilds provide formation and promotion within the selected job.
 
 Town exits lead to traversable overworld maps with miniature destinations. Regional gateways, boats and the Skiff connect shores. `world-travel.js` preserves the original route graph for progression checks; `model.js` rejects locked entrances and guides around unintended automatic entrances.
 

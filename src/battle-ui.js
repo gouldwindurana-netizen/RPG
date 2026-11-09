@@ -216,7 +216,7 @@ class AveluneBattleUI {
       const card = this.node('button', null, 'battle-hero' + (current ? ' current' : '') + (hero.hp <= 0 ? ' fallen' : '') + (this.commands[index] ? ' ordered' : ''));
       card.type = 'button';
       card.disabled = !['command','ready'].includes(this.phase);
-      card.setAttribute('aria-label', hero.name + ', ' + hero.hp + ' of ' + hero.maxHp + ' health. ' + this.commandName(this.commands[index]));
+      card.setAttribute('aria-label', hero.name + ', ' + hero.hp + ' of ' + hero.maxHp + ' health, ' + hero.mp + ' of ' + hero.maxMp + ' MP. ' + this.commandName(this.commands[index]));
       const head = this.node('span', null, 'battle-hero-head');
       head.append(this.node('strong',hero.name), this.node('small','Lv. ' + hero.level));
       card.append(head, this.node('span', hero.role ?? hero.job ?? '', 'battle-hero-job'));
@@ -226,8 +226,8 @@ class AveluneBattleUI {
       const fill = this.node('span');
       fill.style.width = Math.max(0,Math.min(100,hero.hp/hero.maxHp*100)) + '%';
       track.append(fill);
-      const charges = hero.charges ?? [0,0];
-      card.append(hp,track,this.node('span','MP  I ' + charges[0] + '  II ' + charges[1], 'battle-charges'),this.node('span',hero.hp <= 0 ? 'Fallen' : this.commandName(this.commands[index]),'battle-order'));
+      const mana=this.node('span',null,'battle-charges battle-mana');mana.append(this.node('span','MP '+hero.mp+' / '+hero.maxMp));const manaBar=this.node('span',null,'battle-mana-bar'),manaFill=this.node('i');manaFill.style.width=(hero.maxMp?Math.max(0,Math.min(100,100*hero.mp/hero.maxMp)):0)+'%';manaBar.setAttribute('aria-hidden','true');manaBar.append(manaFill);mana.append(manaBar);
+      card.append(hp,track,mana,this.node('span',hero.hp <= 0 ? 'Fallen' : this.commandName(this.commands[index]),'battle-order'));
       card.addEventListener('click', () => {
         if (this.menu === 'target' && this.targetSide === 'party') {
           if (this.validAllyTarget(hero)) this.chooseTarget(index);
@@ -277,7 +277,7 @@ class AveluneBattleUI {
       list.classList.add('battle-main-commands');
       list.append(
         this.button('Attack', () => this.target({type:'attack'}), 'Strike one enemy'),
-        this.button('Magic', () => { this.menu = 'magic'; this.render(); }, 'Use a spell charge', !hero?.spells?.length),
+        this.button('Magic', () => { this.menu = 'magic'; this.render(); }, 'Cast a spell with MP', !hero?.spells?.length),
         this.button('Guard', () => this.queue({type:'guard'}), 'Reduce incoming damage'),
         this.button('Item', () => { this.menu = 'items'; this.render(); }, 'Aid an ally'),
       );
@@ -285,12 +285,12 @@ class AveluneBattleUI {
       retreat.classList.add('battle-retreat');
       list.append(retreat);
     } else if (this.menu === 'magic') {
-      eyebrow.textContent = 'MAGIC · CHARGES I ' + (hero.charges?.[0] ?? 0) + ' / II ' + (hero.charges?.[1] ?? 0);
+      eyebrow.textContent = 'MAGIC · MP ' + hero.mp + ' / ' + hero.maxMp;
       for (const id of hero.spells ?? []) {
         const spell = this.spell(id);
         if (!spell) continue;
         const unlocked = !spell.level || hero.level >= spell.level;
-        list.append(this.button(spell.name + ' · ' + (spell.tier === 2 ? 'II' : 'I'), () => this.target({type:'spell',spell:id}), spell.description || spell.element || spell.kind, !unlocked || (hero.charges?.[spell.tier - 1] ?? 0) <= 0));
+        list.append(this.button(spell.name + ' · ' + spell.mpCost + ' MP', () => this.target({type:'spell',spell:id}), (hero.mp<spell.mpCost?'Not enough MP. ':'')+(spell.description || spell.element || spell.kind), !unlocked || hero.mp < spell.mpCost));
       }
     } else if (this.menu === 'items') {
       eyebrow.textContent = 'SATCHEL · SHARED BY THE PARTY';
@@ -298,7 +298,7 @@ class AveluneBattleUI {
         const item = this.item(id);
         const reserved = this.commands.filter(command => command?.type === 'item' && command.item === id).length;
         const available = Math.max(0,(this.rpg.inventory[id] ?? 0) - reserved);
-        list.append(this.button((item?.name ?? {potion:'Potion',ether:'Ether',revive:'Phoenix salve'}[id]) + ' ×' + available, () => this.target({type:'item',item:id}), item?.description ?? {potion:'Restore an ally’s health.',ether:'Restore an ally’s spell charges.',revive:'Return a fallen ally to battle.'}[id], available <= 0));
+        list.append(this.button((item?.name ?? {potion:'Potion',ether:'Ether',revive:'Phoenix salve'}[id]) + ' ×' + available, () => this.target({type:'item',item:id}), item?.description ?? {potion:'Restore an ally’s health.',ether:'Restore an ally’s MP.',revive:'Return a fallen ally to battle.'}[id], available <= 0));
       }
     } else if (this.menu === 'target') {
       const label = this.commandName(this.pending);
@@ -353,34 +353,22 @@ class AveluneBattleUI {
     this.selectedEnemy = -1;
     const run = this.token;
     this.displayRound = this.encounter.round;
-    this.displayParty = this.rpg.party.map(hero => ({...hero, charges:[...hero.charges]}));
+    this.displayParty = this.rpg.party.map(hero => ({...hero}));
     this.displayEnemies = this.encounter.enemies.map(enemy => ({...enemy}));
     const round = this.rpg.resolveRound(this.commands.map(command => command ?? {type:'guard'}));
     this.encounter = this.rpg.battle ?? this.encounter;
     this.render();
-    const presentedOrders = new Set();
     for (const event of round.events ?? []) {
       if (!this.active || run !== this.token) return;
       const duration = this.reduce ? 60 : this.fast ? 190 : 390;
       const started = performance.now();
       this.logs.push(event);
       this.highlight = {...event, started, duration, until:started + duration};
-      if (event.actorSide === 'party' && !presentedOrders.has(event.actorIndex)) {
-        presentedOrders.add(event.actorIndex);
-        const command = this.commands[event.actorIndex];
-        const hero = this.displayParty[event.actorIndex];
-        if (command?.type === 'spell' && event.kind !== 'miss') {
-          const tier = (this.spell(command.spell)?.tier ?? 1) - 1;
-          hero.charges[tier] = Math.max(0, hero.charges[tier] - 1);
-        }
-        if (command?.item === 'ether' && event.kind === 'heal') {
-          const target = this.displayParty[event.targetIndex];
-          if (target) target.charges = target.charges.map((value,tier) => Math.min(target.maxCharges[tier],value + 2));
-        }
-      }
-      // Show the hit and its health change together; do not show the round's final
-      // health before its actions have played. Ether restores charges, not HP.
-      if (event.targetSide && event.amount && !/spell charges/i.test(event.text || '')) {
+      // Resource payloads are emitted once per cast, even for party-wide spells.
+      if(event.actorSide==='party'&&event.mpCost>0){const hero=this.displayParty[event.actorIndex];if(hero)hero.mp=Math.max(0,hero.mp-event.mpCost);}
+      if(event.resource==='mp'&&event.targetSide==='party'){const hero=this.displayParty[event.targetIndex];if(hero)hero.mp=Math.min(hero.maxMp,Math.max(0,hero.mp+event.amount));}
+      // Resource recovery never changes HP in the replay.
+      if (event.targetSide && event.amount && event.resource!=='mp') {
         const target = (event.targetSide === 'party' ? this.displayParty : this.displayEnemies)?.[event.targetIndex];
         if (target) target.hp = Math.min(target.maxHp, Math.max(0, target.hp + (event.kind === 'heal' ? event.amount : -event.amount)));
       }
@@ -420,7 +408,7 @@ class AveluneBattleUI {
     } else if (summary.outcome === 'defeat') {
       list.append(this.node('p','The party will recover at a safe haven. Your completed story milestones remain intact.','battle-hint'));
     } else {
-      list.append(this.node('p','No spoils today. Your party’s health and spell charges carry into the next encounter.','battle-hint'));
+      list.append(this.node('p','No spoils today. Your party’s health and MP carry into the next encounter.','battle-hint'));
     }
     const go = this.button(summary.outcome === 'defeat' ? 'Return to haven  →' : 'Return to the road  →', () => this.finish());
     go.classList.add('battle-primary');

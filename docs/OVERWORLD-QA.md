@@ -1,6 +1,6 @@
 # Towns, recovery and overworld travel
 
-The requested FF1-inspired structure now has two actual exploration scales. All 18 settlements use compact 36×34 maps with streets, a central square, signed storefronts and a southern exit. Leaving town loads a traversable overworld; walking onto a miniature enters its local scene. The broader map uses smaller scenery and a consistent miniature version of the same party leader. Desktop verification measured a 960×480 world viewport versus a 544×224 local viewport, with square integer pixels in both.
+The requested FF1-inspired structure now has two actual exploration scales. All 18 settlements use compact 36×34 maps with streets, a central square, signed storefronts and an approach gate (subsequently aligned with world geography). Leaving town loads a traversable overworld; walking onto a miniature enters its local scene. The broader map uses smaller scenery and a consistent miniature version of the same party leader. Desktop verification measured a 960×480 world viewport versus a 544×224 local viewport, with square integer pixels in both.
 
 The build adds 32 overworld shores across seven regions to the 108 authored scenes. Separate shores keep boats and Skiff journeys meaningful. Cross-region walking routes now join labeled gateways on the overworld. The original route graph still determines story access, so wandering past a repaired bridge's geography cannot unlock its destination early. Towns retain story buildings, doors, transport counters and all 91 events. Automated collision traversal reaches every event, the ending and postgame through the new routes.
 
@@ -19,7 +19,7 @@ npm run test:visual
 node tests/overworld-render.mjs
 ```
 
-The browser checks cover actual southern-exit movement, miniature entry, paid revival and insufficient gold, supply-based camps, wider camera, overworld saves, desktop/mobile bounds and missing assets. Visual checks render all 108 authored scenes and all 32 overworld shores, preserving local animation anchors and checking 64 miniature poses. Regression checks cover regional gates, visible water boundaries, every route arrival, and guided paths past other entrances.
+The browser checks cover actual town-exit movement, miniature entry, paid revival and insufficient gold, supply-based camps, wider camera, overworld saves, desktop/mobile bounds and missing assets. Visual checks render all 108 authored scenes and all 32 overworld shores, preserving local animation anchors and checking 64 miniature poses. Regression checks cover regional gates, visible water boundaries, every route arrival, and guided paths past other entrances.
 
 Final results on 8 November 2026: 71 Node tests passed; browser gameplay 17 groups, services 13 groups, town/overworld travel eight groups, local visuals six groups, and overworld visuals four groups passed. Chromium reported no JavaScript errors or missing assets. The standalone HTML is 4.80 MiB; the game/source ZIP passed its CRC integrity check.
 

@@ -160,8 +160,10 @@ test('stock grows by region and the restored trade network without moving mercha
 
 test('placement respects an unopened barrier rather than putting a shop beyond it', () => {
   const original = layout.areas.alderreach_09;
-  // Both boundary columns are passable in this authored map, so seal the full row.
-  const area = {...original,barriers:[{rect:[0,20,original.width-1,20],gate:'test-gate'}]};
+  // A controlled split keeps this barrier check independent of mapped gate/spawn changes.
+  const area = {...original,spawn:[18,29],collision:Array.from({length:original.height},()=>'.'.repeat(original.width)),
+    objects:[],events:[],stops:[],serviceSpots:{inn:[4,6],item:[10,6],weapon:[16,6],magic:[22,6],chapel:[28,6],guild:[10,12],rumor:[22,12]},
+    barriers:[{rect:[0,20,original.width-1,20],gate:'test-gate'}]};
   const closed = Town.forArea(area,{has:()=>false});
   assert.equal(closed.length,7);
   assert.ok(closed.every(service=>service.at[1]>20));

@@ -4,9 +4,9 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 
 const ctx=vm.createContext({Set,Map});
-for(const name of ['model','combat','campaign'])vm.runInContext(fs.readFileSync(new URL('../src/'+name+'.js',import.meta.url),'utf8'),ctx);
-vm.runInContext('this.API={AveluneWorld,AveluneRPG,AveluneCampaign,AVELUNE_SPELLS,avelunePath,AveluneDanger}',ctx);
-const {AveluneWorld,AveluneRPG,AveluneCampaign:C,AVELUNE_SPELLS:spells,avelunePath,AveluneDanger}=ctx.API;
+for(const name of ['model','combat','campaign','town-services'])vm.runInContext(fs.readFileSync(new URL('../src/'+name+'.js',import.meta.url),'utf8'),ctx);
+vm.runInContext('this.API={AveluneWorld,AveluneRPG,AveluneCampaign,AVELUNE_SPELLS,avelunePath,AveluneDanger,AveluneTownServices}',ctx);
+const {AveluneWorld,AveluneRPG,AveluneCampaign:C,AVELUNE_SPELLS:spells,avelunePath,AveluneDanger,AveluneTownServices:T}=ctx.API;
 const layout=JSON.parse(fs.readFileSync(new URL('../src/world.json',import.meta.url),'utf8'));
 
 function walkTo(world,to){
@@ -24,14 +24,14 @@ function commandsFor(rpg){
  const plannedHp=rpg.party.map(h=>h.hp),stock={...rpg.inventory},commands=[];
  for(const [i,h]of rpg.party.entries()){
   if(h.hp<=0){commands.push({type:'guard'});continue;}
-  const castable=h.spells.filter(id=>h.charges[spells[id].tier-1]>0);
+  const castable=h.spells.filter(id=>h.mp>=spells[id].mpCost);
   const fallen=plannedHp.findIndex(hp=>hp<=0);
   if(fallen>=0&&castable.includes('raise')){commands.push({type:'spell',spell:'raise',target:fallen});plannedHp[fallen]=rpg.party[fallen].maxHp/2;continue;}
   if(fallen>=0&&stock.revive){commands.push({type:'item',item:'revive',target:fallen});stock.revive--;plannedHp[fallen]=rpg.party[fallen].maxHp/2;continue;}
   const hurt=rpg.party.map((p,index)=>({index,ratio:plannedHp[index]/p.maxHp,missing:p.maxHp-plannedHp[index]})).filter(p=>plannedHp[p.index]>0).sort((a,c)=>a.ratio-c.ratio)[0];
   if(hurt?.ratio<.6&&castable.includes('mend')){commands.push({type:'spell',spell:'mend',target:hurt.index});plannedHp[hurt.index]+=Math.round((32+rpg.level*4)*(h.job==='whitemage'?1.2:1));continue;}
   if(hurt?.ratio<.35&&stock.potion){commands.push({type:'item',item:'potion',target:hurt.index});stock.potion--;plannedHp[hurt.index]+=70;continue;}
-  if(h.spells.length&&h.charges[0]===0&&stock.ether){commands.push({type:'item',item:'ether',target:i});stock.ether--;continue;}
+  if(h.spells.length&&h.mp<4&&stock.ether){commands.push({type:'item',item:'ether',target:i});stock.ether--;continue;}
   const damage=castable.filter(id=>spells[id].kind==='damage').sort((a,c)=>((spells[c].power+rpg.level*4)*(spells[c].element===enemy.e.weakness?1.6:1))-((spells[a].power+rpg.level*4)*(spells[a].element===enemy.e.weakness?1.6:1)))[0];
   if(b.round%3===0&&h.hp<enemy.e.attack*1.7-h.defense*.55){commands.push({type:'guard'});continue;}
   if(damage){commands.push({type:'spell',spell:damage,target:enemy.i});continue;}
@@ -40,26 +40,39 @@ function commandsFor(rpg){
  return commands;
 }
 function provision(rpg){
- // Savings are spent on supplies, then the first two characters' protection/weapon.
- for(const [item,minimum]of [['ether',5],['potion',5],['revive',2]])while(rpg.inventory[item]<minimum&&rpg.buy(item).ok){}
+ // Buy only earned supplies, retaining a small inn/clinic reserve.
+ for(const [item,minimum]of [['potion',5],['ether',2],['revive',1],['tent',2]])while(rpg.inventory[item]<minimum&&rpg.gold>=({potion:25,ether:65,revive:90,tent:60}[item])+30&&rpg.buy(item).ok){}
+ if(rpg.level>=5&&rpg.inventory.cottage<1&&rpg.gold>=280)rpg.buy('cottage');
  for(const [hero,slot]of [[0,'armor'],[1,'weapon'],[1,'armor'],[0,'weapon']]){const q=rpg.quoteUpgrade(hero,slot);if(q.ok&&rpg.gold>=q.cost+150)rpg.upgrade(hero,slot);}
 }
+function recover(rpg,services){
+ for(const [i,h]of rpg.party.entries())if(h.hp===0){
+  if(services.inn&&rpg.gold>=30)rpg.reviveAtClinic(i,30);
+  else if(rpg.inventory.revive)rpg.useItem(i,'revive');
+  else {const caster=rpg.party.findIndex(p=>p.hp>0&&p.spells.includes('raise')&&p.mp>=spells.raise.mpCost);if(caster>=0)rpg.castField(caster,'raise',i)}
+ }
+ if(services.inn)rpg.restAtInn(services.innCost);
+ if(services.camp){
+  if(rpg.inventory.cottage)rpg.useFieldSupply('cottage',{camp:true});
+  else for(let i=0;i<2&&rpg.inventory.tent;i++)if(rpg.party.some(h=>h.hp>0&&(h.hp<h.maxHp*.8||h.mp<h.maxMp*.5)))rpg.useFieldSupply('tent',{camp:true});
+ }
+}
+
 function fight(rpg,spec){assert.equal(rpg.startBattle(spec).ok,true);let rounds=0;while(!rpg.battle.outcome&&rounds++<90)rpg.resolveRound(commandsFor(rpg));const result=rpg.finishBattle();return {event:spec.eventId,partyLevel:rpg.level,foeLevel:spec.level,rounds,outcome:result.outcome,gold:rpg.gold,xp:rpg.xp};}
 
 export function simulateCriticalPath(seed=2026,includePostgame=false,options={}){
- const world=new AveluneWorld(layout),rpg=new AveluneRPG(null,{seed}),battles=[];
- if(options.jobs){options.jobs.forEach((job,i)=>assert.equal(rpg.assignJob(i,job).ok||rpg.party[i].job===job,true));rpg.rest();}
+ const world=new AveluneWorld(layout),rpg=new AveluneRPG(null,{seed,jobs:options.jobs}),battles=[];
  let events=0,trips=0;
  while(!world.has(includePostgame?'seventh_star':'ending')){
   const event=world.objectives()[0]?.event||nextAvailable(world);assert.ok(event,'Available objective before finale');
   trips+=travelTo(world,event.scene);walkTo(world,event.at);
-  const services=C.services(world.area,world);if(services.shop)provision(rpg);
+  const listed=T.forArea(world.area,world),services={...C.services(world.area,world),inn:listed.some(s=>s.type==='inn')};if(services.inn)recover(rpg,{inn:true,innCost:services.innCost});if(listed.some(s=>s.type==='item'))provision(rpg);
   const spec=C.bossFor(event.id,rpg,world);
   if(spec){
    const multiplier=typeof options.bossMultiplier==='function'?options.bossMultiplier(spec):options.bossMultiplier||1;
    spec.enemies.forEach(enemy=>enemy.hp=Math.round(enemy.hp*multiplier));
-   // Rest only where the real service API advertises a permitted free camp.
-   if(services.camp)assert.equal(rpg.rest().ok,true);
+   // Camp recovery consumes purchased stock; there is no free-refill fixture.
+   if(services.camp)recover(rpg,services);
    const result=fight(rpg,spec);battles.push(result);if(result.outcome!=='victory')return {world,rpg,battles,events,trips,failed:event.id};
   }
   const applied=world.applyEvent(event.id);assert.ok(applied&&!applied.missing&&!applied.already,event.id);C.rewardForEvent(event,rpg,world);events++;

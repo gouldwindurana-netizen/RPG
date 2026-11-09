@@ -9,7 +9,7 @@ vm.runInContext('this.API={AveluneOverworld,AveluneWorld,avelunePath}',ctx);
 const {AveluneOverworld:Overworld,AveluneWorld:World,avelunePath}=ctx.API;
 const build=()=>Overworld.apply(JSON.parse(fs.readFileSync(new URL('../src/world.json',import.meta.url),'utf8')));
 
-test('every town southern departure leads to its overworld rather than a regional shortcut',()=>{
+test('every town mapped departure leads to its overworld rather than a regional shortcut',()=>{
   const layout=build();
   for(const town of Object.values(layout.areas).filter(a=>a.classicTown)){
     const departures=town.stops.filter(s=>['foot','pale_path','restored_road'].includes(s.mode));

@@ -7,11 +7,11 @@ const c=vm.createContext({Set,Map});vm.runInContext(fs.readFileSync(new URL('../
 const towns=Object.values(layout.areas).filter(a=>['village','town','port','market'].includes(a.kind));
 const worldFor=a=>new c.api.AveluneWorld(layout,{scene:a.id});
 
-test('every settlement is a compact town with a plaza, commercial streets and a southern overworld exit',()=>{
+test('every settlement is a compact town with a plaza, commercial streets and a mapped cardinal overworld exit',()=>{
  assert.equal(towns.length,18);
  for(const a of towns){
   assert.equal(a.classicTown,true,a.id);assert.ok(a.width<=36&&a.height<=34,a.id);
-  assert.deepEqual(a.worldExit,[Math.floor(a.width/2),a.height-2],a.id);
+  assert.ok(['north','south','east','west'].includes(a.worldEntranceSide),a.id);const expected={north:[18,1],south:[18,32],east:[34,20],west:[1,20]}[a.worldEntranceSide];assert.deepEqual(a.worldExit,expected,a.id);
   assert.ok(a.terrain.some(row=>row.includes('ppppp')),a.id+' has a central paved square');
   assert.ok(a.terrain.every(row=>row.length===a.width)&&a.collision.every(row=>row.length===a.width),a.id);
   const world=worldFor(a);

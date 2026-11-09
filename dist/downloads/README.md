@@ -8,32 +8,33 @@ Open **Avelune.html** in a modern browser for the self-contained offline edition
 
 - WASD or arrow keys: walk. Shift: run. Click the ground to walk there.
 - E or Space: interact. **Follow marker** walks toward the tracked objective.
+- New game: choose a job for each companion, then select Begin adventure. Jobs stay fixed for that journey.
 - P: Status (party and jobs). I: Items. M: Atlas. J: Journal. H: Town services. F: Magic. Esc: menu/back.
 - Touch: directional pad, Interact, and the same menus.
 - In battle, choose one order for each living hero and **Resolve round**. Select a hero card to revise an order before committing it. Magic and items have explicit targets. The enemy’s third-round heavy strike is telegraphed; Guard reduces it.
 - **Town** lists the signed INN, ITEMS, ARMS, MAGIC, CLINIC, GUILD and INFO counters. The town strip’s buttons walk to the corresponding merchant and open their service. You can also walk there and press E. Paid inns restore standing allies; clinics revive at 1 HP, followed by inn recovery. Clinics charge 30 G per fallen ally; Wyla’s guest room is a paid inn. Camps consume a Tent or Cottage.
 - Buy and sell supplies in quantities of 1/5/10. At the armory, buy named gear, compare stats for each hero, then select **Equip**. Worn copies cannot be sold. Party → Equip weapons and armor lets you change owned gear on the road.
-- Magic shops sell permanent spells for eligible characters. Prepare custom loadouts of up to three spells per tier. **Magic** casts healing and revival from the same charge pool used in battle. The original starter spellbooks remain available for compatibility.
+- Magic shops sell permanent spells for eligible characters. Prepare custom loadouts of up to three spells per tier. **Magic** casts healing and revival from the same mana pool used in battle. The original starter spellbooks remain available for compatibility.
 - Use tents and cottage kits from Items while outdoors to recover standing allies. The guild changes jobs, reorders the party, and offers promotion after the Alderreach Hearth at level 5 for 120 G per traveler. Front slots attract more attacks; the leader appears in the field.
 - Use **Menu → Save journal** to save immediately; inns, camps and normal autosave also preserve your progress.
 
 ## Implemented scope
 
-- The **108 authored areas** and **70 named locations**, plus **32 traversable overworld shores** across seven regions. All 18 settlements have compact streets, shop frontages, a central square and a southern exit onto the wider map.
+- The **108 authored areas** and **70 named locations**, plus **32 traversable overworld shores** across seven regions. All 18 settlements have compact streets, shop frontages, a central square and a gate aligned with its mapped approach onto the wider map.
 - **91 field events**, including the **65-event main story**, an explicit ending, and optional postgame routes.
 - **29 scripted encounters** and **35 regional enemy archetypes**. Random encounters accumulate from distance actually traveled in hostile areas, with a visible warning meter and postbattle grace period.
 - Four named heroes available together from the beginning: Roadkeeper, Mara, Iven, and Sella.
-- Six interchangeable jobs: **Vanguard, Monk, Ranger, Red Mage, White Mage, Black Mage**. Each changes stats, equipment proficiency, spells, and a passive trait. All purchased equipment ranks remain owned across job changes; effective ranks obey the current job’s limits.
-- Turn-based party commands, speed-based initiative, elemental weaknesses, auto-retargeting, two tiers of limited spell charges, healing/revival, guarding, consumables, retreat, XP, level-ups, upgrades, and a level-30 cap.
+- Choose four permanent jobs before starting: **Vanguard, Monk, Ranger, Red Mage, White Mage, Black Mage**. Duplicate jobs are allowed. Jobs set stats, equipment proficiency, spells and passives. Status is read-only; guilds arrange formation and promote the existing job.
+- Turn-based party commands, speed-based initiative, elemental weaknesses, auto-retargeting, a shared mana pool with per-spell MP costs, healing/revival, guarding, consumables, retreat, XP, level-ups, upgrades, and a level-30 cap.
 - Signed physical services across all 18 main towns/villages/ports/markets; refuge and interior counters across 37 safe areas. Buy/sell shops carry 30 named gear pieces, six consumables and eight purchasable spells, with stock tiers tied to region/progress.
 - Paid inns, paid clinics, supply-based camps, field healing/revival, camping supplies, equipment comparisons, spell loadouts, formation, earned promotion, manual save, autosave and portable journal import/export.
 - One-time treasure/story rewards, desktop/touch controls, optional synthesized sound effects and reduced-motion support.
-- Classic cobalt command windows, ivory double borders, pixel typography and arrow cursors across exploration, shops, status, dialogue and battles. Desktop commands sit beside a party status table showing HP and both tiers of magic charges. Mobile menus adapt to 320px screens.
+- Classic cobalt command windows, ivory double borders, pixel typography and arrow cursors across exploration, shops, status, dialogue and battles. Desktop commands sit beside a party status table showing HP, current/max MP and visible mana bars. Mobile menus adapt to 320px screens.
 - A unified original 16px world-art vocabulary, fixed 16×24 character source shared by standing/walking/battles/portraits, thirteen enemy silhouettes, and classic blue/ivory command menus. Buildings, foliage, water, paths, furnishings and regional battlefields share material colors and pixel density.
 
 This is a streamlined complete adaptation of the supplied route, not the design bible’s proposed 35–45-hour commercial campaign. The full catalog of 332 items, 72 books, 48 native skills, 70 quests, crafting, summons, six-character roster/recruitment, bespoke multiphase boss mechanics, and unique art for every enemy are **not** all implemented. Bosses use tuned stats, weaknesses, and a shared heavy-strike cycle; multiple named enemies share silhouettes. Playtime has not been measured with human players.
 
-The user requested random-encounter and job customization changes. Attached documents were treated as source references rather than overriding instructions. The four-hero starting party, retrainable jobs, streamlined progression, and new encounter rules are deliberate adaptations. Final Fantasy I’s original classes were chosen at the start; free retraining here is an extension requested for Avelune. Speed initiative and Guard are modernizations, not claims about exact NES rules.
+The user requested random-encounter and job customization changes. Attached documents were treated as source references rather than overriding instructions. The four-hero starting party, starting-only job selection, shared mana, streamlined progression and encounter rules follow the user’s latest direction. Existing saves retain their chosen jobs and convert old spell charges proportionally to mana. Speed initiative and Guard are modernizations, not claims about exact NES rules.
 
 ## Build and test
 
@@ -60,6 +61,7 @@ npm run test:visual
 npm run test:services
 npm run test:travel
 npm run test:ui
+npm run test:party
 node tests/overworld-render.mjs
 ```
 
@@ -75,6 +77,7 @@ The native canvas renderer uses two exploration scales. Towns use compact local 
 - `docs/PLAYTEST.md`, `docs/balance-results.json`: deterministic full-route and party-composition verification.
 - `docs/BROWSER-QA.md`: actual desktop/mobile Chromium checks and limits.
 - `docs/VISUAL-QA.md` and `docs/VISUAL-POLISH.md`: full-map rendering, walking consistency, and visual integration evidence.
+- `docs/PARTY-MANA-GEOGRAPHY.md`: permanent starting jobs, mana costs/recovery, save migration and mapped town approaches.
 - `docs/CLASSIC-UI.md`: the shared classic RPG window design, keyboard controls and desktop/mobile interface checks.
 - `docs/OVERWORLD-QA.md`: town layouts, two-scale travel, recovery economy and current verification.
 - `docs/TOWN-SERVICES.md`, `docs/FF1-SERVICES-GAP.md` and `docs/SERVICES-QA.md`: preparation systems, historical reference differences, physical placements, and transaction/recovery verification.

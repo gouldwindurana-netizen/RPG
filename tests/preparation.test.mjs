@@ -47,17 +47,16 @@ test('equipment inventory accounts for each worn copy and cannot sell or equip i
   unchanged(r,()=>r.sellGear('sword_2'));
 });
 
-test('changing jobs safely returns incompatible gear without destroying owned ranks',()=>{
+test('fixed jobs retain their equipment and reject later retraining without altering resources',()=>{
   const r=rich();
   for(let n=0;n<5;n++)assert.equal(r.upgrade(1,'armor').ok,true);
-  r.buyGear('plate_3');r.equipGear(1,'armor','plate_3');
+  r.buyGear('plate_3');r.equipGear(1,'armor','plate_3');r.party[1].hp=1;
   const gearedDefense=r.party[1].defense;
-  r.party[1].hp=1;r.assignJob(1,'blackmage');
-  assert.equal(r.party[1].equippedGear.armor,null);assert.equal(r.gearOwned.plate_3,1);
-  assert.equal(r.party[1].equipment.armor,5);assert.equal(r.quoteUpgrade(1,'armor').rank,2);
-  assert.equal(r.quoteGear(1,'plate_3').ok,false);assert.equal(r.party[1].hp,1);
-  r.assignJob(1,'vanguard');r.equipGear(1,'armor','plate_3');
-  assert.equal(r.party[1].defense,gearedDefense);
+  unchanged(r,()=>r.assignJob(1,'blackmage'));
+  assert.equal(r.party[1].job,'vanguard');assert.equal(r.party[1].equippedGear.armor,'plate_3');
+  assert.equal(r.gearOwned.plate_3,1);assert.equal(r.party[1].equipment.armor,5);
+  assert.equal(r.party[1].defense,gearedDefense);assert.equal(r.party[1].hp,1);
+  unchanged(r,()=>r.equipGear(3,'armor','plate_3'));
 });
 
 test('bulk purchases and sales reject invalid, unaffordable and overflowing transactions atomically',()=>{
@@ -77,64 +76,61 @@ test('bulk purchases and sales reject invalid, unaffordable and overflowing tran
   r.gold=0;unchanged(r,()=>r.buy('ether'));unchanged(r,()=>r.buyGear('sword_3'));
 });
 
-test('field healing spends only the correct charge on a useful prepared spell',()=>{
+test('field healing spends its MP cost only on a useful prepared spell',()=>{
   const r=rich(),healer=r.party[2],target=r.party[1];
   target.hp-=30;
-  const charges=healer.charges[0];
+  const mp=healer.mp;
   assert.equal(r.castField(2,'mend',1).ok,true);assert.equal(target.hp,target.maxHp);
-  assert.equal(healer.charges[0],charges-1);
-  unchanged(r,()=>r.castField(2,'mend',1));
-  unchanged(r,()=>r.castField(2,'mend',99));
+  assert.equal(healer.mp,mp-AVELUNE_SPELLS.mend.mpCost);
+  unchanged(r,()=>r.castField(2,'mend',1));unchanged(r,()=>r.castField(2,'mend',99));
   unchanged(r,()=>r.castField(0,'spark',1));
   target.hp=0;unchanged(r,()=>r.castField(2,'mend',1));
   healer.hp=0;unchanged(r,()=>r.castField(2,'mend',0));
+  healer.hp=1;healer.mp=AVELUNE_SPELLS.mend.mpCost-1;target.hp=1;
+  unchanged(r,()=>r.castField(2,'mend',1));
 });
 
-test('field tier II magic revives fallen allies and restores all standing allies',()=>{
+test('field revival and party healing share one MP pool and reject insufficient mana',()=>{
   const r=rich();r.gainXP(r.xpForLevel(5));
-  const healer=r.party[2],tierOne=healer.charges[0],tierTwo=healer.charges[1];
-  r.party[1].hp=0;
+  const healer=r.party[2],mp=healer.mp;r.party[1].hp=0;
   assert.equal(r.castField(2,'raise',1).ok,true);
   assert.equal(r.party[1].hp,Math.floor(r.party[1].maxHp/2));
-  assert.equal(healer.charges[1],tierTwo-1);assert.equal(healer.charges[0],tierOne);
+  assert.equal(healer.mp,mp-AVELUNE_SPELLS.raise.mpCost);
   unchanged(r,()=>r.castField(2,'raise',1));
-  r.party[0].hp-=20;
+  r.party[0].hp-=20;r.party[3].hp-=10;
   assert.equal(r.castField(2,'renewal').ok,true);
-  assert.equal(r.party[0].hp,r.party[0].maxHp);
-  assert.equal(healer.charges[1],tierTwo-2);
-  r.party[0].hp-=1;unchanged(r,()=>r.castField(2,'renewal'));
+  assert.equal(r.party[0].hp,r.party[0].maxHp);assert.equal(r.party[3].hp,r.party[3].maxHp);
+  assert.equal(healer.mp,mp-AVELUNE_SPELLS.raise.mpCost-AVELUNE_SPELLS.renewal.mpCost);
+  healer.mp=AVELUNE_SPELLS.renewal.mpCost-1;r.party[0].hp-=1;
+  unchanged(r,()=>r.castField(2,'renewal'));
 });
 
-test('inns restore standing allies while chapel revival requires an offering and further healing',()=>{
+test('inns restore living allies MP while paid revival preserves depleted mana',()=>{
   const r=rich(),fallen=r.party[2];
-  fallen.hp=0;fallen.charges=[0,0];r.party[0].hp=10;r.party[0].charges=[0,0];
+  fallen.hp=0;fallen.mp=0;r.party[0].hp=10;r.party[0].mp=0;
   const gold=r.gold;assert.equal(r.restAtInn(12).ok,true);
   assert.equal(r.gold,gold-12);assert.equal(r.party[0].hp,r.party[0].maxHp);
-  assert.equal(fallen.hp,0);assert.deepEqual(plain(fallen.charges),[0,0]);
-  assert.equal(r.reviveAtClinic(2,30).ok,true);assert.equal(fallen.hp,1);
-  assert.deepEqual(plain(fallen.charges),[0,0]);assert.equal(r.gold,gold-42);
+  assert.equal(r.party[0].mp,r.party[0].maxMp);assert.equal(fallen.hp,0);assert.equal(fallen.mp,0);
+  assert.equal(r.reviveAtClinic(2,30).ok,true);assert.equal(fallen.hp,1);assert.equal(fallen.mp,0);assert.equal(r.gold,gold-42);
   unchanged(r,()=>r.reviveAtClinic(2,30));
-  assert.equal(r.restAtInn(12).ok,true);assert.equal(fallen.hp,fallen.maxHp);
-  assert.deepEqual(plain(fallen.charges),plain(fallen.maxCharges));
+  assert.equal(r.restAtInn(12).ok,true);assert.equal(fallen.hp,fallen.maxHp);assert.equal(fallen.mp,fallen.maxMp);
+  unchanged(r,()=>r.restAtInn(12));
   fallen.hp=0;r.gold=0;unchanged(r,()=>r.reviveAtClinic(2,30));
-  assert.equal(r.rest(0).ok,true);assert.equal(fallen.hp,fallen.maxHp);
 });
 
-test('camping supplies require outdoor use, preserve fallen allies, and never waste full stock',()=>{
+test('camping supplies restore bounded HP and MP, preserve fallen allies, and never waste stock',()=>{
   const r=rich();r.gainXP(r.xpForLevel(5));r.buy('tent',2);r.buy('cottage');
   unchanged(r,()=>r.useFieldSupply('tent',{outdoors:true}));
-  r.party[0].hp=1;r.party[0].charges=[0,0];r.party[2].hp=0;
+  r.party[0].hp=1;r.party[0].mp=0;r.party[2].hp=0;r.party[2].mp=0;
   unchanged(r,()=>r.useFieldSupply('tent',{}));unchanged(r,()=>r.useItem(0,'tent'));
   fight(r);unchanged(r,()=>r.useFieldSupply('tent',{outdoors:true}));r.battle=null;
   assert.equal(r.useFieldSupply('tent',{outdoors:true}).ok,true);
-  assert.equal(r.inventory.tent,1);assert.equal(r.party[2].hp,0);
+  assert.equal(r.inventory.tent,1);assert.equal(r.party[2].hp,0);assert.equal(r.party[2].mp,0);
   assert.ok(r.party[0].hp>1&&r.party[0].hp<r.party[0].maxHp);
-  assert.deepEqual(plain(r.party[0].charges),[1,1]);
+  assert.equal(r.party[0].mp,Math.ceil(r.party[0].maxMp/4));
   assert.equal(r.useFieldSupply('cottage',{camp:true}).ok,true);
-  assert.equal(r.inventory.cottage,0);assert.equal(r.party[2].hp,0);
-  assert.equal(r.party[0].hp,r.party[0].maxHp);
-  assert.deepEqual(plain(r.party[0].charges),plain(r.party[0].maxCharges));
-  unchanged(r,()=>r.useFieldSupply('tent',{outdoors:true}));
+  assert.equal(r.inventory.cottage,0);assert.equal(r.party[2].hp,0);assert.equal(r.party[0].hp,r.party[0].maxHp);
+  assert.equal(r.party[0].mp,r.party[0].maxMp);unchanged(r,()=>r.useFieldSupply('tent',{outdoors:true}));
 });
 
 test('new healing consumables restore their advertised amount with normal battle inventory checks',()=>{
@@ -149,42 +145,42 @@ test('new healing consumables restore their advertised amount with normal battle
 test('magic purchases enforce job, tier and payment while preparation has three distinct slots',()=>{
   const r=rich(),hero=r.party[0];
   unchanged(r,()=>r.learnSpell(2,'comet'));unchanged(r,()=>r.learnSpell(3,'comet'));
-  const gold=r.gold;hero.charges=[0,0];assert.equal(r.learnSpell(0,'gale').ok,true);
+  const gold=r.gold;hero.mp=0;assert.equal(r.learnSpell(0,'gale').ok,true);
   assert.equal(r.gold,gold-AVELUNE_TOWN_SPELLS.gale.price);assert.ok(hero.learnedSpells.includes('gale'));
   assert.ok(hero.knownSpells.includes('gale'));unchanged(r,()=>r.learnSpell(0,'gale'));
   assert.equal(r.prepareSpells(0,1,['mend','gale','ward']).ok,true);
-  assert.deepEqual(plain(hero.spells),['mend','gale','ward']);assert.deepEqual(plain(hero.charges),[0,0]);
+  assert.deepEqual(plain(hero.spells),['mend','gale','ward']);assert.equal(hero.mp,0);
   for(const ids of [['mend','mend'],['mend','gale','ward','spark'],['comet'],['raise']]) unchanged(r,()=>r.prepareSpells(0,1,ids));
   r.gainXP(r.xpForLevel(5));assert.equal(r.learnSpell(3,'comet').ok,true);
   assert.equal(r.prepareSpells(3,2,['comet']).ok,true);
   r.gold=0;unchanged(r,()=>r.learnSpell(2,'greatermend'));
 });
 
-test('learned magic, job-specific loadouts, equipment, promotion and formation survive save round trips',()=>{
+test('fixed jobs, mana, learned spells, equipment, promotion and formation survive save round trips',()=>{
   const r=rich();r.gainXP(r.xpForLevel(5));r.learnSpell(0,'gale');r.prepareSpells(0,1,['mend','gale']);
-  r.assignJob(0,'blackmage');r.prepareSpells(0,1,['gale','bolt']);r.assignJob(0,'redmage');
-  assert.deepEqual(plain(r.party[0].preparedSpells[1]),['mend','gale']);
-  r.buyGear('rapier_2');r.equipGear(0,'weapon','rapier_2');r.promote(0,true);
+  unchanged(r,()=>r.assignJob(0,'blackmage'));assert.deepEqual(plain(r.party[0].preparedSpells[1]),['mend','gale']);
+  r.buyGear('rapier_2');r.equipGear(0,'weapon','rapier_2');r.promote(0,true);r.party[0].mp=7;
   assert.equal(r.moveHero(1,0).ok,true);
   const saved=plain(r.snapshot()),restored=new AveluneRPG(saved);
   assert.deepEqual(plain(restored.snapshot()),saved);
   assert.deepEqual(plain(restored.party.map(h=>h.id)),['mara','roadkeeper','iven','sella']);
   assert.equal(restored.party[1].equippedGear.weapon,'rapier_2');assert.equal(restored.party[1].promoted,true);
-  restored.assignJob(1,'blackmage');assert.deepEqual(plain(restored.party[1].preparedSpells[1]),['gale','bolt']);
+  assert.equal(restored.party[1].job,'redmage');assert.equal(restored.party[1].mp,7);assert.equal(restored.jobsLocked,true);
+  unchanged(restored,()=>restored.assignJob(1,'blackmage'));
   unchanged(restored,()=>restored.moveHero(0,0));unchanged(restored,()=>restored.moveHero(-1,2));
 });
 
 test('promotion requires the story milestone, level and gold and cannot refill or farm resources',()=>{
   const r=rich();unchanged(r,()=>r.promote(0,true));
   r.gainXP(r.xpForLevel(5));unchanged(r,()=>r.promote(0));unchanged(r,()=>r.promote(0,'yes'));
-  const hero=r.party[0];hero.hp=17;hero.charges=[0,0];
+  const hero=r.party[0];hero.hp=17;hero.mp=0;
   const ratio=hero.hp/hero.maxHp,attack=hero.attack,gold=r.gold;
   assert.equal(r.promote(0,true).ok,true);assert.equal(hero.role,'Spellblade');assert.ok(hero.attack>attack);
-  assert.ok(hero.hp/hero.maxHp<=ratio);assert.deepEqual(plain(hero.charges),[0,0]);assert.equal(r.gold,gold-120);
+  assert.ok(hero.hp/hero.maxHp<=ratio);assert.equal(hero.mp,0);assert.equal(r.gold,gold-120);
   unchanged(r,()=>r.promote(0,true));
   r.party[2].hp=0;assert.equal(r.promote(2,true).ok,true);assert.equal(r.party[2].hp,0);
   r.gold=0;unchanged(r,()=>r.promote(1,true));
-  r.assignJob(0,'vanguard');assert.equal(hero.role,'Knight');assert.equal(hero.promoted,true);
+  unchanged(r,()=>r.assignJob(0,'vanguard'));assert.equal(hero.role,'Spellblade');assert.equal(hero.promoted,true);
 });
 
 test('legacy and malformed saves cannot mint gear, spell licenses, duplicate copies or new supplies',()=>{
@@ -206,4 +202,20 @@ test('legacy and malformed saves cannot mint gear, spell licenses, duplicate cop
 test('all preparation transactions are disabled while a battle owns the party',()=>{
   const r=rich();r.gainXP(r.xpForLevel(5));r.buyGear('sword_1');r.buy('tent');r.party[1].hp=0;fight(r);
   for(const action of [()=>r.buy('potion'),()=>r.sell('potion'),()=>r.buyGear('bow_1'),()=>r.sellGear('sword_1'),()=>r.equipGear(0,'weapon','sword_1'),()=>r.learnSpell(0,'gale'),()=>r.prepareSpells(0,1,['mend']),()=>r.castField(0,'mend',0),()=>r.restAtInn(10),()=>r.reviveAtClinic(1,10),()=>r.moveHero(0,1),()=>r.promote(0,true),()=>r.useFieldSupply('tent',{outdoors:true})]) unchanged(r,action);
+});
+
+test('Ether restores capped mana only for a living caster and never consumes stock on invalid recovery',()=>{
+  const r=rich(),caster=r.party[0];
+  unchanged(r,()=>r.useItem(0,'ether'));unchanged(r,()=>r.useItem(1,'ether'));
+  caster.mp=caster.maxMp-5;const count=r.inventory.ether;
+  assert.equal(r.useItem(0,'ether').amount,5);assert.equal(caster.mp,caster.maxMp);assert.equal(r.inventory.ether,count-1);
+  caster.hp=0;caster.mp=0;unchanged(r,()=>r.useItem(0,'ether'));
+  caster.hp=1;caster.mp=0;assert.equal(r.useItem(0,'ether').amount,24);assert.equal(caster.mp,24);
+});
+
+test('level growth expands mana without refilling spent reserves or reviving fallen allies',()=>{
+  const r=rich(),caster=r.party[0],fallen=r.party[2];caster.mp=0;fallen.hp=0;fallen.mp=0;
+  const before=caster.maxMp;r.gainXP(r.xpForLevel(2));
+  assert.equal(caster.mp,caster.maxMp-before);assert.ok(caster.mp<caster.maxMp);
+  assert.equal(fallen.hp,0);assert.equal(fallen.mp,0);assert.equal(r.party[1].maxMp,0);
 });

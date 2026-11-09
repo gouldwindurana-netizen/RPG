@@ -41,3 +41,8 @@
 @media(max-width:360px){
  .town-status{font-size:18px}.town-gold{font-size:24px}.town-ledger-heading{grid-template-columns:1fr}.town-ledger-heading>span:last-child{display:none}.town-row{flex-wrap:wrap}.town-row-info{flex-basis:100%}.town-row>.town-button{max-width:none;flex-basis:100%;padding-left:23px}.town-row>.town-button::before{left:8px}.town-tabs .town-button{min-width:48px}.town-tabs .town-button strong{font-size:18px}.town-job-grid{grid-template-columns:1fr}.town-spell-grid .town-button{padding:8px 6px 8px 21px}.town-hero-summary>strong{font-size:20px}.town-inline-actions{width:100%}.town-inline-actions .town-button{flex:1}.town-rest .town-button{flex-basis:100%}
 }
+/* One visible mana pool is shared by every spell, in town and in battle. */
+.town-mana{display:flex;align-items:center;gap:12px;margin-top:5px;font-size:20px;color:#b6e8ff;font-variant-numeric:tabular-nums}
+.town-mana>span:first-child{white-space:nowrap}.town-mana-bar{display:block;flex:1;min-width:28px;max-width:140px;height:6px;border:1px solid #6178ae;background:#040932}
+.town-mana-bar i{display:block;height:100%;background:#67ccff}
+@media(max-width:600px){.town-mana{font-size:18px;gap:7px}.town-party-summary .town-mana{display:block}.town-party-summary .town-mana-bar{margin-top:4px;max-width:none;width:100%}}

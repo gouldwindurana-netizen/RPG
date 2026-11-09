@@ -15,7 +15,7 @@ class AveluneWorld {
     this.moving = false;
     this.x = Number.isFinite(save?.x) ? save.x : this.center(this.area.spawn[0]);
     this.y = Number.isFinite(save?.y) ? save.y : this.center(this.area.spawn[1]);
-    if (!this.canStand(this.x, this.y) || this.area.classicTown && (save?.version||1)<2) [this.x, this.y] = this.area.spawn.map(n => this.center(n));
+    if (!this.canStand(this.x, this.y) || this.area.classicTown && ((save?.version||1)<2 || (save?.layoutRevision||1)<(this.area.townLayoutVersion||1))) [this.x, this.y] = this.area.spawn.map(n => this.center(n));
     this.visited.add(this.id);
   }
 
@@ -192,7 +192,7 @@ class AveluneWorld {
   }
 
   snapshot() {
-    return {version: 2, scene: this.id, x: this.x, y: this.y, facing: this.facing,
+    return {version: 2, layoutRevision:this.area.townLayoutVersion||1, scene: this.id, x: this.x, y: this.y, facing: this.facing,
             flags: [...this.flags], visited: [...this.visited]};
   }
 }

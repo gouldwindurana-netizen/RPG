@@ -73,7 +73,7 @@ class AveluneTownServices {
     ];
     if (AVELUNE_REFUGE_KINDS.has(area.kind)) return [
       entry('camp', 'camp', area.kind === 'landing' ? 'Mooring rest stop' : 'Roadkeeper’s campsite', 'CAMP', 'Use a Tent or Cottage from your bag to recover living companions’ HP and magic. Fallen allies need revival first.', {offset: [-4, 4], match: /campfire|shelter|infirmary|sanctuary|hearth|bell|gantry|arch/i}),
-      entry('guild', 'guild', 'Traveling job mentor', 'JOBS', 'Change a party member’s job while sheltered, then rest to replenish magic.', {free: true, offset: [4, 4], match: /shelter|pavilion|infirmary|sanctuary|hearth|bell|gantry|arch/i}),
+      entry('guild', 'guild', 'Traveling formation mentor', 'GUILD', 'Arrange the company and train within the jobs chosen at the beginning.', {free: true, offset: [4, 4], match: /shelter|pavilion|infirmary|sanctuary|hearth|bell|gantry|arch/i}),
       entry('rumor', 'rumor', 'Roadkeeper', 'TALK', 'Ask about the next crossing and the work that keeps it open.', {offset: [0, -2], match: /Road post/i})
     ];
     if (!AVELUNE_TOWN_KINDS.has(area.kind)) return [];
@@ -84,7 +84,7 @@ class AveluneTownServices {
       entry('armory', 'weapon', home ? 'Tilda’s forge stall' : `${area.name} armory`, 'ARMS', 'Buy and sell weapons and armor; compare equipment for every party job.', {match: /armory|smithy|furnace|guild|tool|foundry|lampwright|shed|boatbuilder/i, offset: [-5, 6], catalogs: ['weapon', 'armor'], interior: area.id === 'alderreach_07' ? 'oakmere_armory' : home ? 'smithy_inn' : undefined}),
       entry('magic', 'magic', home ? 'Orchard spellwright' : `${area.name} spellwright`, 'MAGIC', 'Learn white and black magic for eligible jobs. Stronger spell stock follows the trade roads.', {match: /observatory|chart|lamp|records|pavilion|well|hall|press/i, offset: [5, 6], catalogs: ['white', 'black']}),
       entry('chapel', 'chapel', home ? 'Brackenwell wardkeeper' : `${area.name} wardkeeper`, 'REVIVE', 'Revive a fallen companion for 30 G. They return with 1 HP; the inn restores HP and magic afterward.', {match: [/clinic|infirmary/i,/shrine|well/i,/shelter|cottage/i], offset: [-8, 3], interior: area.id === 'alderreach_07' ? 'oakmere_clinic' : area.id === 'edrin_05' ? 'infirmary' : undefined}),
-      entry('guild', 'guild', home ? 'Festival roadkeepers’ guild' : `${area.name} job mentor`, 'JOBS', 'Choose jobs for the four-person party. Rest after retraining to replenish magic.', {free: true, match: /guild|hall|office|press|court|exchange|barn/i, offset: [8, 3]}),
+      entry('guild', 'guild', home ? 'Festival roadkeepers’ guild' : `${area.name} formation mentor`, 'GUILD', 'Arrange the party’s formation and advance within the jobs chosen at the beginning.', {free: true, match: /guild|hall|office|press|court|exchange|barn/i, offset: [8, 3]}),
       entry('rumor', 'rumor', `${area.name} road guide`, 'TALK', 'Ask for local directions and news of the next road.', {match: /Road post/i, offset: [0, -2]})
     ];
     if (home) {

@@ -77,11 +77,26 @@ const AveluneOverworldArt = (() => {
   function node(c,node,x,y,accessible=true) {
     const p=AVELUNE_PALETTE;
     c.save();if(!accessible)c.globalAlpha=.65;
+    if(settlements.has(node.kind)) {
+      // This tiny district plan repeats the full town's shore and gate direction.
+      c.fillStyle=p.grassDark;c.fillRect(x-13,y-21,26,24);
+      c.fillStyle=node.theme==='salt'?p.pathLight:node.theme==='snow'?p.snow:p.grass;c.fillRect(x-12,y-20,24,22);
+      const shore=node.waterfront;
+      if(shore){c.fillStyle='#254b73';if(shore==='north')c.fillRect(x-13,y-24,26,5);if(shore==='south')c.fillRect(x-13,y+1,26,5);if(shore==='east')c.fillRect(x+11,y-21,5,24);if(shore==='west')c.fillRect(x-16,y-21,5,24);}
+      const gate={north:[0,-1],south:[0,1],east:[1,0],west:[-1,0]}[node.entranceSide||'south'];
+      const gx=x+gate[0]*13,gy=y-9+gate[1]*13;
+      c.fillStyle=p.pathLight;c.fillRect(gx-(gate[0]?4:1),gy-(gate[1]?4:1),gate[0]?9:3,gate[1]?9:3);
+      c.fillStyle=p.stoneLight;
+      if(gate[0]){c.fillRect(gx-1,gy-5,3,3);c.fillRect(gx-1,gy+3,3,3)}
+      else{c.fillRect(gx-5,gy-1,3,3);c.fillRect(gx+3,gy-1,3,3)}
+    }
     c.fillStyle=p.ink;c.fillRect(x-9,y-1,18,4);
     if(settlements.has(node.kind)) {
       house(c,x-10,y-14,p);house(c,x+1,y-11,p);
       if(node.kind==='town'){c.fillStyle=p.stoneLight;c.fillRect(x-2,y-18,5,11);c.fillStyle=p.gold;c.fillRect(x,y-21,4,2);c.fillStyle=p.ink;c.fillRect(x-2,y-19,5,2);}
-      if(node.kind==='port'){c.fillStyle=p.woodBright;c.fillRect(x-10,y+3,20,2);c.fillRect(x+5,y+1,2,6);}
+      if(node.waterfront){const shore=node.waterfront;c.fillStyle=p.woodBright;if(shore==='east'||shore==='west'){c.fillRect(x+(shore==='east'?8:-16),y-9,9,3);c.fillRect(x+(shore==='east'?14:-16),y-12,2,9)}else{c.fillRect(x-4,y+(shore==='north'?-24:0),3,7);c.fillRect(x-7,y+(shore==='north'?-24:5),9,2)}}
+      if(node.waterFeature==='oasis_pool'){c.fillStyle=p.water;c.fillRect(x+5,y-1,6,3);c.fillStyle=p.waterFoam;c.fillRect(x+6,y-1,4,1)}
+      if(node.theme==='snow'){c.fillStyle=p.cream;c.fillRect(x-8,y-12,5,1);c.fillRect(x+3,y-9,5,1)}
     } else if(['dungeon','ruin','secret','postgame'].includes(node.kind)) {
       c.fillStyle=p.stone;c.fillRect(x-9,y-7,18,8);c.fillRect(x-6,y-11,12,5);c.fillStyle=p.stoneLight;c.fillRect(x-6,y-10,5,2);
       c.fillStyle=p.ink;c.fillRect(x-4,y-5,8,7);c.fillRect(x-2,y-7,4,2);

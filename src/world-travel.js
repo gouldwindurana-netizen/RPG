@@ -50,6 +50,17 @@ const AveluneOverworld = {
         const disk=(cx,cy,r)=>{for(let y=Math.max(1,cy-r);y<Math.min(height-1,cy+r+1);y++)for(let x=Math.max(1,cx-r);x<Math.min(width-1,cx+r+1);x++)if((x-cx)**2+(y-cy)**2<=r*r)cells.add(x+','+y)};
         for(const id of ids){const[x,y]=points.get(id);disk(x,y,7);disk(x+2,y+2,6)}
         for(const r of localEdges.filter(r=>ids.has(r.a))){const a=points.get(r.a),b=points.get(r.b),n=Math.max(Math.abs(a[0]-b[0]),Math.abs(a[1]-b[1]));for(let k=0;k<=n;k++)disk(Math.round(a[0]+(b[0]-a[0])*k/n),Math.round(a[1]+(b[1]-a[1])*k/n),4)}
+        for(const id of ids){
+          const town=layout.areas[id],shore=town.geography?.waterfront;if(!shore)continue;
+          const [dx,dy]={north:[0,-1],south:[0,1],east:[1,0],west:[-1,0]}[shore],[cx,cy]=points.get(id);
+          // A bay beside the miniature agrees with the full town's waterfront.
+          // Its inland apron and neighboring destinations remain clear.
+          for(let d=5;d<=9;d++)for(let across=-4;across<=4;across++){
+            const x=cx+dx*d+dy*across,y=cy+dy*d+dx*across;
+            if([...points.values()].some(p=>Math.hypot(p[0]-x,p[1]-y)<4))continue;
+            cells.delete(x+','+y);
+          }
+        }
         for(const cell of cells){const[x,y]=cell.split(',').map(Number);terrain[y][x]='g'}
         landByGroup.push(cells);
       });
@@ -68,14 +79,15 @@ const AveluneOverworld = {
         const area={id:worldId,name:region.name+' Overworld',region:region.id,kind:'overworld',theme:nodes[0].theme,feature:'continent',indoor:false,width,height,spawn:[first[0],first[1]+3],
           terrain:visible.map(row=>row.join('')),collision:Array.from({length:height},(_,y)=>Array.from({length:width},(_,x)=>land.has(x+','+y)?'.':'#').join('')),
           objects:[],events:[],stops:[],barriers:[],note:'Walk the wider world. Enter a settlement or dungeon at its miniature. Ships and the Skiff connect separate shores.',
-          mapNodes:nodes.map(a=>({id:a.id,name:a.name,kind:a.kind,at:points.get(a.id)})),allowedEntries:[...ids]};
+          mapNodes:nodes.map(a=>({id:a.id,name:a.name,kind:a.kind,at:points.get(a.id),entranceSide:a.worldEntranceSide||'south',waterfront:a.geography?.waterfront||null,waterFeature:a.geography?.waterFeature||null,theme:a.theme,districtPlan:a.geography?.districtPlan||null})),allowedEntries:[...ids]};
         layout.areas[worldId]=area;
         for(const id of ids){const town=layout.areas[id],point=points.get(id),routeId='OW_'+id;
           let exit=town.worldExit||town.stops.find(s=>walk.has(s.mode))?.at||town.spawn;
           exit=[...exit];
-          const localStop={id:id+'_world',mode:'foot',title:region.name+' Overworld',at:exit,arrival:[exit[0],Math.max(1,exit[1]-2)],links:[routeId]};
+          const outward={north:[0,-1],south:[0,1],east:[1,0],west:[-1,0]}[town.worldEntranceSide||'south'];
+          const localStop={id:id+'_world',mode:'foot',title:region.name+' Overworld',at:exit,arrival:[exit[0]-outward[0]*2,exit[1]-outward[1]*2],links:[routeId]};
           if(town.collision[localStop.arrival[1]]?.[localStop.arrival[0]]!=='.')localStop.arrival=[...town.spawn];
-          const worldStop={id:worldId+'_'+id,mode:'entrance',title:town.name,at:point,arrival:[point[0],point[1]+3],links:[routeId]};
+          const worldStop={id:worldId+'_'+id,mode:'entrance',title:town.name,at:point,arrival:[point[0]+outward[0]*3,point[1]+outward[1]*3],links:[routeId]};
           town.stops.push(localStop);area.stops.push(worldStop);town.overworld=worldId;
           layout.routes.push({id:routeId,a:id,b:worldId,mode:'foot',gate:'start',access:id,stops:{[id]:localStop.id,[worldId]:worldStop.id},note:'Enter from the overworld. Earlier road repairs and transport unlocks still apply.'});
         }
@@ -91,7 +103,8 @@ const AveluneOverworld = {
         local.stops=local.stops.filter(s=>!s.links.includes(route.id));
         const map=layout.areas[local.overworld],point=map.mapNodes.find(n=>n.id===local.id).at;
         const n=gatewayCounts.get(local.id)||0;gatewayCounts.set(local.id,n+1);
-        const [dx,dy]=[[5,0],[-5,0],[0,-5],[0,5]][n%4];
+        const choices=[[5,0],[-5,0],[0,-5],[0,5]];
+        const [dx,dy]=[...choices.slice(n%4),...choices.slice(0,n%4)].find(([dx,dy])=>map.collision[point[1]+dy]?.[point[0]+dx]==='.'&&!map.gateways?.some(g=>g.at[0]===point[0]+dx&&g.at[1]===point[1]+dy))||choices[n%4];
         const at=[point[0]+dx,point[1]+dy],arrival=[point[0]+Math.sign(dx)*2,point[1]+Math.sign(dy)*2];
         const other=local===a?b:a;
         const stop={id:map.id+'_'+route.id,mode:route.mode,title:layout.areas[other.overworld].name,at,arrival,links:[route.id]};

@@ -101,7 +101,8 @@ test('rewards respect inventory caps and haven recovery has a positive price', (
   const refuge = Campaign.services(layout.areas.wyla_cottage, model);
   assert.equal(refuge.inn, true);
   assert.equal(refuge.innCost, 11);
-  assert.equal(refuge.jobs, true);
+  assert.equal(refuge.jobs, false);
+  assert.equal(refuge.formation, true);
   assert.equal(Campaign.services(layout.areas.mill_sluice, model).camp, true);
   assert.equal(Campaign.services(layout.areas.alderreach_02, model).jobs, false);
 });
