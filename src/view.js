@@ -81,6 +81,7 @@ class AveluneView {
     this.indoor = area.indoor;
     this.area = area;
     this.overworld = area.kind === 'overworld';
+    if (this.canvas.parentElement?.dataset) this.canvas.parentElement.dataset.view = this.overworld ? 'world' : 'local';
     if (this.images.size > 13) {
       const oldest = [...this.images.keys()].find(key => !['sprites', 'motion', area.id].includes(key));
       if (oldest) this.images.delete(oldest);
@@ -115,9 +116,9 @@ class AveluneView {
     // Towns retain their life-sized tiles. The separate world map uses a wider
     // viewport and miniature landmarks, with a smaller integer display scale.
     const tile = this.tile;
-    const scale = Math.max(1, Math.floor(Math.min(availableWidth / (this.overworld?640:320), availableHeight / (this.overworld?320:192))));
+    const scale = Math.max(1, Math.min(this.overworld?Infinity:2, Math.floor(Math.min(availableWidth / (this.overworld?640:320), availableHeight / (this.overworld?320:192)))));
     const width = Math.max(tile, Math.min(this.overworld?960:576, Math.floor(availableWidth / scale / tile) * tile));
-    const height = Math.max(tile, Math.min(this.overworld?480:224, Math.floor(availableHeight / scale / tile) * tile));
+    const height = Math.max(tile, Math.min(this.overworld?640:464, Math.floor(availableHeight / scale / tile) * tile));
     if (width !== this.canvas.width || height !== this.canvas.height) {
       this.canvas.width = width;
       this.canvas.height = height;

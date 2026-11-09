@@ -108,20 +108,24 @@ test('fallback idle and walking share the same atlas, crop size and fixed baseli
 test('canvas uses square integer pixels and the same scale in interiors and outdoors',()=>{
   const {view,canvas}=renderer();
   view.size();
-  assert.deepEqual([canvas.width,canvas.height,canvas.style.width,canvas.style.height],[544,224,'1088px','448px']);
+  assert.deepEqual([canvas.width,canvas.height,canvas.style.width,canvas.style.height],[544,256,'1088px','512px']);
   view.indoor=true;
   view.bounds={left:-30,top:-20,right:1300,bottom:1000};
   view.size();
-  assert.deepEqual([canvas.width,canvas.height,canvas.style.width,canvas.style.height],[544,224,'1088px','448px']);
+  assert.deepEqual([canvas.width,canvas.height,canvas.style.width,canvas.style.height],[544,256,'1088px','512px']);
   assert.equal(view.ctx.imageSmoothingEnabled,false);
   canvas.parentElement={clientWidth:1095,clientHeight:539};
   view.size();
-  assert.deepEqual([canvas.style.left,canvas.style.top,canvas.style.transform],['3px','45px','none'],
+  assert.deepEqual([canvas.style.left,canvas.style.top,canvas.style.transform],['3px','13px','none'],
     'Odd letterbox margins never place a source pixel on a half display pixel');
   canvas.parentElement={clientWidth:1096,clientHeight:388};
   view.size();
   assert.deepEqual([canvas.width,canvas.height,canvas.style.width,canvas.style.height],[544,192,'1088px','384px']);
   canvas.parentElement={clientWidth:362,clientHeight:312};
   view.size();
-  assert.deepEqual([canvas.width,canvas.height,canvas.style.width,canvas.style.height],[352,224,'352px','224px']);
+  assert.deepEqual([canvas.width,canvas.height,canvas.style.width,canvas.style.height],[352,304,'352px','304px']);
+  canvas.parentElement={clientWidth:792,clientHeight:630};
+  view.size();
+  assert.deepEqual([canvas.width,canvas.height,canvas.style.width,canvas.style.height],[384,304,'768px','608px'],
+    'Tablet field view uses the available frame without large side bars');
 });

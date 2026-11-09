@@ -21,19 +21,24 @@ async function bounds(page,label){
  metrics.push({label,...data});
 }
 async function snapshot(page,label){await settle(page);await bounds(page,label);await page.screenshot({path:path.join(output,label+'.png'),fullPage:label.startsWith('field-')})}
+async function openCommands(page){if(await page.evaluate(()=>__avelune.state.dialogKind)!=='commands')await page.locator('#open-commands').click();await page.waitForFunction(()=>__avelune.state.dialogKind==='commands')}
 async function checkField(page,width){
+ for(const selector of ['#field-commands','#party-strip','#town-strip'])assert.equal(await page.locator(selector).isVisible(),false,selector+' stays hidden while exploring');
+ await openCommands(page);
+ const command=await page.locator('.field-nav').evaluate(e=>{const style=getComputedStyle(e);return{borderStyle:style.borderTopStyle,background:style.backgroundImage}});
+ assert.equal(command.borderStyle,'double');assert.ok(command.background.includes('gradient'));
+ const cursor=await page.locator('#open-party').evaluate(e=>{e.focus();return getComputedStyle(e,'::before').content});assert.ok(['""','none'].includes(cursor),'Arrow is decorative, not spoken text');
+ if(width<=600){for(const selector of ['.field-nav button','.town-strip button']){const heights=await page.locator(selector).evaluateAll(els=>els.filter(e=>e.getClientRects().length).map(e=>e.getBoundingClientRect().height));assert.ok(heights.every(h=>h>=44),selector+' provides44px touch targets')}}
+ await page.locator('#open-party').click();await page.waitForFunction(()=>__avelune.state.dialogKind==='party-overview');
  const appearance=await page.evaluate(()=>{
-  const style=getComputedStyle(document.querySelector('.field-nav')),name=getComputedStyle(document.querySelector('.mini-name'));
-  const nav=document.querySelector('.field-nav').getBoundingClientRect(),party=document.querySelector('.party-strip').getBoundingClientRect();
-  return{borderStyle:style.borderTopStyle,borderColor:style.borderTopColor,background:style.backgroundImage,font:name.fontFamily,nav:{left:nav.left,right:nav.right,top:nav.top},party:{left:party.left,right:party.right,top:party.top},text:[...document.querySelectorAll('.party-mini')].map(e=>({hp:e.querySelector('.hp-line span').textContent,magic:e.querySelector('.mp-line .mp-value').textContent})),state:__avelune.rpg.party.map(h=>({hp:h.hp+' / '+h.maxHp,magic:h.mp+' / '+h.maxMp})),clipping:[...document.querySelectorAll('.mini-name,.hp-line,.mp-line,.field-nav button')].filter(e=>e.scrollWidth>e.clientWidth+1).map(e=>({class:e.className,text:e.textContent,scroll:e.scrollWidth,width:e.clientWidth}))};
+  const name=getComputedStyle(document.querySelector('.mini-name'));
+  return{font:name.fontFamily,text:[...document.querySelectorAll('.party-mini')].map(e=>({hp:e.querySelector('.hp-line span').textContent,magic:e.querySelector('.mp-line .mp-value').textContent})),state:__avelune.rpg.party.map(h=>({hp:h.hp+' / '+h.maxHp,magic:h.mp+' / '+h.maxMp})),clipping:[...document.querySelectorAll('.mini-name,.hp-line,.mp-line')].filter(e=>e.getClientRects().length&&e.scrollWidth>e.clientWidth+1).map(e=>({class:e.className,text:e.textContent,scroll:e.scrollWidth,width:e.clientWidth}))};
  });
- assert.equal(appearance.borderStyle,'double');assert.ok(appearance.background.includes('gradient'));assert.ok(appearance.font.includes('VT323'));assert.deepEqual(appearance.text,appearance.state);
+ assert.ok(appearance.font.includes('VT323'));assert.deepEqual(appearance.text,appearance.state);
  const bars=await page.locator('.party-mini .mana-track[role=progressbar]').evaluateAll(els=>els.map(e=>({id:e.dataset.manaFor,value:Number(e.getAttribute('aria-valuenow')),max:Number(e.getAttribute('aria-valuemax'))})));
  assert.deepEqual(bars,await page.evaluate(()=>__avelune.rpg.party.map(h=>({id:h.id,value:h.mp,max:h.maxMp}))),'Mana bars accurately expose current and maximum MP');
- if(width>760){assert.ok(appearance.nav.right<appearance.party.left,'Command window left of party table');assert.ok(Math.abs(appearance.nav.top-appearance.party.top)<2)}
  assert.deepEqual(appearance.clipping,[],'Party status and commands do not clip');
- const cursor=await page.locator('#open-party').evaluate(e=>{e.focus();return getComputedStyle(e,'::before').content});assert.ok(['""','none'].includes(cursor),'Arrow is decorative, not spoken text');
- if(width<=600){for(const selector of ['.field-nav button','.town-strip button','#close-dialog']){if(selector==='#close-dialog')continue;const heights=await page.locator(selector).evaluateAll(els=>els.filter(e=>e.getClientRects().length).map(e=>e.getBoundingClientRect().height));assert.ok(heights.every(h=>h>=44),selector+' provides44px touch targets')}}
+ await page.locator('#close-dialog').click();
 }
 try{
  browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
@@ -46,7 +51,7 @@ try{
   pass(width+'px title and exploration use classic windows, readable numeric status and no overflow');
 
   await page.evaluate(()=>{for(const id of ['mara','iven','sella'])__avelune.rpg.recruit(id);__avelune.syncLocation()});await checkField(page,width);await snapshot(page,'field-full-party-'+width);
-  await page.locator('#open-party').click();assert.equal(await page.locator('.job-card').count(),0);assert.equal(await page.evaluate(()=>__avelune.rpg.assignJob(0,'ranger').ok),false);
+  await page.locator('#open-roster').click();await page.locator('.party-mini').first().click();assert.equal(await page.locator('.job-card').count(),0);assert.equal(await page.evaluate(()=>__avelune.rpg.assignJob(0,'ranger').ok),false);
   const position=await page.evaluate(()=>({x:__avelune.world.x,y:__avelune.world.y}));
   await page.keyboard.press('ArrowDown');await page.waitForTimeout(100);assert.deepEqual(await page.evaluate(()=>({x:__avelune.world.x,y:__avelune.world.y})),position,'Modal input does not move the world');
   assert.notEqual(await page.evaluate(()=>document.activeElement.id),'close-dialog','Arrow keys navigate visible commands');
@@ -54,13 +59,13 @@ try{
   await snapshot(page,'status-'+width);await page.keyboard.press('Escape');assert.equal(await page.locator('#veil').isHidden(),true);
 
   await page.evaluate(()=>{__avelune.rpg.gold=500;__avelune.syncLocation()});
-  await page.getByRole('button',{name:'Item shop',exact:true}).click();await page.waitForFunction(()=>__avelune.state.dialogKind==='town-service'&&__avelune.world.area.indoor,null,{timeout:20000});
+  await openCommands(page);await page.getByRole('button',{name:'Item shop',exact:true}).click();await page.waitForFunction(()=>__avelune.state.dialogKind==='town-service'&&__avelune.world.area.indoor,null,{timeout:20000});
   const inventory=await page.evaluate(()=>__avelune.rpg.inventory.potion),gold=await page.evaluate(()=>__avelune.rpg.gold);
   await page.locator('.town-row').filter({has:page.locator('.town-row-info > strong',{hasText:/^Potion ·/})}).getByRole('button',{name:/^Buy/}).click();
   assert.equal(await page.evaluate(()=>__avelune.rpg.inventory.potion),inventory+1);assert.equal(await page.evaluate(()=>__avelune.rpg.gold),gold-25);
   await snapshot(page,'shop-'+width);await page.locator('#close-dialog').click();
 
-  await page.evaluate(()=>{__avelune.rpg.party[1].hp=1;__avelune.syncLocation()});await page.locator('#open-magic').click();await page.getByRole('button',{name:'Iven',exact:true}).click();await snapshot(page,'magic-'+width);
+  await page.evaluate(()=>{__avelune.rpg.party[1].hp=1;__avelune.syncLocation()});await openCommands(page);await page.locator('#open-magic').click();await page.getByRole('button',{name:'Iven',exact:true}).click();await snapshot(page,'magic-'+width);
   const mp=await page.evaluate(()=>__avelune.rpg.party[2].mp),cost=await page.evaluate(()=>__avelune.rpg.spellFor(__avelune.rpg.party[2],'mend').mpCost);await page.getByRole('button',{name:/^Cast on Mara/}).click();assert.ok(await page.evaluate(()=>__avelune.rpg.party[1].hp>1));assert.equal(await page.evaluate(()=>__avelune.rpg.party[2].mp),mp-cost);await page.locator('#close-dialog').click();
   pass(width+'px status, merchant purchase and field magic remain functional with modal input isolation');
 

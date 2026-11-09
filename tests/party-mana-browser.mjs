@@ -60,17 +60,24 @@ async function visitService(page,type){
   },type);
 }
 const settle=page=>page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+async function openCommands(page){
+ const kind=await page.evaluate(()=>__avelune.state.dialogKind);
+ if(kind==='commands')return;
+ if(kind)await page.locator('#close-dialog').click();
+ await page.locator('#open-commands').click();
+ await page.waitForFunction(()=>__avelune.state.dialogKind==='commands');
+}
 try{
   browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
   const page=await boot();
   await chooseParty(page);await page.screenshot({path:path.join(output,'choose-party-desktop.png')});
   assert.equal(await page.locator('#dialog button[data-start-job]').count(),6);
   await begin(page);assert.equal(await page.evaluate(()=>__avelune.rpg.jobsLocked),true);
-  await checkManaBars(page);await page.screenshot({path:path.join(output,'party-mana-desktop.png')});
+  await page.locator('#open-roster').click();await checkManaBars(page);assert.ok(await page.locator('#dialog .party-mini').first().isVisible());await page.screenshot({path:path.join(output,'party-mana-desktop.png')});await page.locator('#close-dialog').click();
   assert.equal(await page.locator('.party-mini').count(),1);pass('New game fixes all four future jobs but starts with only the Roadkeeper and accurate mana bars');
   await page.evaluate(()=>{for(const id of ['mara','iven','sella'])__avelune.rpg.recruit(id);__avelune.syncLocation()});
 
-  await page.locator('#open-party').click();assert.equal(await page.locator('#dialog [data-start-job],#dialog .job-card,#dialog .town-job-grid').count(),0);
+  await openCommands(page);await page.locator('#open-party').click();await page.locator('#dialog .party-mini').first().click();assert.equal(await page.locator('#dialog [data-start-job],#dialog .job-card,#dialog .town-job-grid').count(),0);
   assert.match(await page.locator('#dialog-content').textContent(),/fixed|permanent|beginning|outset|chosen at/i);
   await page.locator('#close-dialog').click();
   const locked=await page.evaluate(()=>{const before=__avelune.rpg.party.map(h=>h.job),result=__avelune.rpg.assignJob(0,'vanguard');return{before,after:__avelune.rpg.party.map(h=>h.job),ok:result.ok}});
@@ -81,7 +88,7 @@ try{
   await page.locator('#close-dialog').click();pass('Status, guild and engine reject job changes after the journey begins');
 
   await page.evaluate(()=>{__avelune.rpg.party[1].hp=1;__avelune.rpg.party[2].mp=10;__avelune.syncLocation()});
-  await page.locator('#open-magic').click();await page.getByRole('button',{name:'Iven',exact:true}).click();
+  await openCommands(page);await page.locator('#open-magic').click();await page.getByRole('button',{name:'Iven',exact:true}).click();
   const cast=await page.evaluate(()=>({before:__avelune.rpg.party[2].mp,cost:__avelune.rpg.spellFor(2,'mend').mpCost}));
   await page.getByRole('button',{name:/^Cast on Mara/}).click();
   assert.equal(await page.evaluate(()=>__avelune.rpg.party[2].mp),cast.before-cast.cost);assert.ok(await page.evaluate(()=>__avelune.rpg.party[1].hp>1));
@@ -93,7 +100,7 @@ try{
   pass('Field spells spend their shared MP cost and insufficient mana cannot heal or consume resources');
 
   await page.evaluate(()=>{__avelune.rpg.party[2].mp=0;__avelune.rpg.inventory.ether=1;__avelune.syncLocation()});
-  await page.locator('#open-bag').click();await page.locator('.info-line').filter({has:page.locator('strong',{hasText:/^Ether ×/})}).getByRole('button',{name:'Use',exact:true}).click();
+  await openCommands(page);await page.locator('#open-bag').click();await page.locator('.info-line').filter({has:page.locator('strong',{hasText:/^Ether ×/})}).getByRole('button',{name:'Use',exact:true}).click();
   await page.getByRole('button',{name:/^Iven ·/}).click();
   assert.equal(await page.evaluate(()=>__avelune.rpg.party[2].mp),await page.evaluate(()=>Math.min(24,__avelune.rpg.party[2].maxMp)));
   assert.equal(await page.evaluate(()=>__avelune.rpg.inventory.ether),0);await page.locator('#close-dialog').click();await checkManaBars(page);
@@ -124,15 +131,15 @@ try{
 
   for(const width of [390,320]){
     const mobile=await boot(width,844,true);await chooseParty(mobile);assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
-    await mobile.screenshot({path:path.join(output,'choose-party-'+width+'.png')});await begin(mobile);await checkManaBars(mobile);
+    await mobile.screenshot({path:path.join(output,'choose-party-'+width+'.png')});await begin(mobile);await mobile.locator('#open-roster').click();await checkManaBars(mobile);assert.ok(await mobile.locator('#dialog .party-mini').first().isVisible());
     assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
-    await mobile.screenshot({path:path.join(output,'party-mana-'+width+'.png')});await mobile.close();
+    await mobile.screenshot({path:path.join(output,'party-mana-'+width+'.png')});await mobile.locator('#close-dialog').click();await mobile.close();
   }
   pass('390px and320px touch layouts show complete party selection and accurate mana bars without overflow');
 
   const physical=await boot(390,844,true);const physicalJobs=['vanguard','monk','ranger','monk'];await chooseParty(physical,physicalJobs);await begin(physical,physicalJobs);
   assert.ok(await physical.evaluate(()=>__avelune.rpg.party.every(h=>h.maxMp===0&&h.mp===0)));await checkManaBars(physical);
-  await physical.locator('#open-magic').click();assert.match(await physical.locator('#dialog-content').textContent(),/no prepared field spells|does not use magic/i);
+  await openCommands(physical);await physical.locator('#open-magic').click();assert.match(await physical.locator('#dialog-content').textContent(),/no prepared field spells|does not use magic/i);
   assert.equal(await physical.locator('#dialog [data-start-job]').count(),0);await physical.close();pass('A fully physical starting party remains valid with zero, finite mana bars and no retraining shortcut');
   assert.deepEqual(errors,[]);pass('No browser JavaScript errors or missing assets');
   await fs.writeFile(path.join(output,'party-mana-report.json'),JSON.stringify({date:new Date().toISOString(),browser:await browser.version(),results,errors},null,2));

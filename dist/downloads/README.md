@@ -9,13 +9,13 @@ Open **Avelune.html** in a modern browser for the self-contained offline edition
 - WASD or arrow keys: walk. Shift: run. Click the ground to walk there.
 - E or Space: interact. **Follow marker** walks toward the tracked objective.
 - New game: choose a job for each companion, then select Begin adventure. Jobs stay fixed for that journey.
-- P: Status (party and jobs). I: Items. M: Atlas. J: Journal. H: Town services. F: Magic. Esc: menu/back.
+- C: Command. P: Characters (party overview → choose a companion for settings). I: Items. M: Atlas. J: Journal. H: Town services. F: Magic. Esc: menu/back.
 - Touch: directional pad, Interact, and the same menus.
 - In battle, choose one order for each living hero and **Resolve round**. Select a hero card to revise an order before committing it. Magic and items have explicit targets. The enemy’s third-round heavy strike is telegraphed; Guard reduces it.
-- **Town** lists the signed INN, ITEMS, ARMS, MAGIC, CLINIC, GUILD and INFO counters. The town strip’s buttons walk to the corresponding merchant and open their service. You can also walk there and press E. Paid inns restore standing allies; clinics revive at 1 HP, followed by inn recovery. Clinics charge 30 G per fallen ally; Wyla’s guest room is a paid inn. Camps consume a Tent or Cottage.
-- Buy and sell supplies in quantities of 1/5/10. At the armory, buy named gear, compare stats for each hero, then select **Equip**. Worn copies cannot be sold. Party → Equip weapons and armor lets you change owned gear on the road.
+- **Town** lists the signed INN, ITEMS, ARMS, MAGIC, CLINIC, GUILD and INFO counters. Command also offers nearby town shortcuts that walk to the corresponding merchant and open their service. You can also walk there and press E. Paid inns restore standing allies; clinics revive at 1 HP, followed by inn recovery. Clinics charge 30 G per fallen ally; Wyla’s guest room is a paid inn. Camps consume a Tent or Cottage.
+- Buy and sell supplies in quantities of 1/5/10. At the armory, buy named gear, compare stats for each hero, then select **Equip**. Worn copies cannot be sold. Characters → choose a companion → Equip weapons and armor lets you change owned gear on the road.
 - Magic shops teach distinct spell families and upgrade a known family from I to II at level 5, then III at level 12. Bolt II replaces Bolt I in the menu. Unique utilities remain separate. Prepare up to three families or unique spells per book. **Magic** casts healing and revival from the same mana pool used in battle. The original starter spellbooks remain available for compatibility.
-- Use tents and cottage kits from Items while outdoors to recover standing allies. The guild changes jobs, reorders the party, and offers promotion after the Alderreach Hearth at level 5 for 120 G per traveler. Front slots attract more attacks; the leader appears in the field.
+- Use tents and cottage kits from Items while outdoors to recover standing allies. The guild reorders the party and offers promotion after the Alderreach Hearth at level 5 for 120 G per traveler. Front slots attract more attacks; the leader appears in the field.
 - Use **Menu → Save journal** to save immediately; inns, camps and normal autosave also preserve your progress.
 
 ## Implemented scope
@@ -25,12 +25,12 @@ Open **Avelune.html** in a modern browser for the self-contained offline edition
 - **29 scripted encounters** and **35 regional enemy archetypes**. Random encounters accumulate from distance actually traveled in hostile areas, with a visible warning meter and postbattle grace period.
 - Begin alone as Roadkeeper. Mara joins at Stoneleigh Bridge, Iven at the Oakmere clinic and Sella in Brightwatch. Only recruited companions receive turns, appear in status or use supplies.
 - Plan the four companions’ permanent jobs before starting: **Vanguard, Monk, Ranger, Red Mage, White Mage, Black Mage**. Duplicate jobs are allowed. Jobs set stats, equipment proficiency, spells and passives. Status is read-only; guilds arrange formation and promote the existing job.
-- Turn-based party commands, speed-based initiative, elemental weaknesses, auto-retargeting, a shared mana pool with per-spell MP costs, healing/revival, guarding, consumables, retreat, XP, level-ups, upgrades, and a level-30 cap.
+- Turn-based party commands, speed-based initiative, elemental weaknesses, auto-retargeting, per-character mana shared between field and battle, with per-spell MP costs, healing/revival, guarding, consumables, retreat, XP, level-ups, upgrades, and a level-30 cap.
 - All 18 towns have signed doorways to indoor keepers. Exterior signs contain no duplicate service NPCs. Shops carry 30 named equipment pieces and 14 consumables with healing, mana, party recovery, protection, escape and elemental attack roles. Stock follows regional progression.
 - Paid inns, paid clinics, supply-based camps, field healing/revival, camping supplies, equipment comparisons, spell loadouts, formation, earned promotion, manual save, autosave and portable journal import/export.
 - Attacks gain visible multi-hit ranks at levels 5, 12 and 20, alongside stat and weapon growth. Spell upgrades require gold and level gates; there is no repetitive-use skill grind.
 - One-time treasure/story rewards, desktop/touch controls, optional synthesized sound effects and reduced-motion support.
-- Classic cobalt command windows, ivory double borders, pixel typography and arrow cursors across exploration, shops, status, dialogue and battles. Desktop commands sit beside a party status table showing HP, current/max MP and visible mana bars. Mobile menus adapt to 320px screens.
+- Classic cobalt command windows, ivory double borders, pixel typography and arrow cursors across exploration, shops, status, dialogue and battles. Command and Characters open on demand, keeping party status and town shortcuts off the field. The roster shows current HP, MP and mana bars; choose a companion to open their settings. Mobile windows adapt to 320px screens.
 - A unified original 16px world-art vocabulary, fixed 16×24 character source shared by standing/walking/battles/portraits, thirteen enemy silhouettes, and classic blue/ivory command menus. Buildings, foliage, water, paths, furnishings and regional battlefields share material colors and pixel density.
 
 This is a streamlined complete adaptation of the supplied route, not the design bible’s proposed 35–45-hour commercial campaign. The full catalog of 332 items, 72 books, 48 native skills, 70 quests, crafting, summons, six-character roster/recruitment, bespoke multiphase boss mechanics, and unique art for every enemy are **not** all implemented. Bosses use tuned stats, weaknesses, and a shared heavy-strike cycle; multiple named enemies share silhouettes. Playtime has not been measured with human players.
@@ -64,6 +64,7 @@ npm run test:travel
 npm run test:ui
 npm run test:party
 npm run test:recruit
+npm run test:menus
 node tests/overworld-render.mjs
 ```
 

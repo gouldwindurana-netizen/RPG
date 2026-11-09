@@ -22,7 +22,8 @@ try{
   await page.goto('http://localhost:'+port+'/?test=1');await page.waitForFunction(()=>window.__avelune?.state.ready);
   await page.locator('#new-game').click();await page.locator('#begin-adventure').click();await page.locator('#dialog-content button').click();
   const town=await dimensions(page);assert.equal(await page.evaluate(()=>__avelune.world.area.classicTown),true);
-  assert.ok(await page.getByRole('button',{name:'Revive',exact:true}).isVisible());
+  assert.equal(await page.getByRole('button',{name:'Revive',exact:true}).isVisible(),false);
+  await page.locator('#open-commands').click();assert.ok(await page.getByRole('button',{name:'Revive',exact:true}).isVisible());await page.locator('#close-dialog').click();
   await page.screenshot({path:output+'/compact-town.png'});pass('Compact starting town has signed services and a paid clinic');
   await page.evaluate(async()=>{__avelune.rpg.recruit('mara');__avelune.rpg.gold=0;__avelune.rpg.party[1].hp=0;__avelune.rpg.party[0].hp=1;const d=__avelune.townServices().find(s=>s.type==='chapel');await __avelune.visit(d.scene);__avelune.servicesUI.open(__avelune.townServices().find(s=>s.type==='chapel'))});
   assert.equal(await page.getByRole('button',{name:/^Receive care/}).count(),0);
